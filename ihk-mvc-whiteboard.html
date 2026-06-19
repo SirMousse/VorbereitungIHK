@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>MVC Design Pattern – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  /* ── HEADER ─────────────────────────────── */
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #534AB7; }
+
+  /* ── LAYOUT ──────────────────────────────── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col  { display: flex; flex-direction: column; gap: 6px; }
+
+  /* ── CARDS ───────────────────────────────── */
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  /* ── ROWS ────────────────────────────────── */
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  /* ── CODE ────────────────────────────────── */
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .lang { font-size: 7px; font-weight: 700; color: #fff; padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; display: inline-block; }
+  .py  { background: #3B6D11; }
+  .ja  { background: #185FA5; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .fn  { color: #0F6E56; }
+  .cm  { color: #999; }
+  .str { color: #854F0B; }
+  .cl  { color: #C04828; font-weight: 700; }
+
+  /* ── TAGS ────────────────────────────────── */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 2px; }
+  .tag-p  { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t  { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o  { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b  { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r  { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g  { background: #f4f4f2; color: #444;    border-color: #ccc; }
+  .tag-gr { background: #edfade; color: #3B6D11;  border-color: #86efac; }
+
+  /* ── TABLE ───────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.45; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ── ESELSBRÜCKE ─────────────────────────── */
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text  { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key   { font-weight: 700; color: #b45309; }
+
+  /* ── IHK BOX ─────────────────────────────── */
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* ── MVC FLOW BOX ────────────────────────── */
+  .mvc-row { display: flex; align-items: stretch; gap: 4px; margin: 5px 0; }
+  .mvc-box { flex: 1; border-radius: 5px; padding: 5px 7px; text-align: center; }
+  .mvc-m { background: #e8f3fb; border: 1.5px solid #185FA5; }
+  .mvc-v { background: #f0eeff; border: 1.5px solid #534AB7; }
+  .mvc-c { background: #e6faf4; border: 1.5px solid #0F6E56; }
+  .mvc-title { font-weight: 700; font-size: 10px; margin-bottom: 3px; }
+  .mvc-t-m { color: #185FA5; }
+  .mvc-t-v { color: #534AB7; }
+  .mvc-t-c { color: #0F6E56; }
+  .mvc-sub  { font-size: 7.5px; color: #555; line-height: 1.5; }
+  .mvc-arrow { display: flex; align-items: center; font-size: 13px; color: #bbb; flex-shrink: 0; }
+
+  /* ── STEP FLOW ───────────────────────────── */
+  .step-flow { display: flex; flex-direction: column; gap: 2px; margin: 4px 0; }
+  .step { display: flex; gap: 6px; align-items: flex-start; }
+  .step-num { min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7.5px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .sn-m { background: #185FA5; color: #fff; }
+  .sn-v { background: #534AB7; color: #fff; }
+  .sn-c { background: #0F6E56; color: #fff; }
+  .sn-u { background: #854F0B; color: #fff; }
+  .step-text { font-size: 8px; color: #333; line-height: 1.55; }
+
+  /* ── PRO CON ─────────────────────────────── */
+  .pro-con { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 4px 0; }
+  .pro { background: #e6faf4; border-radius: 3px; padding: 4px 5px; font-size: 8px; line-height: 1.55; }
+  .con { background: #fff0f0; border-radius: 3px; padding: 4px 5px; font-size: 8px; line-height: 1.55; }
+  .pro-title { font-weight: 700; color: #065f46; margin-bottom: 2px; font-size: 8.5px; }
+  .con-title { font-weight: 700; color: #991b1b; margin-bottom: 2px; font-size: 8.5px; }
+
+  /* ── COMPARISON GRID ─────────────────────── */
+  .cmp-row { display: flex; gap: 3px; margin-bottom: 3px; align-items: flex-start; }
+  .cmp-label { font-size: 8px; font-weight: 700; min-width: 70px; color: #555; margin-top: 1px; }
+  .cmp-bad  { flex: 1; background: #fff0f0; border-radius: 3px; padding: 2px 5px; font-size: 8px; color: #991b1b; }
+  .cmp-good { flex: 1; background: #e6faf4; border-radius: 3px; padding: 2px 5px; font-size: 8px; color: #065f46; }
+
+  /* ── FOOTER ──────────────────────────────── */
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>MVC — Model · View · Controller <span class="badge">IHK FIAE</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung · Entwurfsmuster · Softwarearchitektur · Separation of Concerns</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Softwareentwicklung &amp; Systemarchitektur</div>
+</div>
+
+<div class="grid">
+
+<!-- ══════════════════════════════════════════
+     SPALTE 1 — Definition & Überblick
+     ══════════════════════════════════════════ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Was ist MVC? — IHK-Definition</div>
+    <div class="card-body">
+
+      <div class="def-row">
+        <div class="def-term">MVC — Model View Controller</div>
+        <div class="def-text"><strong>MVC</strong> ist ein <strong>Entwurfsmuster</strong> (Design Pattern) der Softwarearchitektur, das eine Anwendung in drei klar voneinander getrennte Schichten unterteilt: <strong>Model</strong> (Daten &amp; Logik), <strong>View</strong> (Darstellung) und <strong>Controller</strong> (Steuerung). Ziel ist die strikte <strong>Trennung der Zuständigkeiten</strong> (Separation of Concerns).</div>
+        <div class="def-note">Entwickelt: 1979 von Trygve Reenskaug (Smalltalk) · Heute Standard in Web- und Desktop-Frameworks</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Warum MVC? — Das Problem ohne MVC</div>
+        <div class="def-text">Ohne Trennung entsteht <strong>Spaghetti-Code</strong>: Datenbankzugriff, Berechnung und HTML-Ausgabe stehen in derselben Datei. Änderungen an der Darstellung brechen die Logik — und umgekehrt.</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Entwurfsmuster (Design Pattern)</div>
+        <div class="def-text">Ein <strong>Entwurfsmuster</strong> ist eine bewährte, wiederverwendbare Lösung für ein häufig auftretendes Problem im Softwaredesign. Es ist kein fertiger Code, sondern eine <strong>Schablone</strong>.</div>
+        <div class="def-note">MVC gehört zu den „Architekturmustern" — übergeordnet über klassische Design Patterns (GoF)</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Kernprinzip: Separation of Concerns (SoC)</div>
+        <div class="def-text"><strong>Separation of Concerns</strong> bedeutet, dass jede Komponente genau <strong>eine klar definierte Aufgabe</strong> hat und nichts über die internen Details der anderen wissen muss.</div>
+        <div class="def-text" style="margin-top:3px">
+          <span class="tag tag-b">Model</span> weiß nicht, wie die Daten dargestellt werden<br>
+          <span class="tag tag-p">View</span> weiß nicht, woher die Daten kommen<br>
+          <span class="tag tag-t">Controller</span> weiß nicht, wie Daten gespeichert oder dargestellt werden
+        </div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: MVC Grundprinzip</div>
+        <div class="esel-text">
+          „<span class="esel-key">M</span>ach <span class="esel-key">V</span>ernünftig <span class="esel-key">C</span>ode" —<br>
+          <span class="esel-key">M</span>odel = die <span class="esel-key">M</span>asse (Daten &amp; Logik)<br>
+          <span class="esel-key">V</span>iew = die <span class="esel-key">V</span>itrine (Darstellung für den User)<br>
+          <span class="esel-key">C</span>ontroller = der <span class="esel-key">C</span>hef (steuert alles)
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">MVC — Wann einsetzen?</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Geeignet wenn…</div>
+        <div class="def-text">
+          · Mehrere Darstellungen derselben Daten nötig (Web + App + API)<br>
+          · Team arbeitet parallel (Frontend / Backend getrennt)<br>
+          · Anwendung langfristig gewartet und erweitert wird<br>
+          · Automatische Tests (Unit-Tests) gewünscht sind<br>
+          · Die Darstellung häufig wechselt (Redesign)
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Weniger geeignet wenn…</div>
+        <div class="def-text">
+          · Sehr kleine, einmalige Skripte<br>
+          · Prototypen mit kurzer Lebensdauer<br>
+          · Anfänger ohne OOP-Kenntnisse (hohe Lernkurve)
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Bekannte MVC-Frameworks</div>
+        <div class="def-text">
+          <span class="tag tag-t">Laravel</span> PHP<br>
+          <span class="tag tag-b">Django</span> Python (MTV ≈ MVC)<br>
+          <span class="tag tag-p">Spring MVC</span> Java<br>
+          <span class="tag tag-o">Ruby on Rails</span> Ruby<br>
+          <span class="tag tag-g">ASP.NET MVC</span> C#<br>
+          <span class="tag tag-gr">Angular</span> TypeScript (MVVM-Variante)
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     SPALTE 2 — Die drei Komponenten
+     ══════════════════════════════════════════ -->
+<div class="col">
+
+  <div class="card acc-blue">
+    <div class="card-head">Model — Daten &amp; Geschäftslogik</div>
+    <div class="card-body">
+
+      <div class="def-row">
+        <div class="def-term">IHK-Definition Model</div>
+        <div class="def-text">Das <strong>Model</strong> repräsentiert die <strong>Daten der Anwendung</strong> und die zugehörige <strong>Geschäftslogik</strong>. Es ist verantwortlich für den Datenbankzugriff, die Validierung von Daten und die Durchführung von Berechnungen. Das Model hat <strong>keinerlei Kenntnis</strong> von der Darstellung (View) oder der Steuerung (Controller).</div>
+        <div class="def-note">Faustregel: Alles, was mit Daten zu tun hat → gehört ins Model</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Aufgaben des Models</div>
+        <div class="def-text">
+          · Datenbankzugriff (CRUD: Create, Read, Update, Delete)<br>
+          · Datenvalidierung (Ist die E-Mail-Adresse gültig?)<br>
+          · Geschäftsregeln (Rabatt ab 100 € Bestellwert)<br>
+          · Berechnungen und Datenverarbeitung<br>
+          · Benachrichtigung des Controllers bei Datenänderung
+        </div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Was das Model NICHT macht</div>
+        <div class="def-text">
+          <span class="tag tag-r">✗</span> HTML ausgeben oder formatieren<br>
+          <span class="tag tag-r">✗</span> Benutzereingaben direkt empfangen<br>
+          <span class="tag tag-r">✗</span> Entscheiden, welche Ansicht angezeigt wird
+        </div>
+      </div>
+
+      <div class="lang py">Python — Beispiel Model</div>
+      <div class="code"><span class="kw">class</span> <span class="cl">ProduktModel</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, db):
+        <span class="kw">self</span>.db = db
+
+    <span class="kw">def</span> <span class="fn">alle_produkte</span>(<span class="kw">self</span>):
+        <span class="cm"># Datenbankzugriff hier</span>
+        <span class="kw">return</span> <span class="kw">self</span>.db.<span class="fn">query</span>(
+            <span class="str">"SELECT * FROM produkte"</span>)
+
+    <span class="kw">def</span> <span class="fn">speichern</span>(<span class="kw">self</span>, produkt):
+        <span class="cm"># Validierung</span>
+        <span class="kw">if</span> produkt[<span class="str">'preis'</span>] < <span class="num">0</span>:
+            <span class="kw">raise</span> ValueError(<span class="str">"Preis ungültig"</span>)
+        <span class="kw">self</span>.db.<span class="fn">insert</span>(produkt)</div>
+
+      <div class="lang ja">Java — Beispiel Model</div>
+      <div class="code"><span class="kw">public class</span> <span class="cl">ProduktModel</span> {
+    <span class="kw">private</span> List&lt;Produkt&gt; produkte;
+
+    <span class="kw">public</span> List&lt;Produkt&gt; <span class="fn">getAlleProdukte</span>() {
+        <span class="kw">return</span> produkte; <span class="cm">// aus DB laden</span>
+    }
+    <span class="kw">public void</span> <span class="fn">speichern</span>(Produkt p) {
+        <span class="kw">if</span> (p.<span class="fn">getPreis</span>() &lt; <span class="num">0</span>)
+            <span class="kw">throw new</span> IllegalArgumentException();
+        produkte.<span class="fn">add</span>(p);
+    }
+}</div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Model</div>
+        <div class="esel-text"><span class="esel-key">M</span>odel = <span class="esel-key">M</span>agazin — lagert alle Daten, kennt die Regeln, weiß aber nicht, in welchem Schaufenster (View) sie ausgestellt werden.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     SPALTE 3 — View & Controller
+     ══════════════════════════════════════════ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">View — Darstellung &amp; Benutzeroberfläche</div>
+    <div class="card-body">
+
+      <div class="def-row">
+        <div class="def-term">IHK-Definition View</div>
+        <div class="def-text">Die <strong>View</strong> ist ausschließlich für die <strong>Darstellung der Daten</strong> zuständig. Sie präsentiert dem Benutzer Informationen und nimmt Eingaben entgegen — enthält aber <strong>keinerlei Geschäftslogik</strong>. Die View erhält Daten vom Controller und stellt sie dar.</div>
+        <div class="def-note">Faustregel: Alles, was der Benutzer sieht → gehört in die View</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Aufgaben der View</div>
+        <div class="def-text">
+          · Daten visuell aufbereiten (HTML, CSS, Templates)<br>
+          · Formulare und Eingabeelemente anzeigen<br>
+          · Benutzereingaben an den Controller weiterleiten<br>
+          · Mehrere Views für dieselben Daten möglich (Web, PDF, JSON)
+        </div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Was die View NICHT macht</div>
+        <div class="def-text">
+          <span class="tag tag-r">✗</span> Direkt auf die Datenbank zugreifen<br>
+          <span class="tag tag-r">✗</span> Berechnungen oder Validierungen durchführen<br>
+          <span class="tag tag-r">✗</span> Entscheiden, welche Daten angezeigt werden
+        </div>
+      </div>
+
+      <div class="lang py">Python — Beispiel View (HTML-Template)</div>
+      <div class="code"><span class="cm"># Jinja2 Template (Flask/Django)</span>
+<span class="cm"># produkte.html — NUR Darstellung!</span>
+&lt;h1&gt;Produktliste&lt;/h1&gt;
+{% for p in produkte %}
+  &lt;p&gt;{{ p.name }} — {{ p.preis }} €&lt;/p&gt;
+{% endfor %}
+&lt;form action=<span class="str">"/kaufen"</span> method=<span class="str">"post"</span>&gt;
+  &lt;input name=<span class="str">"id"</span> type=<span class="str">"text"</span>&gt;
+  &lt;button&gt;Kaufen&lt;/button&gt;
+&lt;/form&gt;</div>
+
+      <div class="lang ja">Java — Beispiel View (JSP)</div>
+      <div class="code"><span class="cm">// produkte.jsp — NUR Darstellung!</span>
+&lt;c:forEach var=<span class="str">"p"</span> items=<span class="str">"${produkte}"</span>&gt;
+  &lt;p&gt;${p.name} — ${p.preis} €&lt;/p&gt;
+&lt;/c:forEach&gt;</div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: View</div>
+        <div class="esel-text"><span class="esel-key">V</span>iew = <span class="esel-key">V</span>itrine im Schaufenster — zeigt nur, was der Controller hineingestellt hat. Die Vitrine denkt nicht nach.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Controller — Steuerung &amp; Vermittlung</div>
+    <div class="card-body">
+
+      <div class="def-row">
+        <div class="def-term">IHK-Definition Controller</div>
+        <div class="def-text">Der <strong>Controller</strong> ist der <strong>Vermittler</strong> zwischen Model und View. Er empfängt Benutzereingaben (z. B. HTTP-Requests), ruft die entsprechenden Methoden des Models auf, empfängt die Daten und entscheidet, welche View mit welchen Daten gerendert wird. Der Controller enthält die <strong>Anwendungslogik</strong> — nicht die Geschäftslogik.</div>
+        <div class="def-note">Faustregel: Alles, was zwischen Daten und Darstellung vermittelt → gehört in den Controller</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Aufgaben des Controllers</div>
+        <div class="def-text">
+          · Benutzereingaben empfangen und interpretieren<br>
+          · Model-Methoden aufrufen (Daten lesen / schreiben)<br>
+          · Entscheiden, welche View angezeigt wird<br>
+          · Daten von Model an View übergeben<br>
+          · URL-Routing (welche Aktion wird aufgerufen?)
+        </div>
+      </div>
+
+      <div class="lang py">Python — Beispiel Controller (Flask)</div>
+      <div class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, render_template, request
+app = Flask(__name__)
+model = ProduktModel(db)
+
+<span class="cm"># Route = Eintrittspunkt für Benutzer</span>
+@app.route(<span class="str">'/produkte'</span>)
+<span class="kw">def</span> <span class="fn">produkte_anzeigen</span>():
+    daten = model.<span class="fn">alle_produkte</span>()  <span class="cm"># Model</span>
+    <span class="kw">return</span> <span class="fn">render_template</span>(          <span class="cm"># View</span>
+        <span class="str">'produkte.html'</span>, produkte=daten)
+
+@app.route(<span class="str">'/kaufen'</span>, methods=[<span class="str">'POST'</span>])
+<span class="kw">def</span> <span class="fn">kaufen</span>():
+    id = request.form[<span class="str">'id'</span>]
+    model.<span class="fn">kauf_verarbeiten</span>(id)
+    <span class="kw">return</span> <span class="fn">render_template</span>(<span class="str">'erfolg.html'</span>)</div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Controller</div>
+        <div class="esel-text"><span class="esel-key">C</span>ontroller = <span class="esel-key">C</span>hef im Restaurant — nimmt Bestellung (Eingabe) auf, gibt sie in die Küche (Model), und bringt das fertige Gericht an den Tisch (View).</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     SPALTE 4 — Ablauf, Vorteile, IHK
+     ══════════════════════════════════════════ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">MVC-Ablauf — Schritt für Schritt</div>
+    <div class="card-body">
+
+      <div class="def-row">
+        <div class="def-term">Vollständiger Ablauf einer Anfrage</div>
+      </div>
+
+      <!-- MVC Visualisierung -->
+      <div class="mvc-row">
+        <div class="mvc-box mvc-m">
+          <div class="mvc-title mvc-t-m">Model</div>
+          <div class="mvc-sub">Daten · Logik<br>Datenbank · Validierung</div>
+        </div>
+        <div class="mvc-arrow">⇄</div>
+        <div class="mvc-box mvc-c">
+          <div class="mvc-title mvc-t-c">Controller</div>
+          <div class="mvc-sub">Steuerung · Routing<br>Vermittlung</div>
+        </div>
+        <div class="mvc-arrow">⇄</div>
+        <div class="mvc-box mvc-v">
+          <div class="mvc-title mvc-t-v">View</div>
+          <div class="mvc-sub">Darstellung<br>HTML · Templates</div>
+        </div>
+      </div>
+
+      <div class="step-flow" style="margin-top:5px">
+        <div class="step"><div class="step-num sn-u">U</div><div class="step-text"><strong>Benutzer</strong> öffnet URL / klickt Button → HTTP-Request gesendet</div></div>
+        <div class="step"><div class="step-num sn-c">1</div><div class="step-text"><strong>Controller</strong> empfängt Request · interpretiert die Eingabe · ruft Model auf</div></div>
+        <div class="step"><div class="step-num sn-m">2</div><div class="step-text"><strong>Model</strong> verarbeitet Daten · greift auf Datenbank zu · gibt Ergebnis zurück</div></div>
+        <div class="step"><div class="step-num sn-c">3</div><div class="step-text"><strong>Controller</strong> erhält Daten vom Model · wählt passende View · übergibt Daten</div></div>
+        <div class="step"><div class="step-num sn-v">4</div><div class="step-text"><strong>View</strong> rendert Daten · erstellt HTML-Ausgabe · sendet Response an Benutzer</div></div>
+        <div class="step"><div class="step-num sn-u">U</div><div class="step-text"><strong>Benutzer</strong> sieht das Ergebnis im Browser</div></div>
+      </div>
+
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: MVC-Ablauf</div>
+        <div class="esel-text">
+          „<span class="esel-key">U</span>ser tippt → <span class="esel-key">C</span>hef nimmt auf → <span class="esel-key">K</span>üche kocht → <span class="esel-key">C</span>hef bringt → <span class="esel-key">V</span>itrine zeigt"<br>
+          User → Controller → Model → Controller → View → User
+        </div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Ohne MVC vs. mit MVC</div>
+        <div class="cmp-row">
+          <div class="cmp-label">Daten &amp; HTML</div>
+          <div class="cmp-bad">✗ Gemischt in einer Datei</div>
+          <div class="cmp-good">✓ Klar getrennt (Model / View)</div>
+        </div>
+        <div class="cmp-row">
+          <div class="cmp-label">Änderung Design</div>
+          <div class="cmp-bad">✗ Logik-Code anfassen</div>
+          <div class="cmp-good">✓ Nur View ändern</div>
+        </div>
+        <div class="cmp-row">
+          <div class="cmp-label">Logik testen</div>
+          <div class="cmp-bad">✗ Browser nötig</div>
+          <div class="cmp-good">✓ Unit-Test auf Model</div>
+        </div>
+        <div class="cmp-row">
+          <div class="cmp-label">Team-Arbeit</div>
+          <div class="cmp-bad">✗ Konflikte im Code</div>
+          <div class="cmp-good">✓ Frontend / Backend parallel</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card acc-green">
+    <div class="card-head">Vorteile — Stabilität · Wartbarkeit · Flexibilität</div>
+    <div class="card-body">
+
+      <div class="pro-con">
+        <div class="pro">
+          <div class="pro-title">Vorteile MVC</div>
+          <strong>Stabilität:</strong> Klare Trennung → Änderung in View bricht nie Logik<br><br>
+          <strong>Wartbarkeit:</strong> Jede Schicht isoliert änderbar · Fehler leicht lokalisierbar<br><br>
+          <strong>Flexibilität:</strong> Mehrere Views für ein Model (Web + App + API)<br><br>
+          <strong>Testbarkeit:</strong> Model ohne UI testbar · Unit-Tests möglich<br><br>
+          <strong>Wiederverwendung:</strong> Model in mehreren Projekten nutzbar<br><br>
+          <strong>Teamarbeit:</strong> Frontend &amp; Backend parallel entwickelbar<br><br>
+          <strong>Lesbarkeit:</strong> Klare Struktur → neues Teammitglied findet sich schnell zurecht
+        </div>
+        <div class="con">
+          <div class="con-title">Nachteile MVC</div>
+          <strong>Komplexität:</strong> Mehr Dateien und Klassen als nötig für kleine Projekte<br><br>
+          <strong>Lernkurve:</strong> Anfänger müssen Konzept verstehen<br><br>
+          <strong>Overhead:</strong> Für sehr einfache Anwendungen überdimensioniert<br><br>
+          <strong>Enge Bindung:</strong> Controller kennt sowohl Model als auch View<br><br>
+          <strong>Framework-abhängig:</strong> Implementierung je Framework verschieden
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">Vergleich: MVC · MVP · MVVM</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>Muster</th><th>Wer steuert?</th><th>View kennt…</th><th>Typisch für</th></tr></thead>
+        <tbody>
+          <tr><td><strong>MVC</strong></td><td>Controller</td><td>Wenig (Templates)</td><td>Web-Apps (Flask, Rails)</td></tr>
+          <tr><td><strong>MVP</strong></td><td>Presenter</td><td>Nur Interface</td><td>Desktop, Android</td></tr>
+          <tr><td><strong>MVVM</strong></td><td>ViewModel</td><td>Binding (2-Wege)</td><td>Angular, WPF, Vue</td></tr>
+        </tbody>
+      </table>
+      <div class="def-note" style="margin-top:3px">IHK fragt meist nur MVC — MVP/MVVM als Bonus-Wissen</div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">IHK-Prüfungsfragen MVC</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Was ist MVC und wozu wird es eingesetzt?</div>
+        <div class="ihk-q">Beschreiben Sie die Aufgaben von Model, View und Controller.</div>
+        <div class="ihk-q">Was versteht man unter Separation of Concerns?</div>
+        <div class="ihk-q">Erläutern Sie den Ablauf einer Benutzeranfrage im MVC-Muster.</div>
+        <div class="ihk-q">Was macht der Controller — was macht er ausdrücklich NICHT?</div>
+        <div class="ihk-q">Welchen Vorteil hat die Trennung von View und Model für die Wartbarkeit?</div>
+        <div class="ihk-q">Warum ist das Model unabhängig von der View?</div>
+        <div class="ihk-q">Nennen Sie zwei Vorteile von MVC für die Teamarbeit.</div>
+        <div class="ihk-q">Was ist ein Entwurfsmuster? Ordnen Sie MVC ein.</div>
+        <div class="ihk-q">Nennen Sie zwei Frameworks, die das MVC-Muster verwenden.</div>
+        <div class="ihk-q">Warum verbessert MVC die Testbarkeit einer Anwendung?</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Geschäftslogik (Model) und Anwendungslogik (Controller)?</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · MVC Design Pattern · Model · View · Controller · Separation of Concerns · Entwurfsmuster · Softwarearchitektur</span>
+  <span>Stabilität · Wartbarkeit · Flexibilität · Testbarkeit · Wiederverwendbarkeit · AP Teil 1 &amp; Teil 2</span>
+  <span>Lernfeld: Softwareentwicklung &amp; Systemarchitektur · Python (Flask) · Java (Spring MVC)</span>
+</div>
+
+</body>
+</html>
