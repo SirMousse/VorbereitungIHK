@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>JS Event-Typen – Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10px; color: #1a1a1a; background: #fff; }
+
+  h1 { font-size: 18px; font-weight: 700; letter-spacing: .03em; margin-bottom: 2px; }
+  .subtitle { font-size: 10px; color: #666; margin-bottom: 10px; }
+
+  .page { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+  .group { border: 1.5px solid #222; border-radius: 6px; overflow: hidden; break-inside: avoid; }
+  .group-head { display: flex; align-items: center; gap: 6px; padding: 5px 8px; font-weight: 700; font-size: 10px; border-bottom: 1.5px solid #222; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .ev { border-bottom: 0.75px solid #ddd; padding: 4px 7px; }
+  .ev:last-child { border-bottom: none; }
+  .ev-name { font-family: 'Courier New', monospace; font-weight: 700; font-size: 10px; color: #111; }
+  .ev-desc { font-size: 9px; color: #555; margin-top: 1px; }
+  .ev-meta { display: flex; gap: 4px; margin-top: 2px; flex-wrap: wrap; }
+  .tag { font-size: 8px; padding: 1px 5px; border-radius: 3px; font-weight: 600; border: 1px solid; }
+  .tag-b { background: #ede9ff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-nb { background: #fff3e0; color: #b45309; border-color: #fcd34d; }
+  .tag-c { background: #e8faf2; color: #065f46; border-color: #6ee7b7; }
+  .ev-code { font-family: 'Courier New', monospace; font-size: 8px; color: #444; background: #f5f5f5; border-radius: 3px; padding: 2px 5px; margin-top: 3px; white-space: pre; line-height: 1.5; border-left: 2px solid #bbb; }
+  .ev-tip { font-size: 8px; color: #888; margin-top: 2px; font-style: italic; }
+
+  /* group colors */
+  .g-maus    .group-head { background: #f0eeff; } .g-maus    .dot { background: #534AB7; }
+  .g-key     .group-head { background: #e6faf4; } .g-key     .dot { background: #0F6E56; }
+  .g-form    .group-head { background: #fff0eb; } .g-form    .dot { background: #993C1D; }
+  .g-doc     .group-head { background: #edfade; } .g-doc     .dot { background: #3B6D11; }
+  .g-touch   .group-head { background: #fceaf3; } .g-touch   .dot { background: #993556; }
+  .g-win     .group-head { background: #e8f3fb; } .g-win     .dot { background: #185FA5; }
+  .g-media   .group-head { background: #fef3e0; } .g-media   .dot { background: #854F0B; }
+
+  .legend { display: flex; gap: 12px; margin-top: 8px; font-size: 9px; align-items: center; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<h1>JavaScript — Event-Typen Übersicht</h1>
+<div class="subtitle">Alle wichtigen Events · Kategorie · Bubbling · Beispiel &nbsp;|&nbsp; Zum Abdrucken / Whiteboard</div>
+
+<div class="page">
+
+  <!-- MAUS -->
+  <div class="group g-maus">
+    <div class="group-head"><div class="dot"></div> Maus-Events (9)</div>
+
+    <div class="ev">
+      <div class="ev-name">click</div>
+      <div class="ev-desc">Linksklick auf ein Element</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span><span class="tag tag-c">abbrechbar</span></div>
+      <div class="ev-code">btn.addEventListener('click', (e) => {
+  console.log(e.clientX, e.clientY);
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">dblclick</div>
+      <div class="ev-desc">Doppelklick</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">el.addEventListener('dblclick', (e) => {
+  e.preventDefault(); // Selektion verhindern
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">mousedown / mouseup</div>
+      <div class="ev-desc">Taste drücken / loslassen · button: 0=L 1=M 2=R</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">el.addEventListener('mousedown', (e) => {
+  if (e.button === 2) console.log('Rechtsklick');
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">mousemove</div>
+      <div class="ev-desc">Maus bewegt sich · clientX / clientY</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-tip">⚡ Sehr häufig — mit requestAnimationFrame drosseln!</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">mouseenter / mouseleave</div>
+      <div class="ev-desc">Maus betritt / verlässt Element</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-tip">Unterschied zu over/out: ignoriert Kind-Elemente</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">mouseover / mouseout</div>
+      <div class="ev-desc">Maus über Element oder Kind</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">contextmenu</div>
+      <div class="ev-desc">Rechtsklick / Kontextmenü öffnet</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span><span class="tag tag-c">abbrechbar</span></div>
+      <div class="ev-code">el.addEventListener('contextmenu', (e) => {
+  e.preventDefault(); // eigenes Menü
+});</div>
+    </div>
+  </div>
+
+  <!-- TASTATUR -->
+  <div class="group g-key">
+    <div class="group-head"><div class="dot"></div> Tastatur-Events (3)</div>
+
+    <div class="ev">
+      <div class="ev-name">keydown</div>
+      <div class="ev-desc">Taste wird gedrückt · wichtigste Methode</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span><span class="tag tag-c">abbrechbar</span></div>
+      <div class="ev-code">document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submit();
+  if (e.ctrlKey && e.key === 's') save();
+  // e.repeat === true wenn Taste gehalten
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">keyup</div>
+      <div class="ev-desc">Taste wird losgelassen</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">input.addEventListener('keyup', (e) => {
+  console.log('Wert:', e.target.value);
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">keypress ⚠️</div>
+      <div class="ev-desc">Taste gedrückt — VERALTET seit 2022</div>
+      <div class="ev-meta"><span class="tag tag-nb">deprecated</span></div>
+      <div class="ev-tip">Nicht mehr verwenden! keydown / keyup stattdessen.</div>
+    </div>
+
+    <!-- TOUCH & POINTER -->
+    <div style="border-top:1.5px solid #222; padding:5px 8px; font-weight:700; font-size:10px; background:#fceaf3; display:flex; align-items:center; gap:6px;">
+      <div class="dot" style="background:#993556"></div> Touch &amp; Pointer (4)
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">touchstart</div>
+      <div class="ev-desc">Finger berührt Screen · touches[0].clientX/Y</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">el.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+}, { passive: true }); // kein Ruckeln!</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">touchmove / touchend</div>
+      <div class="ev-desc">Finger bewegt sich / verlässt Screen</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">pointermove</div>
+      <div class="ev-desc">Maus / Touch / Pen — vereinheitlicht</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">// e.pointerType: 'mouse' | 'touch' | 'pen'</div>
+    </div>
+  </div>
+
+  <!-- FORMULAR + DOKUMENT -->
+  <div class="group g-form">
+    <div class="group-head"><div class="dot"></div> Formular-Events (7)</div>
+
+    <div class="ev">
+      <div class="ev-name">submit</div>
+      <div class="ev-desc">Formular wird abgesendet</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span><span class="tag tag-c">abbrechbar</span></div>
+      <div class="ev-code">form.addEventListener('submit', (e) => {
+  e.preventDefault(); // kein Seitenreload!
+  const data = new FormData(e.target);
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">input</div>
+      <div class="ev-desc">Wert ändert sich — live bei jeder Eingabe</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">input.addEventListener('input', (e) => {
+  preview.textContent = e.target.value;
+});</div>
+      <div class="ev-tip">Unterschied zu change: feuert sofort, nicht erst beim Verlassen</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">change</div>
+      <div class="ev-desc">Feld verlässt Fokus mit neuem Wert</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-tip">Für select / checkbox → change · Für text → input</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">focus / blur</div>
+      <div class="ev-desc">Fokus bekommen / verlieren</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">input.addEventListener('blur', () => validate(input.value));</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">focusin / focusout</div>
+      <div class="ev-desc">Fokus – mit Bubbling (für Delegation)</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span></div>
+      <div class="ev-code">form.addEventListener('focusin', (e) => {
+  e.target.classList.add('active');
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">reset</div>
+      <div class="ev-desc">Formular wird auf Standardwerte zurückgesetzt</div>
+      <div class="ev-meta"><span class="tag tag-b">bubbelt</span><span class="tag tag-c">abbrechbar</span></div>
+    </div>
+  </div>
+
+  <!-- DOKUMENT + FENSTER + MEDIEN -->
+  <div class="group g-doc">
+    <div class="group-head"><div class="dot"></div> Dokument &amp; Lifecycle (5)</div>
+
+    <div class="ev">
+      <div class="ev-name">DOMContentLoaded</div>
+      <div class="ev-desc">HTML fertig geparst — kein CSS/Bild nötig</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">document.addEventListener('DOMContentLoaded', () => {
+  init(); // DOM ist bereit
+});</div>
+      <div class="ev-tip">Schneller als 'load' — CSS/Bilder müssen nicht warten</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">load</div>
+      <div class="ev-desc">Seite vollständig geladen (inkl. Bilder/CSS)</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">window.addEventListener('load', () => { ... });</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">beforeunload</div>
+      <div class="ev-desc">User verlässt Seite — Dialog möglich</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span><span class="tag tag-c">abbrechbar</span></div>
+      <div class="ev-code">window.addEventListener('beforeunload', (e) => {
+  e.returnValue = ''; // zeigt Browser-Dialog
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">visibilitychange</div>
+      <div class="ev-desc">Tab sichtbar / versteckt</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden')
+    pauseVideo();
+});</div>
+    </div>
+
+    <!-- FENSTER -->
+    <div style="border-top:1.5px solid #222; padding:5px 8px; font-weight:700; font-size:10px; background:#e8f3fb; display:flex; align-items:center; gap:6px;">
+      <div class="dot" style="background:#185FA5"></div> Fenster &amp; Navigation (4)
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">resize</div>
+      <div class="ev-desc">Fenster wird skaliert · innerWidth / innerHeight</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-tip">⚡ Immer mit debounce() drosseln!</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">scroll</div>
+      <div class="ev-desc">Seite / Element wird gescrollt</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">window.addEventListener('scroll', () => {
+  if (window.scrollY > 100) nav.classList.add('sticky');
+}, { passive: true });</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">popstate</div>
+      <div class="ev-desc">Browser Vor / Zurück · e.state</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-tip">Basis für clientseitiges Routing in SPAs</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">error</div>
+      <div class="ev-desc">JS-Fehler tritt auf · globaler Catcher</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">window.addEventListener('error', (e) => {
+  logToServer(e.message, e.filename, e.lineno);
+});</div>
+    </div>
+
+    <!-- MEDIEN -->
+    <div style="border-top:1.5px solid #222; padding:5px 8px; font-weight:700; font-size:10px; background:#fef3e0; display:flex; align-items:center; gap:6px;">
+      <div class="dot" style="background:#854F0B"></div> Medien — Audio / Video (5)
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">play / pause / ended</div>
+      <div class="ev-desc">Wiedergabe startet / pausiert / endet</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">video.addEventListener('ended', () => playNext());</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">timeupdate</div>
+      <div class="ev-desc">Position ändert sich (~4× pro Sekunde)</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">video.addEventListener('timeupdate', () => {
+  bar.value = video.currentTime / video.duration;
+});</div>
+    </div>
+
+    <div class="ev">
+      <div class="ev-name">volumechange</div>
+      <div class="ev-desc">Lautstärke oder Mute ändert sich</div>
+      <div class="ev-meta"><span class="tag tag-nb">kein Bubbling</span></div>
+      <div class="ev-code">// e.target.volume · e.target.muted</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="legend">
+  <strong>Legende:</strong>
+  <span><span class="tag tag-b">bubbelt</span> Event wandert zum Parent</span>
+  <span><span class="tag tag-nb">kein Bubbling</span> Event bleibt am Element</span>
+  <span><span class="tag tag-c">abbrechbar</span> preventDefault() möglich</span>
+  <span style="color:#888; font-size:9px">· Tipp: { passive: true } bei Scroll/Touch für bessere Performance</span>
+</div>
+
+</body>
+</html>

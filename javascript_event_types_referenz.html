@@ -1,0 +1,251 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 1rem 2rem}
+.filter-bar{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.fbtn{font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.fbtn.active,.fbtn:hover{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-secondary)}
+.fbtn.active{border-color:var(--color-border-primary)}
+.group{margin-bottom:1.25rem}
+.group-head{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.group-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.group-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.group-count{font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);border-radius:20px;padding:1px 7px}
+.event-list{display:flex;flex-direction:column;gap:.4rem}
+.ev{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.ev:hover{border-color:var(--color-border-secondary)}
+.ev.open{border-color:var(--color-border-primary)}
+.ev-head{display:flex;align-items:center;gap:10px;padding:.6rem .85rem}
+.ev-name{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--color-text-primary);min-width:120px}
+.ev-desc{font-size:12px;color:var(--color-text-secondary);flex:1}
+.ev-chev{font-size:13px;color:var(--color-text-tertiary);transition:transform .2s;margin-left:auto}
+.ev.open .ev-chev{transform:rotate(180deg)}
+.ev-body{display:none;padding:0 .85rem .75rem;border-top:0.5px solid var(--color-border-tertiary)}
+.ev.open .ev-body{display:block}
+.ev-body-inner{padding-top:.6rem;display:flex;flex-direction:column;gap:.5rem}
+.code{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);border-radius:6px;padding:.6rem .85rem;line-height:1.7;color:var(--color-text-secondary);overflow-x:auto;white-space:pre}
+.kw{color:#534AB7}.fn{color:#0F6E56}.str{color:#854F0B}.cm{color:var(--color-text-tertiary)}
+@media(prefers-color-scheme:dark){.kw{color:#AFA9EC}.fn{color:#5DCAA5}.str{color:#FAC775}}
+.props{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem}
+.prop{font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:2px 6px;color:var(--color-text-secondary)}
+.tip{font-size:12px;color:var(--color-text-tertiary);line-height:1.6;margin-top:.2rem}
+.sp-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;cursor:pointer;background:transparent;transition:background .15s;margin-top:.4rem}
+.sp-btn:hover{background:var(--color-background-secondary)}
+.badge{font-size:11px;padding:1px 7px;border-radius:10px;margin-left:4px}
+.b-bubbles{background:#EEEDFE;color:#3C3489}
+.b-no-bubble{background:#FAECE7;color:#993C1D}
+.b-cancel{background:#EAF3DE;color:#3B6D11}
+.b-no-cancel{background:#F1EFE8;color:#5F5E5A}
+@media(prefers-color-scheme:dark){
+  .b-bubbles{background:#26215C;color:#AFA9EC}
+  .b-no-bubble{background:#4A1B0C;color:#F0997B}
+  .b-cancel{background:#173404;color:#97C459}
+  .b-no-cancel{background:#2C2C2A;color:#B4B2A9}
+}
+.hidden{display:none}
+</style>
+
+<h2 class="sr-only" style="position:absolute;left:-9999px">JavaScript Event-Typen Referenz — interaktive Übersicht aller wichtigen Events nach Kategorie</h2>
+
+<div class="wrap">
+
+<div class="filter-bar" id="filter-bar">
+  <button class="fbtn active" onclick="filter('all')">Alle</button>
+  <button class="fbtn" onclick="filter('maus')"><i class="ti ti-mouse" aria-hidden="true"></i> Maus</button>
+  <button class="fbtn" onclick="filter('tastatur')"><i class="ti ti-keyboard" aria-hidden="true"></i> Tastatur</button>
+  <button class="fbtn" onclick="filter('formular')"><i class="ti ti-forms" aria-hidden="true"></i> Formular</button>
+  <button class="fbtn" onclick="filter('dokument')"><i class="ti ti-file-text" aria-hidden="true"></i> Dokument</button>
+  <button class="fbtn" onclick="filter('touch')"><i class="ti ti-hand-touch" aria-hidden="true"></i> Touch</button>
+  <button class="fbtn" onclick="filter('fenster')"><i class="ti ti-browser" aria-hidden="true"></i> Fenster</button>
+  <button class="fbtn" onclick="filter('medien')"><i class="ti ti-player-play" aria-hidden="true"></i> Medien</button>
+</div>
+
+<div id="groups-container"></div>
+
+</div>
+
+<script>
+const GROUPS = [
+  {
+    id:'maus', label:'Maus-Events', icon:'ti-mouse', iconBg:'#EEEDFE', iconColor:'#534AB7',
+    events:[
+      {name:'click',desc:'Linksklick auf ein Element',props:['clientX','clientY','target','button'],bubbles:true,cancel:true,
+       code:`btn.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, (e) => {\n  console.<span class="fn">log</span>(<span class="str">'Position:'</span>, e.clientX, e.clientY);\n});`,
+       tip:'Feuert nach mousedown + mouseup auf demselben Element.'},
+      {name:'dblclick',desc:'Doppelklick',props:['clientX','clientY','detail'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'dblclick'</span>, (e) => {\n  e.<span class="fn">preventDefault</span>(); <span class="cm">// Text-Selektion verhindern</span>\n});`,
+       tip:'detail === 2 beim Doppelklick.'},
+      {name:'mousedown',desc:'Maustaste wird gedrückt',props:['button','buttons','clientX','clientY'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mousedown'</span>, (e) => {\n  <span class="kw">if</span> (e.button === 2) console.<span class="fn">log</span>(<span class="str">'Rechtsklick'</span>);\n});`,
+       tip:'button: 0=links, 1=mitte, 2=rechts'},
+      {name:'mouseup',desc:'Maustaste wird losgelassen',props:['button','clientX','clientY'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mouseup'</span>, handler);`,tip:''},
+      {name:'mousemove',desc:'Maus bewegt sich über Element',props:['clientX','clientY','movementX','movementY'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mousemove'</span>, (e) => {\n  cursor.style.left = e.clientX + <span class="str">'px'</span>;\n});`,
+       tip:'Feuert sehr oft — am besten mit requestAnimationFrame drosseln.'},
+      {name:'mouseenter',desc:'Maus betritt Element (kein Bubbling)',props:['relatedTarget'],bubbles:false,cancel:false,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mouseenter'</span>, () => el.classList.<span class="fn">add</span>(<span class="str">'hover'</span>));`,
+       tip:'Unterschied zu mouseover: feuert nicht bei Kind-Elementen.'},
+      {name:'mouseleave',desc:'Maus verlässt Element (kein Bubbling)',props:['relatedTarget'],bubbles:false,cancel:false,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mouseleave'</span>, () => el.classList.<span class="fn">remove</span>(<span class="str">'hover'</span>));`,tip:''},
+      {name:'mouseover',desc:'Maus betritt Element oder Kind',props:['relatedTarget'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'mouseover'</span>, handler);`,tip:'Bubbelt — feuert auch für alle Kind-Elemente.'},
+      {name:'contextmenu',desc:'Rechtsklick / Kontextmenü',props:['clientX','clientY'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'contextmenu'</span>, (e) => {\n  e.<span class="fn">preventDefault</span>(); <span class="cm">// eigenes Menü zeigen</span>\n});`,tip:''},
+    ]
+  },
+  {
+    id:'tastatur', label:'Tastatur-Events', icon:'ti-keyboard', iconBg:'#E1F5EE', iconColor:'#0F6E56',
+    events:[
+      {name:'keydown',desc:'Taste wird gedrückt',props:['key','code','ctrlKey','shiftKey','altKey','repeat'],bubbles:true,cancel:true,
+       code:`document.<span class="fn">addEventListener</span>(<span class="str">'keydown'</span>, (e) => {\n  <span class="kw">if</span> (e.key === <span class="str">'Enter'</span>) <span class="fn">submit</span>();\n  <span class="kw">if</span> (e.ctrlKey && e.key === <span class="str">'s'</span>) <span class="fn">save</span>();\n});`,
+       tip:'repeat=true wenn Taste gehalten wird.'},
+      {name:'keyup',desc:'Taste wird losgelassen',props:['key','code'],bubbles:true,cancel:true,
+       code:`input.<span class="fn">addEventListener</span>(<span class="str">'keyup'</span>, (e) => {\n  console.<span class="fn">log</span>(<span class="str">'Eingabe:'</span>, e.target.value);\n});`,tip:''},
+      {name:'keypress',desc:'Taste gedrückt (veraltet)',props:['key','charCode'],bubbles:true,cancel:true,
+       code:`<span class="cm">// ⚠️ Veraltet — keydown/keyup bevorzugen</span>`,
+       tip:'Seit 2022 als deprecated markiert. Nicht mehr verwenden!'},
+    ]
+  },
+  {
+    id:'formular', label:'Formular-Events', icon:'ti-forms', iconBg:'#FAECE7', iconColor:'#993C1D',
+    events:[
+      {name:'submit',desc:'Formular wird abgesendet',props:['target','submitter'],bubbles:true,cancel:true,
+       code:`form.<span class="fn">addEventListener</span>(<span class="str">'submit'</span>, (e) => {\n  e.<span class="fn">preventDefault</span>(); <span class="cm">// kein Seitenreload</span>\n  <span class="kw">const</span> data = <span class="kw">new</span> <span class="fn">FormData</span>(e.target);\n});`,tip:'Immer preventDefault() für AJAX-Formulare.'},
+      {name:'input',desc:'Wert eines Feldes ändert sich',props:['target.value','data','inputType'],bubbles:true,cancel:false,
+       code:`input.<span class="fn">addEventListener</span>(<span class="str">'input'</span>, (e) => {\n  preview.textContent = e.target.value; <span class="cm">// live</span>\n});`,
+       tip:'Feuert bei jeder Änderung — anders als change.'},
+      {name:'change',desc:'Feld verliert Fokus mit neuem Wert',props:['target.value','target.checked'],bubbles:true,cancel:true,
+       code:`select.<span class="fn">addEventListener</span>(<span class="str">'change'</span>, (e) => {\n  console.<span class="fn">log</span>(e.target.value);\n});`,
+       tip:'Bei Checkboxen/Selects auf change hören, bei Text-Inputs auf input.'},
+      {name:'focus',desc:'Element bekommt Fokus',props:['relatedTarget'],bubbles:false,cancel:false,
+       code:`input.<span class="fn">addEventListener</span>(<span class="str">'focus'</span>, () => input.style.outline = <span class="str">'2px solid blue'</span>);`,tip:'Kein Bubbling — focusin bubbelt.'},
+      {name:'blur',desc:'Element verliert Fokus',props:['relatedTarget'],bubbles:false,cancel:false,
+       code:`input.<span class="fn">addEventListener</span>(<span class="str">'blur'</span>, () => <span class="fn">validate</span>(input.value));`,tip:'Kein Bubbling — focusout bubbelt.'},
+      {name:'focusin',desc:'Fokus (bubbelt)',props:['relatedTarget'],bubbles:true,cancel:false,
+       code:`form.<span class="fn">addEventListener</span>(<span class="str">'focusin'</span>, (e) => {\n  e.target.classList.<span class="fn">add</span>(<span class="str">'active'</span>);\n});`,tip:'Praktisch für Event Delegation auf dem Formular.'},
+      {name:'reset',desc:'Formular wird zurückgesetzt',props:['target'],bubbles:true,cancel:true,
+       code:`form.<span class="fn">addEventListener</span>(<span class="str">'reset'</span>, () => console.<span class="fn">log</span>(<span class="str">'Formular geleert'</span>));`,tip:''},
+    ]
+  },
+  {
+    id:'dokument', label:'Dokument & Lifecycle', icon:'ti-file-text', iconBg:'#EAF3DE', iconColor:'#3B6D11',
+    events:[
+      {name:'DOMContentLoaded',desc:'HTML fertig geladen (kein CSS/Bild)',props:[],bubbles:false,cancel:false,
+       code:`document.<span class="fn">addEventListener</span>(<span class="str">'DOMContentLoaded'</span>, () => {\n  <span class="fn">init</span>(); <span class="cm">// DOM ist bereit</span>\n});`,
+       tip:'Schneller als load — CSS und Bilder müssen nicht warten.'},
+      {name:'load',desc:'Seite vollständig geladen (inkl. Bilder)',props:[],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'load'</span>, () => console.<span class="fn">log</span>(<span class="str">'Alles geladen'</span>));`,tip:''},
+      {name:'beforeunload',desc:'User verlässt Seite — Dialog möglich',props:['returnValue'],bubbles:false,cancel:true,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'beforeunload'</span>, (e) => {\n  e.returnValue = <span class="str">''</span>; <span class="cm">// Browser zeigt Dialog</span>\n});`,
+       tip:'Nur setzen wenn wirklich ungespeicherte Daten vorhanden sind.'},
+      {name:'unload',desc:'Seite wird entladen',props:[],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'unload'</span>, () => <span class="fn">sendBeacon</span>());`,
+       tip:'Veralteter Weg — besser visibilitychange oder pagehide nutzen.'},
+      {name:'visibilitychange',desc:'Tab wird sichtbar / versteckt',props:['document.visibilityState'],bubbles:false,cancel:false,
+       code:`document.<span class="fn">addEventListener</span>(<span class="str">'visibilitychange'</span>, () => {\n  <span class="kw">if</span> (document.visibilityState === <span class="str">'hidden'</span>) <span class="fn">pauseVideo</span>();\n});`,
+       tip:'Ideal um Audio/Video zu pausieren wenn Tab gewechselt wird.'},
+    ]
+  },
+  {
+    id:'touch', label:'Touch & Pointer', icon:'ti-hand-touch', iconBg:'#FBEAF0', iconColor:'#993556',
+    events:[
+      {name:'touchstart',desc:'Finger berührt den Screen',props:['touches','targetTouches','changedTouches'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'touchstart'</span>, (e) => {\n  <span class="kw">const</span> t = e.touches[0];\n  startX = t.clientX;\n}, { passive: <span class="kw">true</span> });`,
+       tip:'passive: true → Browser kann sofort scrollen (kein Ruckeln).'},
+      {name:'touchmove',desc:'Finger bewegt sich',props:['touches','changedTouches'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'touchmove'</span>, (e) => {\n  e.<span class="fn">preventDefault</span>(); <span class="cm">// Scrollen verhindern</span>\n}, { passive: <span class="kw">false</span> });`,tip:''},
+      {name:'touchend',desc:'Finger verlässt Screen',props:['changedTouches'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'touchend'</span>, handler);`,tip:''},
+      {name:'pointermove',desc:'Zeiger bewegt sich (Maus/Touch/Pen)',props:['pointerType','pointerId','pressure'],bubbles:true,cancel:true,
+       code:`el.<span class="fn">addEventListener</span>(<span class="str">'pointermove'</span>, (e) => {\n  <span class="cm">// e.pointerType: 'mouse' | 'touch' | 'pen'</span>\n});`,
+       tip:'Pointer Events vereinheitlichen Maus, Touch und Stift.'},
+    ]
+  },
+  {
+    id:'fenster', label:'Fenster & Navigation', icon:'ti-browser', iconBg:'#E6F1FB', iconColor:'#185FA5',
+    events:[
+      {name:'resize',desc:'Fenster wird skaliert',props:['innerWidth','innerHeight'],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'resize'</span>, <span class="fn">debounce</span>(() => {\n  console.<span class="fn">log</span>(window.innerWidth);\n}, 200));`,
+       tip:'Immer mit debounce drosseln — feuert sehr häufig.'},
+      {name:'scroll',desc:'Seite oder Element wird gescrollt',props:['scrollX','scrollY'],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'scroll'</span>, () => {\n  <span class="kw">if</span> (window.scrollY > 100) nav.classList.<span class="fn">add</span>(<span class="str">'sticky'</span>);\n});`,
+       tip:'passive:true für bessere Scroll-Performance.'},
+      {name:'popstate',desc:'Browser Vor/Zurück gedrückt',props:['state'],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'popstate'</span>, (e) => {\n  <span class="fn">loadPage</span>(e.state.url);\n});`,
+       tip:'Basis für clientseitiges Routing in SPAs.'},
+      {name:'hashchange',desc:'URL-Anker (#) ändert sich',props:['oldURL','newURL'],bubbles:false,cancel:false,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'hashchange'</span>, (e) => {\n  console.<span class="fn">log</span>(location.hash);\n});`,tip:''},
+      {name:'error',desc:'JavaScript-Fehler tritt auf',props:['message','filename','lineno'],bubbles:false,cancel:true,
+       code:`window.<span class="fn">addEventListener</span>(<span class="str">'error'</span>, (e) => {\n  <span class="fn">logToServer</span>(e.message, e.filename);\n});`,
+       tip:'Globaler Fehler-Catcher — gut für Logging.'},
+    ]
+  },
+  {
+    id:'medien', label:'Medien-Events (Audio/Video)', icon:'ti-player-play', iconBg:'#FAEEDA', iconColor:'#854F0B',
+    events:[
+      {name:'play',desc:'Wiedergabe startet',props:['target'],bubbles:false,cancel:false,
+       code:`video.<span class="fn">addEventListener</span>(<span class="str">'play'</span>, () => btn.textContent = <span class="str">'Pause'</span>);`,tip:''},
+      {name:'pause',desc:'Wiedergabe pausiert',props:['target'],bubbles:false,cancel:false,
+       code:`video.<span class="fn">addEventListener</span>(<span class="str">'pause'</span>, () => btn.textContent = <span class="str">'Play'</span>);`,tip:''},
+      {name:'ended',desc:'Medien komplett abgespielt',props:['target'],bubbles:false,cancel:false,
+       code:`video.<span class="fn">addEventListener</span>(<span class="str">'ended'</span>, () => <span class="fn">playNext</span>());`,tip:''},
+      {name:'timeupdate',desc:'Abspielposition ändert sich',props:['target.currentTime'],bubbles:false,cancel:false,
+       code:`video.<span class="fn">addEventListener</span>(<span class="str">'timeupdate'</span>, () => {\n  progress.value = video.currentTime / video.duration;\n});`,
+       tip:'Feuert ca. 4× pro Sekunde.'},
+      {name:'volumechange',desc:'Lautstärke oder Mute ändert sich',props:['target.volume','target.muted'],bubbles:false,cancel:false,
+       code:`video.<span class="fn">addEventListener</span>(<span class="str">'volumechange'</span>, (e) => {\n  icon.className = e.target.muted ? <span class="str">'muted'</span> : <span class="str">'loud'</span>;\n});`,tip:''},
+    ]
+  }
+];
+
+function renderGroups(filterKey){
+  const container = document.getElementById('groups-container');
+  container.innerHTML = '';
+  GROUPS.forEach(g => {
+    if(filterKey !== 'all' && g.id !== filterKey) return;
+    const div = document.createElement('div');
+    div.className = 'group';
+    const evHTML = g.events.map(ev => `
+      <div class="ev" onclick="toggleEv(this)">
+        <div class="ev-head">
+          <span class="ev-name">${ev.name}</span>
+          <span class="ev-desc">${ev.desc}</span>
+          <span class="badge ${ev.bubbles?'b-bubbles':'b-no-bubble'}">${ev.bubbles?'bubbelt':'kein Bubbling'}</span>
+          <span class="ev-chev">▾</span>
+        </div>
+        <div class="ev-body">
+          <div class="ev-body-inner">
+            ${ev.props.length ? `<div><div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);margin-bottom:4px">Wichtige Properties</div><div class="props">${ev.props.map(p=>`<span class="prop">${p}</span>`).join('')}</div></div>` : ''}
+            <div class="code">${ev.code}</div>
+            ${ev.tip ? `<div class="tip"><i class="ti ti-info-circle" aria-hidden="true"></i> ${ev.tip}</div>` : ''}
+            <button class="sp-btn" onclick="event.stopPropagation();sendPrompt('Zeig mir ein praxisnahes Beispiel für das ${ev.name}-Event in JavaScript')">Praxisbeispiel ↗</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    div.innerHTML = `
+      <div class="group-head">
+        <div class="group-icon" style="background:${g.iconBg}"><i class="ti ${g.icon}" style="color:${g.iconColor}" aria-hidden="true"></i></div>
+        <span class="group-title">${g.label}</span>
+        <span class="group-count">${g.events.length}</span>
+      </div>
+      <div class="event-list">${evHTML}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleEv(el){
+  el.classList.toggle('open');
+}
+
+function filter(key){
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  renderGroups(key);
+}
+
+renderGroups('all');
+</script>

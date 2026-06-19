@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Wirtschaftlichkeitsanalyse – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.5px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 8px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+  .header-left .meta { font-size: 8.5px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .col { display: flex; flex-direction: column; gap: 7px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+  .card-head { padding: 4px 8px; font-weight: 700; font-size: 9.5px; border-bottom: 1.5px solid #222; display: flex; align-items: center; gap: 6px; }
+  .card-body { padding: 6px 8px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.75px solid #e0e0e0; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9.5px; color: #111; margin-bottom: 2px; }
+  .def-text { font-size: 9px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8.5px; color: #777; font-style: italic; margin-top: 2px; }
+
+  /* QA */
+  .qa { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.75px solid #e0e0e0; }
+  .qa:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .q { font-weight: 700; font-size: 9px; color: #111; display: flex; gap: 5px; }
+  .q-num { color: #888; font-weight: 700; min-width: 14px; }
+  .a { font-size: 9px; color: #1a5c38; line-height: 1.55; margin: 2px 0 0 19px; }
+  .a::before { content: '→ '; font-weight: 700; color: #0F6E56; }
+  .erkl { font-size: 8.5px; color: #666; font-style: italic; line-height: 1.5; margin: 2px 0 0 19px; }
+
+  /* CALC BOX */
+  .calc { background: #f5f5f5; border-left: 3px solid #534AB7; border-radius: 3px; padding: 5px 8px; margin: 4px 0; font-size: 8.5px; line-height: 1.7; }
+  .calc b { color: #111; }
+  .calc .result { font-weight: 700; color: #0F6E56; font-size: 9px; border-top: 0.75px solid #ccc; margin-top: 3px; padding-top: 3px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 8.5px; margin-top: 4px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 3px 5px; text-align: left; border: 0.75px solid #ccc; }
+  td { padding: 3px 5px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.45; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .td-r { text-align: right; font-family: 'Courier New', monospace; }
+  .td-b { font-weight: 700; }
+  .td-green { color: #1a5c38; font-weight: 700; }
+  .td-red   { color: #991b1b; font-weight: 700; }
+
+  /* TAGS */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid; margin-right: 2px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  /* GEGENÜBERSTELLUNG */
+  .gegen { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 5px 0; }
+  .gegen-box { border-radius: 4px; padding: 5px 7px; }
+  .gegen-kosten { background: #fff0f0; border: 1px solid #fca5a5; }
+  .gegen-nutzen { background: #e6faf4; border: 1px solid #6ee7b7; }
+  .gegen-title { font-weight: 700; font-size: 9px; margin-bottom: 3px; }
+  .gegen-title-k { color: #991b1b; }
+  .gegen-title-n { color: #065f46; }
+  .gegen-item { font-size: 8.5px; color: #333; line-height: 1.6; }
+
+  /* IHK BOX */
+  .ihk-box { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 5px 7px; margin-top: 4px; }
+  .ihk-box-title { font-size: 8px; font-weight: 700; color: #b45309; margin-bottom: 3px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8.5px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #b45309; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 7px; padding-top: 4px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Wirtschaftlichkeitsanalyse: Entwicklungskosten · Prozesskostenreduktion · Gegenüberstellung</h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Lernfeld: Projektplanung &amp; Wirtschaftlichkeit</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Projektdokumentation<br>Themenbereich: Projektkalkulation &amp; Nutzenbewertung</div>
+</div>
+
+<div class="grid">
+
+  <!-- ══ SPALTE 1: Entwicklungskosten ══ -->
+  <div class="col">
+
+    <div class="card acc-purple">
+      <div class="card-head">① Ermittlung der Entwicklungskosten</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Die <strong>Entwicklungskosten</strong> umfassen alle Kosten, die durch die Planung, Entwicklung, Implementierung und Einführung einer Softwarelösung entstehen. Sie sind die <strong>Investitionsseite</strong> der Wirtschaftlichkeitsbetrachtung.</div>
+          <div class="def-note">Wann angewandt: vor und nach einem IT-Projekt zur Kalkulation und Nachkalkulation.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Kostenarten (IHK-relevant)</div>
+          <div class="def-text">
+            <strong>Personalkosten:</strong> Stundensatz × Arbeitsstunden (größter Kostenblock)<br>
+            <strong>Hardwarekosten:</strong> Server, Geräte, Infrastruktur<br>
+            <strong>Softwarekosten:</strong> Lizenzen, Frameworks, Tools<br>
+            <strong>Schulungskosten:</strong> Einweisung der Mitarbeiter<br>
+            <strong>Infrastrukturkosten:</strong> Hosting, Netzwerk, Cloud<br>
+            <strong>Sonstige:</strong> Reisen, externe Dienstleister, Dokumentation
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Formel: Personalkosten</div>
+          <div class="calc">
+            <b>Personalkosten</b> = Stundensatz (€/h) × Aufwand (h)<br><br>
+            Beispiel: Entwicklung eines digitalen Bestellsystems<br>
+            Entwickler: 45 €/h × 80 h = 3.600 €<br>
+            Projektleiter: 60 €/h × 20 h = 1.200 €<br>
+            Tester: 40 €/h × 15 h = 600 €<br>
+            Lizenzen (Software): 500 €<br>
+            Schulung Mitarbeiter: 300 €
+            <div class="result">Gesamte Entwicklungskosten: 6.200 €</div>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Hinweis: Interne vs. externe Kosten</div>
+          <div class="def-text">
+            <span class="tag tag-p">Intern</span> Eigene Mitarbeiter → Stundensatz aus Lohnkosten + Overhead berechnen.<br>
+            <span class="tag tag-b">Extern</span> Dienstleister → Angebot / Vertragspreis ansetzen.
+          </div>
+          <div class="def-note">IHK erwartet: alle Kostenarten benennen, nicht nur Personalkosten!</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-amber">
+      <div class="card-head">Typische IHK-Prüfungsfragen</div>
+      <div class="card-body">
+        <div class="ihk-box">
+          <div class="ihk-box-title">Mögliche Aufgabenstellungen AP Teil 1</div>
+          <div class="ihk-q">Ermitteln Sie die Entwicklungskosten des Projekts anhand der gegebenen Stundensätze und Aufwände.</div>
+          <div class="ihk-q">Welche Kostenarten fallen bei der Entwicklung einer Webanwendung an? Nennen Sie mindestens vier.</div>
+          <div class="ihk-q">Berechnen Sie die jährliche Einsparung durch die Digitalisierung des Bestellprozesses.</div>
+          <div class="ihk-q">Stellen Sie Entwicklungskosten und Nutzenpotenzial gegenüber und beurteilen Sie die Wirtschaftlichkeit.</div>
+          <div class="ihk-q">Ab wann hat sich die Investition amortisiert? Berechnen Sie den Break-Even-Punkt.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 2: Prozesskosten ══ -->
+  <div class="col">
+
+    <div class="card acc-teal">
+      <div class="card-head">② Quantifizierung der Prozesskostenreduktion</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Die <strong>Prozesskostenreduktion</strong> bezeichnet die Einsparung von Kosten, die durch die Digitalisierung oder Automatisierung eines bisher manuellen Geschäftsprozesses entsteht. Sie ist der <strong>Nutzen</strong> (Ertrag) der Investition.</div>
+          <div class="def-note">Wann angewandt: nach Analyse des Ist-Prozesses, um den Nutzen der Digitalisierung zu quantifizieren.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Vorgehensweise (IHK-Schritte)</div>
+          <div class="def-text">
+            <strong>1. Ist-Prozess analysieren:</strong> Wie lange dauert der Prozess manuell?<br>
+            <strong>2. Häufigkeit ermitteln:</strong> Wie oft wird der Prozess ausgeführt?<br>
+            <strong>3. Kosten berechnen:</strong> Zeitaufwand × Stundensatz × Häufigkeit<br>
+            <strong>4. Soll-Prozess ermitteln:</strong> Wie lange dauert der digitale Prozess?<br>
+            <strong>5. Differenz berechnen:</strong> Ist-Kosten − Soll-Kosten = Einsparung
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Formel: Prozesskostenreduktion</div>
+          <div class="calc">
+            <b>Einsparung</b> = (Zeit_IST − Zeit_SOLL) × Stundensatz × Häufigkeit<br><br>
+            Beispiel: Digitalisierung der Bestellannahme<br>
+            IST (manuell): 15 Min. pro Bestellung<br>
+            SOLL (digital): 2 Min. pro Bestellung<br>
+            Einsparung pro Bestellung: 13 Min. = 0,217 h<br>
+            Stundensatz Sachbearbeiter: 30 €/h<br>
+            Bestellungen pro Jahr: 2.000<br><br>
+            0,217 h × 30 €/h × 2.000 = 13.020 €
+            <div class="result">Jährliche Einsparung: 13.020 €/Jahr</div>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Weitere Einsparungsquellen</div>
+          <div class="def-text">
+            · <strong>Fehlerreduktion:</strong> Weniger manuelle Fehler → weniger Korrekturaufwand<br>
+            · <strong>Papierkosten:</strong> Druck, Porto, Archivierung entfällt<br>
+            · <strong>Durchlaufzeit:</strong> Schnellere Prozesse → höhere Kundenzufriedenheit<br>
+            · <strong>Skaleneffekte:</strong> Mehr Vorgänge ohne mehr Personal
+          </div>
+          <div class="def-note">Nicht alle Einsparungen sind direkt monetär — qualitative Vorteile ebenfalls nennen!</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-green">
+      <div class="card-head">Ist-Prozess vs. Soll-Prozess</div>
+      <div class="card-body">
+
+        <table>
+          <thead>
+            <tr><th>Kriterium</th><th>IST (manuell)</th><th>SOLL (digital)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Bearbeitung</td><td>15 Min. / Vorgang</td><td>2 Min. / Vorgang</td></tr>
+            <tr><td>Fehlerquote</td><td>ca. 5 %</td><td>ca. 0,5 %</td></tr>
+            <tr><td>Verfügbarkeit</td><td>Mo–Fr 8–17 Uhr</td><td>24/7</td></tr>
+            <tr><td>Medienbrüche</td><td>Papier → PC → System</td><td>Direkt ins System</td></tr>
+            <tr><td>Personalaufwand</td><td>2 Vollzeitstellen</td><td>0,5 Stellen (Kontrolle)</td></tr>
+            <tr><td>Kosten/Jahr</td><td>ca. 52.000 €</td><td>ca. 13.000 €</td></tr>
+          </tbody>
+        </table>
+
+        <div class="def-row" style="margin-top:6px">
+          <div class="def-term">Begriff: Medienbruch</div>
+          <div class="def-text">Ein <strong>Medienbruch</strong> ist der manuelle Wechsel zwischen verschiedenen Informationsträgern (z. B. Papier → PC-Eingabe). Medienbrüche verursachen Fehler und Zeitverlust — Digitalisierung eliminiert sie.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 3: Gegenüberstellung ══ -->
+  <div class="col">
+
+    <div class="card acc-coral">
+      <div class="card-head">③ Gegenüberstellung &amp; Wirtschaftlichkeit</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition Wirtschaftlichkeitsanalyse</div>
+          <div class="def-text">Die <strong>Wirtschaftlichkeitsanalyse</strong> stellt die Kosten einer Investition dem zu erwartenden Nutzen gegenüber. Ziel ist es, die Vorteilhaftigkeit einer Maßnahme zu bewerten und zu begründen.</div>
+          <div class="def-note">Wann angewandt: vor einem Projekt (Entscheidungsgrundlage) und nach Abschluss (Erfolgskontrolle).</div>
+        </div>
+
+        <div class="gegen">
+          <div class="gegen-box gegen-kosten">
+            <div class="gegen-title gegen-title-k">Kosten (Investition)</div>
+            <div class="gegen-item">Personalkosten: 5.400 €</div>
+            <div class="gegen-item">Lizenzen: 500 €</div>
+            <div class="gegen-item">Schulung: 300 €</div>
+            <div class="gegen-item"><b>Gesamt: 6.200 €</b></div>
+          </div>
+          <div class="gegen-box gegen-nutzen">
+            <div class="gegen-title gegen-title-n">Nutzen (Einsparung/Jahr)</div>
+            <div class="gegen-item">Personalentlastung: 13.020 €</div>
+            <div class="gegen-item">Fehlerreduktion: 800 €</div>
+            <div class="gegen-item">Papier/Porto: 180 €</div>
+            <div class="gegen-item"><b>Gesamt: 14.000 €/Jahr</b></div>
+          </div>
+        </div>
+
+        <div class="def-row" style="margin-top:5px">
+          <div class="def-term">Amortisationsrechnung (Break-Even)</div>
+          <div class="calc">
+            <b>Amortisationsdauer</b> = Entwicklungskosten ÷ jährliche Einsparung<br><br>
+            6.200 € ÷ 14.000 €/Jahr = 0,44 Jahre
+            <div class="result">Amortisation nach ca. 5,3 Monaten → wirtschaftlich!</div>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Rentabilitätsrechnung</div>
+          <div class="calc">
+            <b>Rentabilität</b> = (Einsparung − Kosten) ÷ Kosten × 100<br><br>
+            (14.000 − 6.200) ÷ 6.200 × 100
+            <div class="result">Rentabilität im 1. Jahr: ca. 126 % → sehr wirtschaftlich</div>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Bewertung: Wirtschaftlich oder nicht?</div>
+          <div class="def-text">
+            <span class="tag tag-t">Wirtschaftlich</span> Einsparung &gt; Kosten, kurze Amortisationszeit<br>
+            <span class="tag tag-r">Nicht wirtschaftlich</span> Kosten &gt; Nutzen, lange Amortisation<br>
+            <span class="tag tag-o">Qualitativ bewerten</span> Auch nicht-monetäre Vorteile einbeziehen
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-blue">
+      <div class="card-head">Kennzahlen &amp; Begriffe (IHK-Wissen)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Amortisationsdauer</div>
+          <div class="def-text">Zeitraum, nach dem die Investitionskosten durch die erzielten Einsparungen vollständig gedeckt sind. Je kürzer, desto wirtschaftlicher.</div>
+          <div class="def-note">Formel: Entwicklungskosten ÷ jährliche Einsparung</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Kostenvergleichsrechnung</div>
+          <div class="def-text">Vergleicht die Gesamtkosten verschiedener Alternativen (z. B. Eigenentwicklung vs. Kauf einer Standardsoftware) ohne Berücksichtigung von Erlösen.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Nutzwertanalyse</div>
+          <div class="def-text">Bewertet Alternativen anhand gewichteter Kriterien — auch nicht-monetäre Faktoren wie Benutzerfreundlichkeit, Wartbarkeit oder Sicherheit fließen ein.</div>
+          <div class="def-note">Ergänzt die reine Kostenrechnung um qualitative Aspekte.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">TCO — Total Cost of Ownership</div>
+          <div class="def-text">Gesamtkostenbetrachtung über den gesamten Lebenszyklus: Anschaffung + Betrieb + Wartung + Schulung + Entsorgung.</div>
+          <div class="def-note">Wichtig: Nicht nur Entwicklungskosten — auch laufende Kosten einrechnen!</div>
+        </div>
+
+        <table style="margin-top:2px">
+          <thead><tr><th>Methode</th><th>Berücksichtigt</th><th>Wann einsetzen</th></tr></thead>
+          <tbody>
+            <tr><td>Amortisation</td><td>Zeit bis Gewinnzone</td><td>Investitionsentscheidung</td></tr>
+            <tr><td>Rentabilität</td><td>Gewinn in %</td><td>Vergleich von Projekten</td></tr>
+            <tr><td>Kostenvergleich</td><td>Nur Kosten</td><td>Make-or-Buy</td></tr>
+            <tr><td>Nutzwertanalyse</td><td>Kosten + Qualität</td><td>Mehrere Alternativen</td></tr>
+            <tr><td>TCO</td><td>Lebenszykluskosten</td><td>Langfristige Planung</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <div class="card acc-gray">
+      <div class="card-head">Merksätze &amp; Prüfungsstruktur</div>
+      <div class="card-body">
+        <div class="def-row">
+          <div class="def-term">Dreierschritt für die IHK-Aufgabe</div>
+          <div class="def-text">
+            <span class="tag tag-p">① Kosten</span> Alle Entwicklungskosten vollständig ermitteln<br>
+            <span class="tag tag-t">② Nutzen</span> Einsparung pro Jahr berechnen (IST − SOLL)<br>
+            <span class="tag tag-b">③ Bewerten</span> Gegenüberstellen + Amortisation + Urteil
+          </div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Häufige Fehler in der Prüfung</div>
+          <div class="def-text">
+            · Nur Personalkosten angeben — alle Kostenarten nennen!<br>
+            · Einsparung nur für einen Monat rechnen — immer aufs Jahr hochrechnen<br>
+            · Keine abschließende Bewertung — immer Urteil formulieren<br>
+            · Qualitative Vorteile vergessen (Kundenzufriedenheit, Fehlerreduktion)
+          </div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Formulierungshilfe Fazit (IHK)</div>
+          <div class="def-text">„Die Entwicklungskosten von [X €] amortisieren sich nach [Y Monaten] durch die jährliche Einsparung von [Z €]. Das Projekt ist wirtschaftlich und wird empfohlen."</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Wirtschaftlichkeitsanalyse · Entwicklungskosten · Prozesskostenreduktion · Gegenüberstellung</span>
+  <span>AP Teil 1 (Projektdokumentation &amp; Präsentation) · Lernfeld 4 / 6</span>
+  <span>Amortisation · Rentabilität · TCO · Nutzwertanalyse · Kostenvergleich</span>
+</div>
+
+</body>
+</html>

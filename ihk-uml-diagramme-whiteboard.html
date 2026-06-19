@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>UML-Diagramme – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  /* QA */
+  .qa { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .qa:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .q { font-weight: 700; font-size: 8.5px; color: #111; display: flex; gap: 4px; }
+  .q-num { color: #999; min-width: 13px; }
+  .a { font-size: 8.5px; color: #1a5c38; line-height: 1.5; margin: 2px 0 0 17px; }
+  .a::before { content: '→ '; font-weight: 700; color: #0F6E56; }
+  .erkl { font-size: 8px; color: #666; font-style: italic; line-height: 1.5; margin: 1px 0 0 17px; }
+
+  /* TAGS */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+  .tag-gr { background: #edfade; color: #3B6D11; border-color: #86efac; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; text-align: left; border: 0.75px solid #ccc; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* IHK BOX */
+  .ihk-box { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-box-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #b45309; }
+
+  /* SVG DIAGRAMS */
+  .diagram-wrap { background: #fafafa; border: 0.75px solid #ddd; border-radius: 4px; padding: 5px; margin: 4px 0; }
+  svg { display: block; }
+
+  /* PROS CONS */
+  .pro-con { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 4px 0; }
+  .pro { background: #e6faf4; border-radius: 3px; padding: 4px 5px; font-size: 8px; line-height: 1.55; }
+  .con { background: #fff0f0; border-radius: 3px; padding: 4px 5px; font-size: 8px; line-height: 1.55; }
+  .pro-title { font-weight: 700; color: #065f46; margin-bottom: 2px; }
+  .con-title { font-weight: 700; color: #991b1b; margin-bottom: 2px; }
+
+  /* NOTATION ROWS */
+  .notation { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 8px; }
+  .notation-sym { flex-shrink: 0; }
+  .notation-desc { color: #333; line-height: 1.4; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>UML-Diagramme — Use-Case · Aktivitätsdiagramm · Zustandsdiagramm</h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Lernfeld: Analyse, Design &amp; Modellierung · Unified Modeling Language (UML 2.x)</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Analyse-, Entwurfs- &amp; Implementierungsphase</div>
+</div>
+
+<div class="grid">
+
+  <!-- ══ SPALTE 1: UML Grundlagen ══ -->
+  <div class="col">
+
+    <div class="card acc-gray">
+      <div class="card-head">UML — Grundlagen &amp; Überblick</div>
+      <div class="card-body">
+        <div class="def-row">
+          <div class="def-term">Definition UML</div>
+          <div class="def-text">Die <strong>Unified Modeling Language (UML)</strong> ist eine standardisierte, grafische Modellierungssprache zur Beschreibung, Dokumentation und Visualisierung von Softwaresystemen. Sie wird in der Analyse- und Entwurfsphase eingesetzt und ist ein internationaler Standard (ISO/IEC 19501).</div>
+          <div class="def-note">Aktuell: UML 2.x · herausgegeben von der Object Management Group (OMG)</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Zweck &amp; Einsatzgebiete</div>
+          <div class="def-text">
+            · Kommunikation zwischen Entwicklern, Kunden &amp; Stakeholdern<br>
+            · Dokumentation von Anforderungen und Systemstruktur<br>
+            · Grundlage für Implementierungsentscheidungen<br>
+            · Basis für Testfälle und Abnahmekriterien
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Diagrammkategorien</div>
+          <div class="def-text">
+            <span class="tag tag-p">Strukturdiagramme</span> zeigen statischen Aufbau<br>
+            z. B. Klassendiagramm, Komponentendiagramm<br><br>
+            <span class="tag tag-t">Verhaltensdiagramme</span> zeigen dynamisches Verhalten<br>
+            z. B. Use-Case, Aktivitäts-, Zustandsdiagramm
+          </div>
+          <div class="def-note">IHK FIAE: Verhaltensdiagramme besonders prüfungsrelevant!</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Wann wird UML eingesetzt?</div>
+          <div class="def-text">
+            <span class="tag tag-b">Analyse</span> Anforderungen verstehen → Use-Case<br>
+            <span class="tag tag-o">Design</span> Abläufe modellieren → Aktivität, Zustand<br>
+            <span class="tag tag-gr">Doku</span> System beschreiben → alle Diagrammtypen<br>
+            <span class="tag tag-r">Test</span> Testfälle ableiten → Use-Case &amp; Aktivität
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Vorteile von UML allgemein</div>
+          <div class="def-text">
+            · Einheitliche, normierte Notation weltweit<br>
+            · Unabhängig von Programmiersprache<br>
+            · Verständlich für technische &amp; fachliche Stakeholder<br>
+            · Fehler frühzeitig erkennen (vor dem Coden)
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Nachteile von UML allgemein</div>
+          <div class="def-text">
+            · Hoher Aufwand bei vollständiger Modellierung<br>
+            · Kann schnell veralten (Wartung notwendig)<br>
+            · Lernkurve für Einsteiger<br>
+            · Gefahr der Über-Modellierung (zu viele Diagramme)
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-amber">
+      <div class="card-head">Überblick: Welches Diagramm wann?</div>
+      <div class="card-body">
+        <table>
+          <thead>
+            <tr><th>Diagramm</th><th>Frage</th><th>Phase</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Use-Case</strong></td><td>Wer macht was mit dem System?</td><td>Analyse</td></tr>
+            <tr><td><strong>Aktivität</strong></td><td>Wie läuft ein Prozess ab?</td><td>Analyse / Design</td></tr>
+            <tr><td><strong>Zustand</strong></td><td>Welche Zustände hat ein Objekt?</td><td>Design</td></tr>
+            <tr><td>Klasse</td><td>Wie ist das System aufgebaut?</td><td>Design</td></tr>
+            <tr><td>Sequenz</td><td>Wer kommuniziert wann wie?</td><td>Design</td></tr>
+          </tbody>
+        </table>
+        <div class="ihk-box" style="margin-top:5px">
+          <div class="ihk-box-title">IHK-Prüfungsfragen (allgemein)</div>
+          <div class="ihk-q">Was ist UML und wozu wird sie eingesetzt?</div>
+          <div class="ihk-q">Nennen Sie drei UML-Diagrammtypen und deren Einsatzbereich.</div>
+          <div class="ihk-q">Welchen Vorteil bietet die UML-Notation gegenüber einer textuellen Beschreibung?</div>
+          <div class="ihk-q">Unterscheiden Sie Struktur- und Verhaltensdiagramme in UML.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 2: Use-Case-Diagramm ══ -->
+  <div class="col">
+
+    <div class="card acc-purple">
+      <div class="card-head">Use-Case-Diagramm (Anwendungsfalldiagramm)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Das <strong>Use-Case-Diagramm</strong> beschreibt die <strong>funktionalen Anforderungen</strong> eines Systems aus Sicht der Benutzer. Es zeigt, <em>welche Akteure</em> mit dem System interagieren und <em>welche Funktionen</em> (Anwendungsfälle) das System bereitstellt — ohne zu beschreiben, <em>wie</em> diese umgesetzt werden.</div>
+          <div class="def-note">Einsatz: Anforderungsanalyse · Kommunikation mit Kunden · Ableitung von Testfällen</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Wann einsetzen?</div>
+          <div class="def-text">
+            · In der <strong>Analysephase</strong> zur Erfassung von Anforderungen<br>
+            · Wenn unklar ist, <em>was</em> das System leisten soll<br>
+            · Als Gesprächsgrundlage mit dem Kunden / Auftraggeber<br>
+            · Zur Ableitung von Testfällen (jeder UC = potenzieller Test)
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notationselemente</div>
+          <div class="diagram-wrap">
+            <svg width="100%" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg">
+              <!-- System boundary -->
+              <rect x="70" y="10" width="160" height="175" rx="4" fill="#f9f9f9" stroke="#534AB7" stroke-width="1.2" stroke-dasharray="4 2"/>
+              <text x="150" y="23" text-anchor="middle" font-size="8" font-weight="700" fill="#534AB7">«System»</text>
+
+              <!-- Use Cases -->
+              <ellipse cx="150" cy="55" rx="45" ry="14" fill="#f0eeff" stroke="#534AB7" stroke-width="1"/>
+              <text x="150" y="59" text-anchor="middle" font-size="7.5" fill="#3730a3">Produkt bestellen</text>
+
+              <ellipse cx="150" cy="100" rx="45" ry="14" fill="#f0eeff" stroke="#534AB7" stroke-width="1"/>
+              <text x="150" y="104" text-anchor="middle" font-size="7.5" fill="#3730a3">Konto anlegen</text>
+
+              <ellipse cx="150" cy="145" rx="45" ry="14" fill="#f0eeff" stroke="#534AB7" stroke-width="1"/>
+              <text x="150" y="149" text-anchor="middle" font-size="7.5" fill="#3730a3">Rechnung einsehen</text>
+
+              <!-- Actor Kunde -->
+              <circle cx="28" cy="70" r="7" fill="none" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="77" x2="28" y2="100" stroke="#333" stroke-width="1"/>
+              <line x1="14" y1="88" x2="42" y2="88" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="100" x2="16" y2="115" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="100" x2="40" y2="115" stroke="#333" stroke-width="1"/>
+              <text x="28" y="125" text-anchor="middle" font-size="7.5" fill="#111">Kunde</text>
+
+              <!-- Actor Admin -->
+              <circle cx="28" cy="150" r="7" fill="none" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="157" x2="28" y2="178" stroke="#333" stroke-width="1"/>
+              <line x1="14" y1="167" x2="42" y2="167" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="178" x2="16" y2="190" stroke="#333" stroke-width="1"/>
+              <line x1="28" y1="178" x2="40" y2="190" stroke="#333" stroke-width="1"/>
+              <text x="28" y="200" text-anchor="middle" font-size="7.5" fill="#111">Admin</text>
+
+              <!-- Associations -->
+              <line x1="36" y1="75" x2="105" y2="55" stroke="#555" stroke-width="0.8"/>
+              <line x1="36" y1="85" x2="105" y2="100" stroke="#555" stroke-width="0.8"/>
+              <line x1="36" y1="155" x2="105" y2="145" stroke="#555" stroke-width="0.8"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notationselemente erklärt</div>
+          <div class="def-text">
+            <span class="tag tag-p">Akteur</span> Person/System außerhalb · Strichmännchen<br>
+            <span class="tag tag-p">Anwendungsfall</span> Funktion des Systems · Ellipse<br>
+            <span class="tag tag-p">Systemgrenze</span> Rechteck · trennt innen/außen<br>
+            <span class="tag tag-p">Assoziation</span> Linie · Akteur nutzt Anwendungsfall<br>
+            <span class="tag tag-p">«include»</span> Pflichtbeziehung · wird immer aufgerufen<br>
+            <span class="tag tag-p">«extend»</span> Optionalbeziehung · wird bedingt aufgerufen<br>
+            <span class="tag tag-p">Generalisierung</span> Pfeil · Vererbung zwischen Akteuren/UCs
+          </div>
+        </div>
+
+        <div class="pro-con">
+          <div class="pro">
+            <div class="pro-title">Vorteile</div>
+            Einfach verständlich für Kunden<br>
+            Anforderungen klar strukturiert<br>
+            Basis für Testfälle<br>
+            Schnell erstellt
+          </div>
+          <div class="con">
+            <div class="con-title">Nachteile</div>
+            Kein Ablauf erkennbar<br>
+            Keine Zeitinformation<br>
+            Keine Datendarstellung<br>
+            Kann zu grob sein
+          </div>
+        </div>
+
+        <div class="ihk-box" style="margin-top:4px">
+          <div class="ihk-box-title">IHK-Prüfungsfragen Use-Case</div>
+          <div class="ihk-q">Erläutern Sie den Unterschied zwischen «include» und «extend».</div>
+          <div class="ihk-q">Was ist ein Akteur im Use-Case-Diagramm? Nennen Sie ein Beispiel.</div>
+          <div class="ihk-q">Warum wird das Use-Case-Diagramm in der Analysephase eingesetzt?</div>
+          <div class="ihk-q">Ergänzen Sie das vorliegende Diagramm um einen weiteren Anwendungsfall.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 3: Aktivitätsdiagramm ══ -->
+  <div class="col">
+
+    <div class="card acc-teal">
+      <div class="card-head">Aktivitätsdiagramm (Activity Diagram)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Das <strong>Aktivitätsdiagramm</strong> beschreibt den <strong>zeitlich-logischen Ablauf</strong> von Aktivitäten (Schritten) in einem Prozess oder Algorithmus. Es zeigt Sequenzen, Verzweigungen, Parallelitäten und Schleifen — es modelliert das <em>Wie</em> eines Ablaufs.</div>
+          <div class="def-note">Einsatz: Analyse &amp; Design · Geschäftsprozesse · Algorithmen · Workflows</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Wann einsetzen?</div>
+          <div class="def-text">
+            · Wenn <strong>Prozessabläufe</strong> mit Verzweigungen modelliert werden sollen<br>
+            · Zur Beschreibung von <strong>Algorithmen</strong> und Geschäftsregeln<br>
+            · Wenn <strong>parallele</strong> Abläufe dargestellt werden müssen<br>
+            · Als Grundlage für Programmlogik und Testfälle<br>
+            · Bei <strong>Swimlane-Darstellung</strong>: Zuständigkeiten klären
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notation</div>
+          <div class="diagram-wrap">
+            <svg width="100%" viewBox="0 0 200 270" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr-t" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/>
+                </marker>
+              </defs>
+
+              <!-- Start -->
+              <circle cx="100" cy="15" r="7" fill="#0F6E56"/>
+              <text x="115" y="19" font-size="7.5" fill="#555">Startknoten</text>
+
+              <!-- Aktivität 1 -->
+              <rect x="55" y="32" width="90" height="20" rx="10" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="100" y="46" text-anchor="middle" font-size="7.5" fill="#065f46">Bestellung prüfen</text>
+
+              <!-- Raute Entscheidung -->
+              <polygon points="100,65 120,78 100,91 80,78" fill="#fffde7" stroke="#854F0B" stroke-width="1"/>
+              <text x="100" y="82" text-anchor="middle" font-size="7" fill="#854F0B">Lager?</text>
+              <text x="125" y="76" font-size="7" fill="#854F0B">Ja</text>
+              <text x="62" y="76" font-size="7" fill="#854F0B">Nein</text>
+
+              <!-- Ja-Pfad -->
+              <rect x="130" y="95" width="60" height="20" rx="10" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="160" y="109" text-anchor="middle" font-size="7.5" fill="#065f46">Versenden</text>
+
+              <!-- Nein-Pfad -->
+              <rect x="10" y="95" width="60" height="20" rx="10" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="40" y="109" text-anchor="middle" font-size="7.5" fill="#065f46">Nachbestellen</text>
+
+              <!-- Fork / Join (Parallelität) -->
+              <rect x="55" y="130" width="90" height="4" rx="1" fill="#0F6E56"/>
+              <text x="152" y="135" font-size="7" fill="#555">Fork</text>
+
+              <rect x="55" y="65" width="1" height="1" fill="none"/>
+
+              <!-- Parallel-Aktivitäten -->
+              <rect x="20" y="144" width="70" height="18" rx="9" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="55" y="156" text-anchor="middle" font-size="7" fill="#065f46">Rechnung erstellen</text>
+
+              <rect x="110" y="144" width="70" height="18" rx="9" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="145" y="156" text-anchor="middle" font-size="7" fill="#065f46">E-Mail senden</text>
+
+              <!-- Join -->
+              <rect x="55" y="172" width="90" height="4" rx="1" fill="#0F6E56"/>
+              <text x="152" y="178" font-size="7" fill="#555">Join</text>
+
+              <!-- Letzte Aktivität -->
+              <rect x="55" y="186" width="90" height="20" rx="10" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+              <text x="100" y="200" text-anchor="middle" font-size="7.5" fill="#065f46">Abschluss buchen</text>
+
+              <!-- Ende -->
+              <circle cx="100" cy="223" r="7" fill="none" stroke="#0F6E56" stroke-width="1.5"/>
+              <circle cx="100" cy="223" r="4" fill="#0F6E56"/>
+              <text x="115" y="227" font-size="7.5" fill="#555">Endknoten</text>
+
+              <!-- Pfeile -->
+              <line x1="100" y1="22" x2="100" y2="32" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="100" y1="52" x2="100" y2="65" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="120" y1="78" x2="130" y2="105" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="80" y1="78" x2="70" y2="105" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="160" y1="115" x2="120" y2="132" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="40" y1="115" x2="80" y2="132" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="55" y1="134" x2="55" y2="144" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="145" y1="134" x2="145" y2="144" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="55" y1="162" x2="55" y2="174" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="145" y1="162" x2="145" y2="174" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="100" y1="176" x2="100" y2="186" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+              <line x1="100" y1="206" x2="100" y2="216" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-t)"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notationselemente erklärt</div>
+          <div class="def-text">
+            <span class="tag tag-t">Startknoten</span> ausgefüllter Kreis · Beginn<br>
+            <span class="tag tag-t">Aktivität</span> abgerundetes Rechteck · Schritt<br>
+            <span class="tag tag-t">Entscheidung</span> Raute · Ja/Nein-Verzweigung<br>
+            <span class="tag tag-t">Fork</span> Balken · parallele Zweige starten<br>
+            <span class="tag tag-t">Join</span> Balken · parallele Zweige enden<br>
+            <span class="tag tag-t">Endknoten</span> Kreis mit Punkt · Ende<br>
+            <span class="tag tag-t">Swimlane</span> Spalten · Zuständigkeiten trennen
+          </div>
+        </div>
+
+        <div class="pro-con">
+          <div class="pro">
+            <div class="pro-title">Vorteile</div>
+            Abläufe klar visualisiert<br>
+            Parallelität darstellbar<br>
+            Swimlanes für Rollen<br>
+            Algorithmen beschreibbar
+          </div>
+          <div class="con">
+            <div class="con-title">Nachteile</div>
+            Bei vielen Verzweigungen unübersichtlich<br>
+            Kein Fokus auf Zustände<br>
+            Keine Zeitachse<br>
+            Kein Akteur direkt sichtbar
+          </div>
+        </div>
+
+        <div class="ihk-box">
+          <div class="ihk-box-title">IHK-Prüfungsfragen Aktivität</div>
+          <div class="ihk-q">Was zeigt ein Aktivitätsdiagramm und wann wird es eingesetzt?</div>
+          <div class="ihk-q">Erläutern Sie den Unterschied zwischen Fork und Join.</div>
+          <div class="ihk-q">Was ist eine Swimlane und welchen Zweck hat sie?</div>
+          <div class="ihk-q">Erstellen Sie ein Aktivitätsdiagramm für den Bestellprozess.</div>
+          <div class="ihk-q">Wie wird eine Schleife im Aktivitätsdiagramm dargestellt?</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 4: Zustandsdiagramm ══ -->
+  <div class="col">
+
+    <div class="card acc-coral">
+      <div class="card-head">Zustandsdiagramm (State Machine Diagram)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Das <strong>Zustandsdiagramm</strong> (auch: Zustandsautomat) beschreibt alle möglichen <strong>Zustände</strong>, die ein Objekt während seines Lebens annehmen kann, sowie die <strong>Übergänge</strong> zwischen diesen Zuständen, ausgelöst durch Ereignisse oder Bedingungen.</div>
+          <div class="def-note">Einsatz: Design-Phase · Objekte mit komplexem Lebenszyklusverhalten · Steuerungslogik</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Wann einsetzen?</div>
+          <div class="def-text">
+            · Wenn ein Objekt <strong>verschiedene Zustände</strong> durchläuft (z. B. Bestellung: neu → bezahlt → versandt → abgeschlossen)<br>
+            · Wenn <strong>Übergangsbedingungen</strong> zwischen Zuständen wichtig sind<br>
+            · Für <strong>UI-Zustände</strong> (Login, Warenkorb, Formular)<br>
+            · Bei eingebetteten Systemen und Steuerungslogik<br>
+            · Wenn der <strong>Lebenszyklus</strong> eines Objekts dokumentiert werden soll
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notation</div>
+          <div class="diagram-wrap">
+            <svg width="100%" viewBox="0 0 210 280" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arr-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M2 1L8 5L2 9" fill="none" stroke="#C04828" stroke-width="1.5" stroke-linecap="round"/>
+                </marker>
+              </defs>
+
+              <!-- Startzustand -->
+              <circle cx="105" cy="16" r="7" fill="#C04828"/>
+              <text x="120" y="20" font-size="7.5" fill="#555">Startzustand</text>
+
+              <!-- Zustand: Neu -->
+              <rect x="60" y="32" width="90" height="28" rx="6" fill="#fff0eb" stroke="#C04828" stroke-width="1.2"/>
+              <line x1="60" y1="43" x2="150" y2="43" stroke="#C04828" stroke-width="0.5"/>
+              <text x="105" y="41" text-anchor="middle" font-size="8" font-weight="700" fill="#7c2d12">Neu</text>
+              <text x="105" y="55" text-anchor="middle" font-size="7" fill="#9a3412">entry: ID vergeben</text>
+
+              <!-- Zustand: Bezahlt -->
+              <rect x="60" y="82" width="90" height="28" rx="6" fill="#fff0eb" stroke="#C04828" stroke-width="1.2"/>
+              <line x1="60" y1="93" x2="150" y2="93" stroke="#C04828" stroke-width="0.5"/>
+              <text x="105" y="91" text-anchor="middle" font-size="8" font-weight="700" fill="#7c2d12">Bezahlt</text>
+              <text x="105" y="105" text-anchor="middle" font-size="7" fill="#9a3412">do: Lager prüfen</text>
+
+              <!-- Zustand: Versandt -->
+              <rect x="60" y="132" width="90" height="28" rx="6" fill="#fff0eb" stroke="#C04828" stroke-width="1.2"/>
+              <line x1="60" y1="143" x2="150" y2="143" stroke="#C04828" stroke-width="0.5"/>
+              <text x="105" y="141" text-anchor="middle" font-size="8" font-weight="700" fill="#7c2d12">Versandt</text>
+              <text x="105" y="155" text-anchor="middle" font-size="7" fill="#9a3412">entry: Tracking erstellen</text>
+
+              <!-- Zustand: Storniert -->
+              <rect x="5" y="107" width="45" height="20" rx="5" fill="#fff0f0" stroke="#991b1b" stroke-width="1"/>
+              <text x="27" y="121" text-anchor="middle" font-size="7" fill="#991b1b">Storniert</text>
+
+              <!-- Zustand: Abgeschlossen -->
+              <rect x="60" y="183" width="90" height="22" rx="6" fill="#fff0eb" stroke="#C04828" stroke-width="1.2"/>
+              <text x="105" y="198" text-anchor="middle" font-size="8" font-weight="700" fill="#7c2d12">Abgeschlossen</text>
+
+              <!-- Endzustand -->
+              <circle cx="105" cy="228" r="7" fill="none" stroke="#C04828" stroke-width="1.5"/>
+              <circle cx="105" cy="228" r="4" fill="#C04828"/>
+              <text x="120" y="232" font-size="7.5" fill="#555">Endzustand</text>
+
+              <!-- Übergangspfeile -->
+              <line x1="105" y1="23" x2="105" y2="32" stroke="#C04828" stroke-width="0.8" marker-end="url(#arr-c)"/>
+              <line x1="105" y1="60" x2="105" y2="82" stroke="#C04828" stroke-width="0.8" marker-end="url(#arr-c)"/>
+              <line x1="105" y1="110" x2="105" y2="132" stroke="#C04828" stroke-width="0.8" marker-end="url(#arr-c)"/>
+              <line x1="105" y1="160" x2="105" y2="183" stroke="#C04828" stroke-width="0.8" marker-end="url(#arr-c)"/>
+              <line x1="105" y1="205" x2="105" y2="221" stroke="#C04828" stroke-width="0.8" marker-end="url(#arr-c)"/>
+              <!-- Storno von Neu -->
+              <line x1="60" y1="50" x2="50" y2="107" stroke="#991b1b" stroke-width="0.8" stroke-dasharray="3 2" marker-end="url(#arr-c)"/>
+              <!-- Storno von Bezahlt -->
+              <line x1="60" y1="100" x2="50" y2="115" stroke="#991b1b" stroke-width="0.8" stroke-dasharray="3 2" marker-end="url(#arr-c)"/>
+
+              <!-- Transition Labels -->
+              <text x="112" y="74" font-size="7" fill="#555">Zahlung eingegangen</text>
+              <text x="112" y="124" font-size="7" fill="#555">Lager verfügbar</text>
+              <text x="112" y="174" font-size="7" fill="#555">Lieferung bestätigt</text>
+              <text x="112" y="217" font-size="7" fill="#555">Archiviert</text>
+              <text x="2" y="103" font-size="6.5" fill="#991b1b">Storniert</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Notationselemente erklärt</div>
+          <div class="def-text">
+            <span class="tag tag-o">Startzustand</span> ausgefüllter Kreis · nur einer<br>
+            <span class="tag tag-o">Zustand</span> Rechteck mit abger. Ecken · Name + Aktivitäten<br>
+            <span class="tag tag-o">Transition</span> Pfeil mit Beschriftung · Auslöser [Bedingung] / Aktion<br>
+            <span class="tag tag-o">Endzustand</span> Kreis mit Punkt · Lebensende<br>
+            <span class="tag tag-o">entry:</span> Aktion beim Betreten des Zustands<br>
+            <span class="tag tag-o">do:</span> Aktion während des Zustands<br>
+            <span class="tag tag-o">exit:</span> Aktion beim Verlassen des Zustands
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Transition-Syntax (IHK)</div>
+          <div class="def-text" style="font-family:'Courier New',monospace; font-size:8px; background:#f5f5f5; padding:3px 5px; border-radius:3px; border-left:2px solid #C04828">
+            Ereignis [Bedingung] / Aktion<br>
+            z. B.: Zahlung [Betrag &gt; 0] / Quittung senden
+          </div>
+        </div>
+
+        <div class="pro-con">
+          <div class="pro">
+            <div class="pro-title">Vorteile</div>
+            Lebenszyklus vollständig<br>
+            Alle Zustände sichtbar<br>
+            Fehlerhafte Zustände findbar<br>
+            Steuerungslogik klar
+          </div>
+          <div class="con">
+            <div class="con-title">Nachteile</div>
+            Nur ein Objekt pro Diagramm<br>
+            Kein Prozessablauf sichtbar<br>
+            Viele Zustände = unübersichtlich<br>
+            Kein Akteur erkennbar
+          </div>
+        </div>
+
+        <div class="ihk-box">
+          <div class="ihk-box-title">IHK-Prüfungsfragen Zustand</div>
+          <div class="ihk-q">Was zeigt ein Zustandsdiagramm und wann wird es eingesetzt?</div>
+          <div class="ihk-q">Erläutern Sie den Unterschied zwischen entry, do und exit.</div>
+          <div class="ihk-q">Wie wird ein Zustandsübergang (Transition) notiert?</div>
+          <div class="ihk-q">Erstellen Sie ein Zustandsdiagramm für eine Bestellung (neu → bezahlt → versandt → abgeschlossen).</div>
+          <div class="ihk-q">Was ist der Unterschied zwischen Zustandsdiagramm und Aktivitätsdiagramm?</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · UML-Diagramme · Use-Case · Aktivitätsdiagramm · Zustandsdiagramm · UML 2.x / ISO 19501</span>
+  <span>AP Teil 1 (Projektdokumentation) &amp; Teil 2 (schriftlich) · Lernfeld 6 / 8 · Analyse &amp; Entwurfsphase</span>
+  <span>Verhaltensdiagramme · Modellierung · OMG Standard · Softwareentwicklung</span>
+</div>
+
+</body>
+</html>

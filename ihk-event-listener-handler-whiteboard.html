@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Event Listener & Handler – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.5px; color: #111; background: #fff; }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 8px; }
+  .header-left h1 { font-size: 17px; font-weight: 700; letter-spacing: .02em; }
+  .header-left .meta { font-size: 8.5px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+
+  /* ── LAYOUT ──────────────────────────────────────── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .col { display: flex; flex-direction: column; gap: 7px; }
+
+  /* ── CARDS ───────────────────────────────────────── */
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+  .card-head { padding: 4px 8px; font-weight: 700; font-size: 9.5px; border-bottom: 1.5px solid #222; display: flex; align-items: center; gap: 6px; }
+  .card-body { padding: 6px 8px; }
+
+  /* accent bars */
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+
+  /* ── DEFINITION ROWS ─────────────────────────────── */
+  .def-row { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.75px solid #e0e0e0; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9.5px; color: #111; }
+  .def-text { font-size: 9px; color: #333; line-height: 1.55; margin-top: 2px; }
+  .def-note { font-size: 8.5px; color: #777; font-style: italic; margin-top: 2px; }
+
+  /* ── CODE BLOCKS ──────────────────────────────────── */
+  .code { font-family: 'Courier New', monospace; font-size: 8px; color: #333; background: #f5f5f5; border-radius: 3px; padding: 4px 6px; margin-top: 4px; white-space: pre; line-height: 1.6; border-left: 2px solid #ccc; }
+
+  /* ── TAGS / BADGES ───────────────────────────────── */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid; }
+  .tag-p  { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t  { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o  { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-g  { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  /* ── COMPARISON TABLE ────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 8.5px; margin-top: 4px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 3px 5px; text-align: left; border: 0.75px solid #ccc; }
+  td { padding: 3px 5px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ── PHASE DIAGRAM ───────────────────────────────── */
+  .phase-row { display: flex; align-items: stretch; gap: 0; margin-top: 4px; }
+  .phase-box { flex: 1; border: 1px solid #bbb; border-radius: 3px; padding: 4px 5px; text-align: center; }
+  .phase-box + .phase-box { border-left: none; border-radius: 0; }
+  .phase-box:last-child { border-radius: 0 3px 3px 0; }
+  .phase-box:first-child { border-radius: 3px 0 0 3px; }
+  .phase-num { font-size: 8px; color: #888; font-weight: 700; }
+  .phase-name { font-size: 9px; font-weight: 700; margin: 1px 0; }
+  .phase-sub { font-size: 7.5px; color: #555; }
+  .ph-cap { background: #f0eeff; }
+  .ph-tgt { background: #fff0eb; }
+  .ph-bub { background: #e6faf4; }
+  .arrow-mid { font-size: 13px; color: #999; display: flex; align-items: center; padding: 0 2px; }
+
+  /* ── IHK BOX ─────────────────────────────────────── */
+  .ihk-box { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 5px 7px; margin-top: 4px; }
+  .ihk-box-title { font-size: 8px; font-weight: 700; color: #b45309; margin-bottom: 3px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8.5px; color: #333; line-height: 1.5; margin-bottom: 2px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #b45309; }
+
+  /* ── FOOTER ──────────────────────────────────────── */
+  .footer { border-top: 1px solid #ccc; margin-top: 7px; padding-top: 4px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>Event Listener &amp; Event Handler — JavaScript</h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Lernfeld: Webanwendungen entwickeln</div>
+  </div>
+  <div class="header-right">
+    AP Teil 1 &amp; Teil 2 relevant<br>Themenbereich: Clientseitige Programmierung
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="grid">
+
+  <!-- ══ SPALTE 1 ══ -->
+  <div class="col">
+
+    <!-- Grundbegriffe -->
+    <div class="card acc-purple">
+      <div class="card-head">Grundbegriffe &amp; Definitionen (IHK)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Event (Ereignis)</div>
+          <div class="def-text">Ein <strong>Ereignis</strong> ist eine Aktion oder ein Vorkommnis im Browser, das durch den Benutzer oder das System ausgelöst wird und auf das eine Webanwendung reagieren kann.</div>
+          <div class="def-note">Beispiele: Mausklick, Tastatureingabe, Seitenladung, Formularübermittlung</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Event Listener (Ereignishorcher)</div>
+          <div class="def-text">Ein <strong>Event Listener</strong> ist eine Funktion oder ein Objekt, das auf einem DOM-Element registriert wird und auf ein bestimmtes Ereignis wartet. Er „horcht" auf das Eintreten des Events.</div>
+          <div class="def-note">Registrierung via: <code style="font-family:monospace">element.addEventListener(typ, handler)</code></div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Event Handler (Ereignisbehandler)</div>
+          <div class="def-text">Ein <strong>Event Handler</strong> ist die Funktion, die aufgerufen wird, sobald das überwachte Ereignis eintritt. Sie enthält die Logik zur Reaktion auf das Event.</div>
+          <div class="def-note">Der Handler erhält automatisch das Event-Objekt als Parameter.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Event-Objekt</div>
+          <div class="def-text">Das <strong>Event-Objekt</strong> wird beim Eintreten eines Ereignisses automatisch erzeugt und an den Handler übergeben. Es enthält alle Informationen über das Ereignis.</div>
+          <div class="def-note">Wichtige Properties: <code style="font-family:monospace">target</code>, <code style="font-family:monospace">type</code>, <code style="font-family:monospace">currentTarget</code></div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">DOM (Document Object Model)</div>
+          <div class="def-text">Das <strong>DOM</strong> ist eine baumartige Programmierschnittstelle, die HTML-Dokumente als Objekte repräsentiert. Events werden auf DOM-Elementen (Knoten) registriert und verarbeitet.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- IHK Prüfungsfragen -->
+    <div class="card acc-amber">
+      <div class="card-head">Typische IHK-Prüfungsfragen</div>
+      <div class="card-body">
+        <div class="ihk-box">
+          <div class="ihk-box-title">Mögliche Aufgabenstellungen AP</div>
+          <div class="ihk-q">Erläutern Sie den Unterschied zwischen Event Listener und Event Handler.</div>
+          <div class="ihk-q">Beschreiben Sie die drei Phasen der Event-Propagation.</div>
+          <div class="ihk-q">Was versteht man unter Event Delegation? Nennen Sie einen Vorteil.</div>
+          <div class="ihk-q">Erklären Sie, wozu <code style="font-family:monospace">preventDefault()</code> und <code style="font-family:monospace">stopPropagation()</code> verwendet werden.</div>
+          <div class="ihk-q">Nennen Sie drei Browser-Events und beschreiben Sie deren Auslöser.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 2 ══ -->
+  <div class="col">
+
+    <!-- Event Propagation -->
+    <div class="card acc-teal">
+      <div class="card-head">Event-Propagation (Ereignisweiterleitung)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition Propagation</div>
+          <div class="def-text">Unter <strong>Event-Propagation</strong> versteht man die Weitergabe eines Ereignisses durch den DOM-Baum. Sie läuft in drei Phasen ab:</div>
+        </div>
+
+        <div class="phase-row">
+          <div class="phase-box ph-cap">
+            <div class="phase-num">Phase 1</div>
+            <div class="phase-name">Capturing</div>
+            <div class="phase-sub">window → target<br>von oben nach unten</div>
+          </div>
+          <div class="arrow-mid">→</div>
+          <div class="phase-box ph-tgt">
+            <div class="phase-num">Phase 2</div>
+            <div class="phase-name">Target</div>
+            <div class="phase-sub">Ziel-Element<br>Event trifft ein</div>
+          </div>
+          <div class="arrow-mid">→</div>
+          <div class="phase-box ph-bub">
+            <div class="phase-num">Phase 3</div>
+            <div class="phase-name">Bubbling</div>
+            <div class="phase-sub">target → window<br>von unten nach oben</div>
+          </div>
+        </div>
+
+        <div class="def-row" style="margin-top:6px">
+          <div class="def-term">Bubbling</div>
+          <div class="def-text">Nach dem Eintreten wandert das Event vom Ziel-Element aufwärts durch alle Eltern-Elemente bis zum <code style="font-family:monospace">window</code>. Standard-Verhalten der meisten Events.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Capturing</div>
+          <div class="def-text">Das Event wandert zuerst vom <code style="font-family:monospace">window</code> abwärts zum Ziel. Nur aktiv wenn <code style="font-family:monospace">{ capture: true }</code> gesetzt ist.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">stopPropagation()</div>
+          <div class="def-text">Unterbricht die Weitergabe des Events an übergeordnete oder untergeordnete Elemente. Das Event wird nicht weiter weitergeleitet.</div>
+          <div class="code">e.stopPropagation(); // kein Bubbling mehr</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">preventDefault()</div>
+          <div class="def-text">Verhindert das <strong>Standardverhalten</strong> des Browsers für dieses Event (z. B. Seitenreload bei Formular-Submit, Link-Navigation).</div>
+          <div class="code">e.preventDefault(); // kein Seitenreload</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Event Delegation -->
+    <div class="card acc-green">
+      <div class="card-head">Event Delegation</div>
+      <div class="card-body">
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text"><strong>Event Delegation</strong> ist ein Entwurfsmuster, bei dem statt auf jedem Kind-Element ein einzelner Event Listener auf dem gemeinsamen Eltern-Element registriert wird. Das Bubbling-Prinzip leitet alle Events nach oben weiter.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Vorteile (IHK-relevant)</div>
+          <div class="def-text">
+            · Weniger Listener → bessere Performance<br>
+            · Funktioniert auch für dynamisch hinzugefügte Elemente<br>
+            · Weniger Speicherverbrauch
+          </div>
+        </div>
+        <div class="code">// Listener auf Parent statt auf jedem &lt;li&gt;
+ul.addEventListener('click', (e) => {
+  if (e.target.tagName === 'LI') {
+    console.log('Geklickt:', e.target.textContent);
+  }
+});</div>
+        <div class="def-note" style="margin-top:4px">e.target → auslösendes Element &nbsp;|&nbsp; e.currentTarget → Element mit Listener</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 3 ══ -->
+  <div class="col">
+
+    <!-- Syntax & Methoden -->
+    <div class="card acc-coral">
+      <div class="card-head">Syntax &amp; Methoden im Vergleich</div>
+      <div class="card-body">
+
+        <table>
+          <thead>
+            <tr>
+              <th>Methode</th>
+              <th>Syntax</th>
+              <th>Bewertung</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>addEventListener</strong></td>
+              <td><code style="font-family:monospace">el.addEventListener('click', fn)</code></td>
+              <td>✔ Empfohlen · mehrere Listener möglich · entfernbar</td>
+            </tr>
+            <tr>
+              <td>onclick-Attribut (HTML)</td>
+              <td><code style="font-family:monospace">&lt;button onclick="fn()"&gt;</code></td>
+              <td>✖ Vermeiden · HTML und JS vermischt (kein Separation of Concerns)</td>
+            </tr>
+            <tr>
+              <td>onclick-Property (JS)</td>
+              <td><code style="font-family:monospace">el.onclick = fn;</code></td>
+              <td>✖ Nur 1 Listener · überschreibt sich selbst</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="def-row" style="margin-top:7px">
+          <div class="def-term">addEventListener — vollständige Syntax</div>
+          <div class="code">element.addEventListener(type, handler, options)
+
+// type    → Event-Typ als String: 'click', 'submit', …
+// handler → Funktion (benannt oder anonym)
+// options → { capture, once, passive }
+
+element.removeEventListener('click', handler);
+// ⚠ Nur mit benannter Funktion entfernbar!</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Options-Parameter (IHK-Wissen)</div>
+          <div class="def-text">
+            <span class="tag tag-p">capture: true</span> Listener in Capturing-Phase aktiv<br>
+            <span class="tag tag-t">once: true</span> &nbsp;&nbsp;&nbsp;&nbsp;Listener feuert nur einmal<br>
+            <span class="tag tag-o">passive: true</span> &nbsp;preventDefault() wird nicht aufgerufen → bessere Scroll-Performance
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Event-Objekt Eigenschaften -->
+    <div class="card acc-blue">
+      <div class="card-head">Event-Objekt — wichtige Eigenschaften</div>
+      <div class="card-body">
+
+        <table>
+          <thead>
+            <tr><th>Eigenschaft / Methode</th><th>Beschreibung</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code style="font-family:monospace">event.type</code></td><td>Typ des Events: <code style="font-family:monospace">'click'</code>, <code style="font-family:monospace">'keydown'</code>, …</td></tr>
+            <tr><td><code style="font-family:monospace">event.target</code></td><td>Element, das das Event <em>ausgelöst</em> hat</td></tr>
+            <tr><td><code style="font-family:monospace">event.currentTarget</code></td><td>Element, auf dem der Listener <em>registriert</em> ist</td></tr>
+            <tr><td><code style="font-family:monospace">event.preventDefault()</code></td><td>Verhindert das Browser-Standardverhalten</td></tr>
+            <tr><td><code style="font-family:monospace">event.stopPropagation()</code></td><td>Stoppt die Weiterleitung im DOM-Baum</td></tr>
+            <tr><td><code style="font-family:monospace">event.key</code></td><td>Gedrückte Taste (z. B. <code style="font-family:monospace">'Enter'</code>, <code style="font-family:monospace">'a'</code>)</td></tr>
+            <tr><td><code style="font-family:monospace">event.clientX / Y</code></td><td>Mausposition im Viewport (px)</td></tr>
+            <tr><td><code style="font-family:monospace">event.bubbles</code></td><td><code style="font-family:monospace">true</code> wenn Event bubbelt</td></tr>
+            <tr><td><code style="font-family:monospace">event.cancelable</code></td><td><code style="font-family:monospace">true</code> wenn preventDefault() möglich</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code" style="margin-top:5px">// Vollständiges Beispiel (IHK-konform)
+const btn = document.querySelector('#mein-btn');
+
+function handleClick(event) {
+  event.preventDefault();       // Standardaktion stoppen
+  console.log(event.target);    // auslösendes Element
+  console.log(event.type);      // 'click'
+}
+
+btn.addEventListener('click', handleClick);
+
+// Entfernen (nur mit benannter Funktion!):
+btn.removeEventListener('click', handleClick);</div>
+
+      </div>
+    </div>
+
+    <!-- Separation of Concerns -->
+    <div class="card acc-gray">
+      <div class="card-head">Fachbegriff: Separation of Concerns</div>
+      <div class="card-body">
+        <div class="def-row">
+          <div class="def-text"><strong>Separation of Concerns</strong> (Trennung der Zuständigkeiten) ist ein Entwurfsprinzip, nach dem HTML (Struktur), CSS (Darstellung) und JavaScript (Verhalten) strikt getrennt werden sollen.</div>
+          <div class="def-note">→ Daher: Event Listener immer in JS registrieren, <em>nicht</em> als HTML-Attribut (<code style="font-family:monospace">onclick="..."</code>).</div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Merksatz für die Prüfung</div>
+          <div class="def-text">
+            <strong>Event Listener</strong> = Wächter · registriert sich auf einem Element<br>
+            <strong>Event Handler</strong> = Ausführer · enthält die Reaktionslogik<br>
+            <strong>Event-Objekt</strong> = Datenbote · liefert alle Infos zum Ereignis<br>
+            <strong>Propagation</strong> = Reiseroute · Capturing → Target → Bubbling
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>IHK FIAE · Webanwendungen entwickeln · Event Listener &amp; Handler</span>
+  <span>Prüfungsrelevanz: AP Teil 1 (Projektarbeit) &amp; Teil 2 (schriftlich) · Lernfeld 9 / 10</span>
+  <span>JavaScript · DOM · clientseitige Programmierung</span>
+</div>
+
+</body>
+</html>

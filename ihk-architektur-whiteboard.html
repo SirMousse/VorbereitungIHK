@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Architektursysteme – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.5px; color: #111; background: #fff; }
+
+  /* HEADER */
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 8px; }
+  .header-left h1 { font-size: 17px; font-weight: 700; letter-spacing: .02em; }
+  .header-left .meta { font-size: 8.5px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+
+  /* LAYOUT */
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .col { display: flex; flex-direction: column; gap: 7px; }
+
+  /* CARDS */
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+  .card-head { padding: 4px 8px; font-weight: 700; font-size: 9.5px; border-bottom: 1.5px solid #222; display: flex; align-items: center; gap: 6px; }
+  .card-body { padding: 6px 8px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  /* ROWS */
+  .def-row { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.75px solid #e0e0e0; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9.5px; color: #111; }
+  .def-text { font-size: 9px; color: #333; line-height: 1.55; margin-top: 2px; }
+  .def-note { font-size: 8.5px; color: #777; font-style: italic; margin-top: 2px; }
+
+  /* CODE */
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; color: #333; background: #f5f5f5; border-radius: 3px; padding: 3px 6px; margin-top: 4px; white-space: pre; line-height: 1.6; border-left: 2px solid #ccc; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 8.5px; margin-top: 4px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 3px 5px; text-align: left; border: 0.75px solid #ccc; }
+  td { padding: 3px 5px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.45; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* TAGS */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid; margin-right: 2px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g { background: #f4f4f2; color: #444;    border-color: #ccc; }
+
+  /* SCHICHTEN DIAGRAM */
+  .layer { border: 1px solid #bbb; border-radius: 3px; padding: 4px 8px; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+  .layer-num { font-size: 8px; font-weight: 700; color: #888; min-width: 14px; text-align: right; }
+  .layer-name { font-weight: 700; font-size: 9px; min-width: 90px; }
+  .layer-desc { font-size: 8px; color: #555; }
+
+  .l-pres  { background: #f0eeff; }
+  .l-biz   { background: #e6faf4; }
+  .l-data  { background: #e8f3fb; }
+  .l-db    { background: #fef3e0; }
+
+  /* MVC FLOW */
+  .mvc-row { display: flex; align-items: center; gap: 4px; margin-top: 5px; }
+  .mvc-box { flex: 1; border: 1.5px solid; border-radius: 4px; padding: 5px 4px; text-align: center; }
+  .mvc-m { background: #e8f3fb; border-color: #185FA5; }
+  .mvc-v { background: #f0eeff; border-color: #534AB7; }
+  .mvc-c { background: #e6faf4; border-color: #0F6E56; }
+  .mvc-box-title { font-weight: 700; font-size: 9.5px; }
+  .mvc-box-sub { font-size: 7.5px; color: #555; margin-top: 2px; line-height: 1.4; }
+  .mvc-arrow { font-size: 11px; color: #999; }
+
+  /* CS DIAGRAM */
+  .cs-row { display: flex; align-items: center; gap: 5px; margin: 6px 0 3px; }
+  .cs-box { border: 1.5px solid #333; border-radius: 4px; padding: 5px 8px; text-align: center; flex: 1; }
+  .cs-client { background: #f0eeff; }
+  .cs-server { background: #e6faf4; }
+  .cs-db     { background: #fef3e0; }
+  .cs-title  { font-weight: 700; font-size: 9px; }
+  .cs-sub    { font-size: 7.5px; color: #555; margin-top: 2px; }
+  .cs-arrow  { text-align: center; font-size: 9px; color: #555; flex: 0 0 28px; }
+
+  /* IHK BOX */
+  .ihk-box { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 5px 7px; margin-top: 4px; }
+  .ihk-box-title { font-size: 8px; font-weight: 700; color: #b45309; margin-bottom: 3px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8.5px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #b45309; }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid #ccc; margin-top: 7px; padding-top: 4px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>Architektursysteme — Client-Server · Schichtenmodell · MVC</h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Lernfeld: Softwareentwicklung &amp; Systemarchitektur</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Themenbereich: Systemarchitektur &amp; Softwaredesign</div>
+</div>
+
+<div class="grid">
+
+  <!-- ══ SPALTE 1: Client-Server ══ -->
+  <div class="col">
+
+    <div class="card acc-purple">
+      <div class="card-head">Client-Server-Architektur — Grundbegriffe</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Client-Server-Architektur</div>
+          <div class="def-text">Ein <strong>Architekturmuster</strong>, bei dem Aufgaben zwischen Dienstanforderern (<strong>Clients</strong>) und Dienstanbietern (<strong>Servern</strong>) aufgeteilt werden. Die Kommunikation erfolgt über ein Netzwerk nach dem <strong>Anfrage-Antwort-Prinzip</strong> (Request-Response).</div>
+        </div>
+
+        <div class="cs-row">
+          <div class="cs-box cs-client">
+            <div class="cs-title">Client</div>
+            <div class="cs-sub">Browser, App<br>stellt Anfragen</div>
+          </div>
+          <div class="cs-arrow">→ Request →<br>← Response ←</div>
+          <div class="cs-box cs-server">
+            <div class="cs-title">Server</div>
+            <div class="cs-sub">Webserver<br>verarbeitet, antwortet</div>
+          </div>
+          <div class="cs-arrow">→ SQL →<br>← Daten ←</div>
+          <div class="cs-box cs-db">
+            <div class="cs-title">Datenbank</div>
+            <div class="cs-sub">Datenpersistenz<br>speichert Daten</div>
+          </div>
+        </div>
+
+        <div class="def-row" style="margin-top:5px">
+          <div class="def-term">Client</div>
+          <div class="def-text">Ein Programm oder Gerät, das Dienste eines Servers in Anspruch nimmt. Der Client sendet Anfragen (Requests) und empfängt Antworten (Responses).</div>
+          <div class="def-note">Beispiele: Webbrowser, mobile App, Desktop-Anwendung</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Server</div>
+          <div class="def-text">Ein System, das Dienste für Clients bereitstellt. Er nimmt Anfragen entgegen, verarbeitet sie und sendet eine Antwort zurück.</div>
+          <div class="def-note">Beispiele: Webserver (Apache, nginx), Datenbankserver, Mailserver</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Protokoll</div>
+          <div class="def-text">Vereinbartes Regelwerk für die Kommunikation zwischen Client und Server.</div>
+          <div class="def-note">HTTP/HTTPS für Web · FTP für Dateien · SMTP für E-Mail</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Thin Client vs. Fat Client</div>
+          <div class="def-text">
+            <strong>Thin Client:</strong> Minimale lokale Verarbeitung, Logik liegt auf dem Server (z. B. reiner Browser).<br>
+            <strong>Fat Client:</strong> Viel Verarbeitung lokal, Server nur für Daten (z. B. Desktop-App).
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-amber">
+      <div class="card-head">Typische IHK-Prüfungsfragen</div>
+      <div class="card-body">
+        <div class="ihk-box">
+          <div class="ihk-box-title">Mögliche Aufgabenstellungen AP</div>
+          <div class="ihk-q">Erläutern Sie das Client-Server-Prinzip anhand eines Beispiels.</div>
+          <div class="ihk-q">Nennen Sie Vor- und Nachteile der 3-Schichten-Architektur.</div>
+          <div class="ihk-q">Beschreiben Sie die Aufgaben von Model, View und Controller im MVC-Muster.</div>
+          <div class="ihk-q">Erklären Sie den Unterschied zwischen 2-Tier- und 3-Tier-Architektur.</div>
+          <div class="ihk-q">Welches Entwurfsmuster trennt Datenhaltung, Logik und Darstellung?</div>
+          <div class="ihk-q">Nennen Sie einen Vorteil der Schichtenarchitektur gegenüber monolithischen Systemen.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 2: Schichtenmodell ══ -->
+  <div class="col">
+
+    <div class="card acc-teal">
+      <div class="card-head">Schichtenarchitektur (Layered Architecture)</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition</div>
+          <div class="def-text">Die <strong>Schichtenarchitektur</strong> ist ein Architekturmuster, bei dem eine Anwendung in übereinanderliegende, logisch getrennte Schichten unterteilt wird. Jede Schicht erfüllt eine klar definierte Aufgabe und kommuniziert nur mit der direkt benachbarten Schicht.</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">3-Schichten-Architektur (3-Tier)</div>
+        </div>
+
+        <div class="layer l-pres">
+          <div class="layer-num">3</div>
+          <div class="layer-name">Präsentationsschicht</div>
+          <div class="layer-desc">Benutzeroberfläche · Darstellung · HTML, CSS, JS · kein Datenbankzugriff</div>
+        </div>
+        <div style="text-align:center; font-size:9px; color:#888; margin:1px 0">↕ Nur Schicht-zu-Schicht-Kommunikation</div>
+        <div class="layer l-biz">
+          <div class="layer-num">2</div>
+          <div class="layer-name">Logikschicht</div>
+          <div class="layer-desc">Geschäftslogik · Verarbeitung · Validierung · z. B. Java, Python, PHP</div>
+        </div>
+        <div style="text-align:center; font-size:9px; color:#888; margin:1px 0">↕ Nur Schicht-zu-Schicht-Kommunikation</div>
+        <div class="layer l-data">
+          <div class="layer-num">1</div>
+          <div class="layer-name">Datenhaltungsschicht</div>
+          <div class="layer-desc">Datenbankzugriff · Persistenz · SQL · z. B. MySQL, PostgreSQL</div>
+        </div>
+
+        <div class="def-row" style="margin-top:7px">
+          <div class="def-term">Vorteile der Schichtenarchitektur</div>
+          <div class="def-text">
+            · <strong>Wartbarkeit:</strong> Jede Schicht unabhängig änderbar<br>
+            · <strong>Wiederverwendbarkeit:</strong> Schichten in anderen Projekten nutzbar<br>
+            · <strong>Testbarkeit:</strong> Einzelne Schichten isoliert testbar<br>
+            · <strong>Skalierbarkeit:</strong> Schichten unabhängig skalierbar
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Nachteile</div>
+          <div class="def-text">
+            · Höherer Entwicklungsaufwand<br>
+            · Leistungsverlust durch Schichtenwechsel<br>
+            · Strenge Schichtentrennung kann unflexibel sein
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">2-Tier vs. 3-Tier vs. n-Tier</div>
+          <div class="def-text">
+            <span class="tag tag-g">2-Tier</span> Client + Datenbankserver (keine separate Logikschicht)<br>
+            <span class="tag tag-t">3-Tier</span> Client + Applikationsserver + Datenbankserver<br>
+            <span class="tag tag-p">n-Tier</span> Beliebig viele Schichten für komplexe Systeme
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-gray">
+      <div class="card-head">Fachbegriffe &amp; Prinzipien (IHK-Wissen)</div>
+      <div class="card-body">
+        <div class="def-row">
+          <div class="def-term">Separation of Concerns (SoC)</div>
+          <div class="def-text">Entwurfsprinzip: Verschiedene Zuständigkeiten werden strikt voneinander getrennt. Grundlage für Schichten- und MVC-Architektur.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Kopplung &amp; Kohäsion</div>
+          <div class="def-text">
+            <strong>Lose Kopplung:</strong> Module sind möglichst unabhängig voneinander (Ziel).<br>
+            <strong>Hohe Kohäsion:</strong> Ein Modul hat genau eine klar definierte Aufgabe (Ziel).
+          </div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Schnittstelle (Interface / API)</div>
+          <div class="def-text">Definiert, wie zwei Schichten oder Systeme miteinander kommunizieren, ohne interne Implementierungsdetails preiszugeben.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-term">Monolithische Architektur</div>
+          <div class="def-text">Gegenteil zur Schichtenarchitektur: Alle Komponenten in einem einzigen, eng verzahnten System. Einfach zu entwickeln, schwer zu warten und skalieren.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 3: MVC ══ -->
+  <div class="col">
+
+    <div class="card acc-blue">
+      <div class="card-head">MVC — Model View Controller</div>
+      <div class="card-body">
+
+        <div class="def-row">
+          <div class="def-term">Definition MVC</div>
+          <div class="def-text"><strong>MVC</strong> ist ein <strong>Entwurfsmuster</strong> (Design Pattern), das eine Anwendung in drei voneinander getrennte Komponenten aufteilt, um Datenhaltung, Darstellung und Steuerungslogik zu trennen.</div>
+        </div>
+
+        <div class="mvc-row">
+          <div class="mvc-box mvc-m">
+            <div class="mvc-box-title">Model</div>
+            <div class="mvc-box-sub">Daten &amp; Logik<br>Datenbankzugriff<br>Geschäftsregeln</div>
+          </div>
+          <div class="mvc-arrow">⇄</div>
+          <div class="mvc-box mvc-c">
+            <div class="mvc-box-title">Controller</div>
+            <div class="mvc-box-sub">Steuerung<br>Verarbeitet Eingaben<br>Verbindet M &amp; V</div>
+          </div>
+          <div class="mvc-arrow">⇄</div>
+          <div class="mvc-box mvc-v">
+            <div class="mvc-box-title">View</div>
+            <div class="mvc-box-sub">Darstellung<br>Benutzeroberfläche<br>HTML / Templates</div>
+          </div>
+        </div>
+
+        <div class="def-row" style="margin-top:7px">
+          <div class="def-term">Model</div>
+          <div class="def-text">Das <strong>Model</strong> repräsentiert die <strong>Daten und die Geschäftslogik</strong> einer Anwendung. Es ist zuständig für den Datenbankzugriff, die Validierung und die Verarbeitung von Daten. Es hat keine Kenntnis von der Darstellung.</div>
+          <div class="def-note">Beispiel: Klasse „Kunde" mit Methoden wie speichern(), laden(), validieren()</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">View</div>
+          <div class="def-text">Die <strong>View</strong> ist ausschließlich für die <strong>Darstellung</strong> der Daten zuständig. Sie zeigt dem Benutzer die Informationen an und nimmt Eingaben entgegen, enthält aber keine Geschäftslogik.</div>
+          <div class="def-note">Beispiel: HTML-Template, das Kundendaten anzeigt</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Controller</div>
+          <div class="def-text">Der <strong>Controller</strong> nimmt Benutzereingaben entgegen, steuert den Ablauf der Anwendung und vermittelt zwischen Model und View. Er ruft Model-Methoden auf und übergibt die Ergebnisse an die View.</div>
+          <div class="def-note">Beispiel: HTTP-Request empfangen → Model abfragen → View rendern</div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Ablauf einer Anfrage im MVC</div>
+          <div class="def-text">
+            1. Benutzer sendet Anfrage → <strong>Controller</strong> empfängt<br>
+            2. Controller ruft <strong>Model</strong> auf (Daten holen / verarbeiten)<br>
+            3. Model gibt Daten zurück an Controller<br>
+            4. Controller übergibt Daten an <strong>View</strong><br>
+            5. View rendert die Ausgabe für den Benutzer
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-coral">
+      <div class="card-head">Vergleich &amp; Abgrenzung</div>
+      <div class="card-body">
+
+        <table>
+          <thead>
+            <tr><th>Kriterium</th><th>2-Tier</th><th>3-Tier / MVC</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Logik liegt in</td><td>Client oder DB</td><td>Eigener Schicht / Controller</td></tr>
+            <tr><td>Wartbarkeit</td><td>Gering</td><td>Hoch</td></tr>
+            <tr><td>Skalierbarkeit</td><td>Eingeschränkt</td><td>Gut (je Schicht)</td></tr>
+            <tr><td>Testbarkeit</td><td>Schwierig</td><td>Isoliert je Schicht</td></tr>
+            <tr><td>Typisch für</td><td>Einfache Anwendungen</td><td>Webanwendungen, Frameworks</td></tr>
+          </tbody>
+        </table>
+
+        <div class="def-row" style="margin-top:7px">
+          <div class="def-term">MVC in der Praxis — Frameworks</div>
+          <div class="def-text">
+            <span class="tag tag-p">Laravel</span> PHP-Framework (MVC)<br>
+            <span class="tag tag-t">Spring MVC</span> Java-Framework<br>
+            <span class="tag tag-b">Django</span> Python (MTV ≈ MVC)<br>
+            <span class="tag tag-o">Ruby on Rails</span> Ruby (MVC)
+          </div>
+        </div>
+
+        <div class="def-row">
+          <div class="def-term">Merksatz für die Prüfung</div>
+          <div class="def-text">
+            <strong>Model</strong> = die Daten (Was?)<br>
+            <strong>View</strong> = die Ansicht (Wie sieht es aus?)<br>
+            <strong>Controller</strong> = die Steuerung (Was passiert bei Eingabe?)<br>
+            <strong>Schicht</strong> = Trennung nach Aufgabe, nicht nach Technik<br>
+            <strong>3-Tier</strong> ≠ MVC — 3-Tier beschreibt physische Ebenen, MVC logische Rollen
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>IHK FIAE · Architektursysteme · Client-Server · Schichtenmodell · MVC</span>
+  <span>Prüfungsrelevanz: AP Teil 1 (Projektarbeit) &amp; Teil 2 (schriftlich) · Lernfeld 6 / 8 / 9</span>
+  <span>Softwarearchitektur · Systemdesign · Entwurfsmuster</span>
+</div>
+
+</body>
+</html>

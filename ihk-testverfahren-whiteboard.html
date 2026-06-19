@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Testverfahren – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.5px; color: #111; background: #fff; }
+
+  /* HEADER */
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 8px; }
+  .header-left h1 { font-size: 17px; font-weight: 700; letter-spacing: .02em; }
+  .header-left .meta { font-size: 8.5px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+
+  /* LAYOUT */
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .col { display: flex; flex-direction: column; gap: 7px; }
+
+  /* CARDS */
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+  .card-head { padding: 4px 8px; font-weight: 700; font-size: 9.5px; border-bottom: 1.5px solid #222; display: flex; align-items: center; gap: 6px; }
+  .card-body { padding: 6px 8px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  /* QA ROWS */
+  .qa { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 0.75px solid #e0e0e0; }
+  .qa:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .q { font-weight: 700; font-size: 9px; color: #111; display: flex; gap: 5px; }
+  .q-num { color: #888; font-weight: 700; min-width: 14px; }
+  .a { font-size: 9px; color: #1a5c38; line-height: 1.55; margin: 2px 0 0 19px; }
+  .a::before { content: '→ '; font-weight: 700; color: #0F6E56; }
+  .erkl { font-size: 8.5px; color: #666; font-style: italic; line-height: 1.5; margin: 2px 0 0 19px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 8.5px; margin-top: 4px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 3px 5px; text-align: left; border: 0.75px solid #ccc; }
+  td { padding: 3px 5px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.45; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* TAGS */
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid; margin-right: 2px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444;    border-color: #ccc; }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid #ccc; margin-top: 7px; padding-top: 4px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Testverfahren — Prüfungsfragen mit Antworten &amp; Erklärung</h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Lernfeld: Softwarequalität &amp; Testen</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Themenbereich: Qualitätssicherung &amp; Softwaretest</div>
+</div>
+
+<div class="grid">
+
+  <!-- ══ SPALTE 1 ══ -->
+  <div class="col">
+
+    <div class="card acc-purple">
+      <div class="card-head">Grundbegriffe Testen</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">1</span>Was versteht man unter einem Softwaretest?</div>
+          <div class="a">Ein Softwaretest ist die systematische Prüfung einer Software auf Fehler, Abweichungen von der Spezifikation und Qualitätsmängel unter definierten Bedingungen.</div>
+          <div class="erkl">Ziel: Fehler finden — nicht beweisen, dass keine Fehler vorhanden sind (Dijkstra).</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">2</span>Was ist der Unterschied zwischen einem Fehler (Error), einem Defekt (Defect/Bug) und einem Versagen (Failure)?</div>
+          <div class="a">Error: menschlicher Irrtum beim Entwickeln. Defect/Bug: Fehler im Code (Ursache). Failure: sichtbares Fehlverhalten zur Laufzeit (Auswirkung).</div>
+          <div class="erkl">Error → erzeugt → Defect → verursacht → Failure</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">3</span>Was ist ein Testfall (Test Case)?</div>
+          <div class="a">Ein Testfall beschreibt eine konkrete Testsituation mit: Eingabedaten, Vorbedingungen, erwarteten Ergebnissen und Nachbedingungen.</div>
+          <div class="erkl">Grundlage für reproduzierbare, nachvollziehbare Tests.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">4</span>Was ist der Unterschied zwischen Verifikation und Validierung?</div>
+          <div class="a">Verifikation: „Wird das Produkt richtig gebaut?" (entspricht die Software der Spezifikation). Validierung: „Wird das richtige Produkt gebaut?" (entspricht die Software den Anforderungen des Kunden).</div>
+          <div class="erkl">Verifikation = intern · Validierung = kundenbezogen</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">5</span>Nennen Sie vier Testziele.</div>
+          <div class="a">Fehler finden, Qualität bewerten, Vertrauen aufbauen, Risiken minimieren.</div>
+          <div class="erkl">Tests können Fehlerfreiheit nicht beweisen — nur Fehler aufdecken.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-green">
+      <div class="card-head">Teststufen (Wann wird getestet?)</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">6</span>Nennen und erläutern Sie die vier Teststufen.</div>
+          <div class="a">
+            Unit-Test: einzelne Funktionen/Klassen isoliert testen.<br>
+            Integrationstest: Zusammenspiel mehrerer Komponenten prüfen.<br>
+            Systemtest: gesamtes System gegen Anforderungen testen.<br>
+            Abnahmetest: Kunde prüft, ob Anforderungen erfüllt sind.
+          </div>
+          <div class="erkl">Reihenfolge: Unit → Integration → System → Abnahme (von innen nach außen)</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">7</span>Was ist ein Unit-Test und wer führt ihn durch?</div>
+          <div class="a">Ein Unit-Test prüft eine einzelne, isolierte Einheit (Funktion, Methode, Klasse) auf korrekte Funktionalität. Durchgeführt vom Entwickler, meist automatisiert.</div>
+          <div class="erkl">Werkzeuge: JUnit (Java), pytest (Python), Jest (JavaScript)</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">8</span>Was ist der Unterschied zwischen Systemtest und Abnahmetest?</div>
+          <div class="a">Systemtest: intern, durch Tester, prüft technische Anforderungen. Abnahmetest: extern, durch Kunden, prüft ob fachliche Anforderungen erfüllt sind (auch: UAT – User Acceptance Test).</div>
+          <div class="erkl">Abnahmetest ist Grundlage für die Abnahme und Bezahlung.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 2 ══ -->
+  <div class="col">
+
+    <div class="card acc-teal">
+      <div class="card-head">Testmethoden: Black-Box vs. White-Box</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">9</span>Was versteht man unter Black-Box-Test?</div>
+          <div class="a">Beim Black-Box-Test wird die Software nur über ihre Schnittstellen getestet, ohne Kenntnis des inneren Aufbaus (Quellcode). Getestet wird: Eingabe → erwartete Ausgabe.</div>
+          <div class="erkl">Perspektive des Anwenders. Geeignet für Funktions- und Akzeptanztests.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">10</span>Was versteht man unter White-Box-Test (auch: Glass-Box)?</div>
+          <div class="a">Beim White-Box-Test kennt der Tester den Quellcode und prüft interne Strukturen, Pfade und Verzweigungen gezielt auf Korrektheit.</div>
+          <div class="erkl">Perspektive des Entwicklers. Geeignet für Unit- und Integrationstests.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">11</span>Was ist der Grey-Box-Test?</div>
+          <div class="a">Kombination aus Black- und White-Box: Der Tester hat teilweise Kenntnis der internen Struktur (z. B. Datenbankschema), testet aber über die Oberfläche.</div>
+          <div class="erkl">Häufig bei Integrationstests eingesetzt.</div>
+        </div>
+
+        <table style="margin-top:4px">
+          <thead><tr><th></th><th>Black-Box</th><th>White-Box</th></tr></thead>
+          <tbody>
+            <tr><td>Codewissen</td><td>Nein</td><td>Ja</td></tr>
+            <tr><td>Tester</td><td>Kunde / QA</td><td>Entwickler</td></tr>
+            <tr><td>Fokus</td><td>Funktion</td><td>Struktur / Pfade</td></tr>
+            <tr><td>Teststufe</td><td>System / Abnahme</td><td>Unit / Integration</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <div class="card acc-coral">
+      <div class="card-head">Testmethoden: Äquivalenzklassen &amp; Grenzwerte</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">12</span>Was ist die Äquivalenzklassenanalyse?</div>
+          <div class="a">Die Äquivalenzklassenanalyse teilt mögliche Eingabewerte in Gruppen (Klassen), die sich gleich verhalten. Pro Klasse wird nur ein repräsentativer Wert getestet, um die Anzahl der Testfälle zu reduzieren.</div>
+          <div class="erkl">Gültige Klassen (EC+) und ungültige Klassen (EC−) werden unterschieden.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">13</span>Erklären Sie die Grenzwertanalyse anhand eines Beispiels.</div>
+          <div class="a">Die Grenzwertanalyse testet Werte an den Rändern der Äquivalenzklassen, da dort besonders häufig Fehler auftreten. Beispiel: Alter 0–120 → Testfälle: −1, 0, 1, 119, 120, 121.</div>
+          <div class="erkl">Ergänzt die Äquivalenzklassenanalyse — beide gemeinsam verwenden!</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">14</span>Ein Eingabefeld akzeptiert Zahlen von 1 bis 100. Nennen Sie typische Testfälle.</div>
+          <div class="a">Gültig: 1, 50, 100. Ungültig: 0, −1, 101, 200. Grenzwerte: 0, 1, 100, 101. Sonderfälle: leer, Buchstabe, Kommazahl.</div>
+          <div class="erkl">IHK erwartet: gültige + ungültige Klassen + Grenzwerte benennen.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-pink">
+      <div class="card-head">Weitere Testarten</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">15</span>Was ist ein Regressionstest?</div>
+          <div class="a">Ein Regressionstest prüft nach einer Änderung (Bugfix, neues Feature), ob bisher funktionierende Teile der Software noch korrekt arbeiten.</div>
+          <div class="erkl">Verhindert, dass Änderungen neue Fehler (Regressionsfehler) einführen.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">16</span>Was ist der Unterschied zwischen manuellem und automatisiertem Testen?</div>
+          <div class="a">Manuell: Tester führt Tests von Hand aus — flexibel, teuer, fehleranfällig. Automatisiert: Testskripte laufen automatisch — schnell, wiederholbar, hohe Anfangsinvestition.</div>
+          <div class="erkl">Automatisierung lohnt sich besonders für Regressionstests.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">17</span>Was ist ein Lasttest / Stresstest?</div>
+          <div class="a">Lasttest: prüft das Verhalten unter erwarteter Last (z. B. 1000 gleichzeitige Nutzer). Stresstest: prüft das Verhalten unter Überlast bis zum Systemversagen.</div>
+          <div class="erkl">Beide gehören zu den nicht-funktionalen Tests.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SPALTE 3 ══ -->
+  <div class="col">
+
+    <div class="card acc-blue">
+      <div class="card-head">Statische vs. Dynamische Tests</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">18</span>Was ist der Unterschied zwischen statischem und dynamischem Test?</div>
+          <div class="a">Statischer Test: Software wird geprüft, ohne sie auszuführen (z. B. Code-Review, Inspektion). Dynamischer Test: Software wird ausgeführt und das Verhalten geprüft.</div>
+          <div class="erkl">Statisch = früh &amp; günstig · Dynamisch = Laufzeitverhalten</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">19</span>Nennen Sie drei statische Testmethoden.</div>
+          <div class="a">Code-Review (Vier-Augen-Prinzip), Walkthrough (Autor erklärt Code), Inspektion (formaler Prozess mit Rollen), statische Code-Analyse (automatisiert, z. B. SonarQube).</div>
+          <div class="erkl">Ohne Programmausführung — Fehler frühzeitig und kostengünstig finden.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">20</span>Was versteht man unter Testabdeckung (Code Coverage)?</div>
+          <div class="a">Die Testabdeckung gibt an, welcher Anteil des Quellcodes durch Tests ausgeführt wird. Typen: Anweisungsabdeckung, Zweigabdeckung, Pfadabdeckung.</div>
+          <div class="erkl">100 % Coverage bedeutet nicht fehlerfreie Software — nur: jede Zeile wurde durchlaufen.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">21</span>Was ist der Unterschied zwischen Anweisungs- und Zweigabdeckung?</div>
+          <div class="a">Anweisungsabdeckung (C0): jede Anweisung mindestens einmal ausgeführt. Zweigabdeckung (C1): jeder Zweig (if/else, true/false) mindestens einmal ausgeführt. C1 ist stärker als C0.</div>
+          <div class="erkl">IHK-relevant: C1 (Zweigabdeckung) ist Mindeststandard für sinnvolle Tests.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-amber">
+      <div class="card-head">Testprozess &amp; Qualitätssicherung</div>
+      <div class="card-body">
+
+        <div class="qa">
+          <div class="q"><span class="q-num">22</span>Nennen Sie die Phasen des Testprozesses.</div>
+          <div class="a">1. Testplanung, 2. Testanalyse &amp; Testentwurf, 3. Testrealisierung, 4. Testdurchführung, 5. Testauswertung &amp; Abschlussbericht.</div>
+          <div class="erkl">Analog zum Softwareentwicklungsprozess — Test beginnt nicht erst beim fertigen Produkt.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">23</span>Was ist der Unterschied zwischen Qualitätssicherung (QS) und Qualitätskontrolle (QK)?</div>
+          <div class="a">QS (Quality Assurance): proaktiv — Prozesse und Standards einhalten, um Fehler zu vermeiden. QK (Quality Control): reaktiv — fertiges Produkt prüfen und Fehler finden.</div>
+          <div class="erkl">Testen ist Teil der Qualitätskontrolle; Code-Reviews Teil der Qualitätssicherung.</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">24</span>Was ist Test-Driven Development (TDD)?</div>
+          <div class="a">Bei TDD werden Tests vor dem eigentlichen Code geschrieben. Zyklus: Test schreiben (schlägt fehl) → Code schreiben (Test besteht) → Refactoring → wiederholen.</div>
+          <div class="erkl">Vorteil: Sauberes Design, hohe Testabdeckung von Anfang an (Red-Green-Refactor).</div>
+        </div>
+
+        <div class="qa">
+          <div class="q"><span class="q-num">25</span>Nennen Sie drei Merkmale von Softwarequalität nach ISO 25010.</div>
+          <div class="a">Funktionalität, Zuverlässigkeit, Benutzbarkeit (Usability), Effizienz (Performance), Wartbarkeit, Übertragbarkeit (Portabilität), Sicherheit.</div>
+          <div class="erkl">ISO 25010 ersetzt ISO 9126 — Qualität umfasst mehr als nur Fehlerfreiheit.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card acc-gray">
+      <div class="card-head">Merksätze &amp; Übersicht</div>
+      <div class="card-body">
+
+        <div style="margin-bottom:5px">
+          <span class="tag tag-p">Black-Box</span> testet Was · ohne Codewissen<br>
+          <span class="tag tag-t">White-Box</span> testet Wie · mit Codewissen<br>
+          <span class="tag tag-b">Unit-Test</span> kleinste Einheit · Entwickler · automatisiert<br>
+          <span class="tag tag-o">Abnahmetest</span> Kunde entscheidet · fachlich<br>
+          <span class="tag tag-r">Regressionstest</span> nach Änderung · Rückschritt prüfen<br>
+          <span class="tag tag-g">Statisch</span> ohne Ausführung · Code-Review · früh
+        </div>
+
+        <table>
+          <thead><tr><th>Testart</th><th>Wann</th><th>Wer</th></tr></thead>
+          <tbody>
+            <tr><td>Unit-Test</td><td>Entwicklung</td><td>Entwickler</td></tr>
+            <tr><td>Integrationstest</td><td>Nach Unit-Tests</td><td>Entwickler / QA</td></tr>
+            <tr><td>Systemtest</td><td>Vor Abnahme</td><td>QA-Team</td></tr>
+            <tr><td>Abnahmetest</td><td>Vor Lieferung</td><td>Kunde / Auftraggeber</td></tr>
+            <tr><td>Regressionstest</td><td>Nach jeder Änderung</td><td>QA / automatisiert</td></tr>
+            <tr><td>Lasttest</td><td>Vor Go-Live</td><td>QA / Ops</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Testverfahren &amp; Qualitätssicherung · 25 Prüfungsfragen mit Antworten</span>
+  <span>AP Teil 1 (Projektdokumentation) &amp; Teil 2 (schriftlich) · Lernfeld 7 / 9</span>
+  <span>Softwarequalität · Testing · ISO 25010 · TDD · Black-Box · White-Box</span>
+</div>
+
+</body>
+</html>
