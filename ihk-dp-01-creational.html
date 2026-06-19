@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Design Patterns Creational – IHK FIAE Blatt 1</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #534AB7; }
+  .cat-badge { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; background: #e8f3fb; color: #185FA5; border: 1px solid #93c5fd; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col  { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .kw { color: #534AB7; font-weight: 700; }
+  .fn { color: #0F6E56; }
+  .cm { color: #999; }
+  .cl { color: #C04828; font-weight: 700; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p  { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t  { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o  { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b  { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g  { background: #f4f4f2; color: #444;    border-color: #ccc; }
+  .tag-r  { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-gr { background: #edfade; color: #3B6D11;  border-color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text  { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key   { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* PATTERN META ROW */
+  .pmeta { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0 4px; }
+  .pmeta-item { font-size: 7.5px; background: #f4f4f2; border: 0.75px solid #ddd; border-radius: 3px; padding: 1px 5px; color: #555; }
+  .pmeta-item strong { color: #111; }
+
+  /* UML MINI */
+  .uml { font-family: 'Courier New', monospace; font-size: 7.5px; background: #fafafa; border: 1px solid #ddd; border-radius: 3px; padding: 3px 6px; margin: 3px 0; line-height: 1.6; color: #444; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Design Patterns — Erzeugungsmuster (Creational Patterns) <span class="badge">Blatt 1 / 3</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · GoF-Entwurfsmuster · Sprachunabhängig · Singleton · Factory · Builder · Prototype · Abstract Factory</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Softwareentwicklung &amp; -design</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1: Einführung + Singleton ══ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Design Patterns — Grundlagen &amp; Einteilung</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Was ist ein Design Pattern?</div>
+        <div class="def-text">Ein <strong>Design Pattern (Entwurfsmuster)</strong> ist eine bewährte, wiederverwendbare Schablone zur Lösung häufig wiederkehrender Entwurfsprobleme in der Softwareentwicklung. Es beschreibt ein allgemeines Problem und eine erprobte Lösung — unabhängig von der Programmiersprache.</div>
+        <div class="def-note">Ursprung: „Gang of Four" (GoF) — Gamma, Helm, Johnson, Vlissides (1994): „Design Patterns: Elements of Reusable Object-Oriented Software"</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Die 3 Kategorien der GoF-Patterns</div>
+        <div class="def-text">
+          <span class="tag tag-b">Erzeugungsmuster</span> Wie werden Objekte erzeugt? → Blatt 1<br>
+          <span class="tag tag-t">Strukturmuster</span> Wie werden Klassen strukturiert? → Blatt 2<br>
+          <span class="tag tag-o">Verhaltensmuster</span> Wie kommunizieren Objekte? → Blatt 3
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Aufbau eines Patterns (IHK-Wissen)</div>
+        <div class="def-text">
+          <span class="tag tag-g">Name</span> eindeutiger, bekannter Begriff<br>
+          <span class="tag tag-g">Problem</span> wann wird es eingesetzt?<br>
+          <span class="tag tag-g">Lösung</span> Struktur der Klassen/Objekte<br>
+          <span class="tag tag-g">Konsequenz</span> Vor- und Nachteile
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">IHK-relevante Patterns im Überblick</div>
+        <table>
+          <thead><tr><th>Kategorie</th><th>Pattern</th><th>Kurzform</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="5"><strong>Creational</strong></td><td>Singleton</td><td>Nur 1 Instanz</td></tr>
+            <tr><td>Factory Method</td><td>Objekt-Fabrik</td></tr>
+            <tr><td>Abstract Factory</td><td>Familien-Fabrik</td></tr>
+            <tr><td>Builder</td><td>Schrittweise bauen</td></tr>
+            <tr><td>Prototype</td><td>Klonen</td></tr>
+            <tr><td rowspan="4"><strong>Structural</strong></td><td>Adapter</td><td>Übersetzer</td></tr>
+            <tr><td>Decorator</td><td>Aufwerten</td></tr>
+            <tr><td>Facade</td><td>Vereinfachen</td></tr>
+            <tr><td>Composite</td><td>Baum-Struktur</td></tr>
+            <tr><td rowspan="5"><strong>Behavioral</strong></td><td>Observer</td><td>Benachrichtiger</td></tr>
+            <tr><td>Strategy</td><td>Austauschbar</td></tr>
+            <tr><td>Command</td><td>Befehl kapseln</td></tr>
+            <tr><td>Template Method</td><td>Skelett + Hooks</td></tr>
+            <tr><td>Iterator</td><td>Durchlaufen</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: 3 Kategorien</div>
+        <div class="esel-text">„<span class="esel-key">E</span>rzeugen · <span class="esel-key">S</span>trukturieren · <span class="esel-key">V</span>erhalten" — <span class="esel-key">E</span>in <span class="esel-key">S</span>chlaues <span class="esel-key">V</span>orbild</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-purple">
+    <div class="card-head">Singleton <span class="cat-badge">Creational</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Nur eine Instanz erlaubt</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Creational #1</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Singleton</strong>-Pattern stellt sicher, dass von einer Klasse <strong>genau eine Instanz</strong> existiert und bietet einen globalen Zugriffspunkt auf diese Instanz. Der Konstruktor ist privat — Erzeugung nur über eine Klassenmethode möglich.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Datenbankverbindung (nur eine nötig)<br>· Logger (zentrales Protokoll)<br>· Konfigurationsobjekt (einmalig geladen)<br>· Druckerspooler (nur eine Warteschlange)</div>
+      </div>
+      <div class="code"><span class="kw">KLASSE</span> <span class="cl">Singleton</span>:
+  <span class="kw">PRIVAT STATISCH</span> instanz = <span class="kw">NULL</span>
+  <span class="kw">PRIVAT</span> Konstruktor()   <span class="cm">// gesperrt!</span>
+
+  <span class="kw">ÖFFENTLICH STATISCH</span> <span class="fn">gibInstanz</span>():
+    <span class="kw">WENN</span> instanz == <span class="kw">NULL</span> <span class="kw">DANN</span>
+      instanz = <span class="kw">NEU</span> Singleton()
+    <span class="kw">ZURÜCK</span> instanz</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Genau eine Instanz garantiert<br>
+          <span class="tag tag-t">✓</span> Globaler Zugriff<br>
+          <span class="tag tag-r">✗</span> Schwer testbar (globaler Zustand)<br>
+          <span class="tag tag-r">✗</span> Verletzt Single-Responsibility-Prinzip
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Singleton</div>
+        <div class="esel-text"><span class="esel-key">Single</span>ton = <span class="esel-key">Einzelkind</span> — es gibt immer nur genau eines, egal wie oft man fragt.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2: Factory + Abstract Factory ══ -->
+<div class="col">
+
+  <div class="card acc-blue">
+    <div class="card-head">Factory Method <span class="cat-badge">Creational</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Objekterzeugung delegieren</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Creational #3</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Die <strong>Factory Method</strong> definiert eine Schnittstelle zur <strong>Erzeugung eines Objekts</strong>, überlässt aber den Unterklassen die Entscheidung, welche konkrete Klasse instanziiert wird. Die Erzeugungslogik ist vom Aufrufer entkoppelt.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Wenn der Typ des Objekts zur Laufzeit bestimmt wird<br>· Wenn Unterklassen die Kontrolle über Erzeugung haben sollen<br>· Erstellung von Dokumenten (PDF, DOCX, HTML je nach Typ)</div>
+      </div>
+      <div class="code"><span class="kw">ABSTRAKTE KLASSE</span> <span class="cl">Fahrzeugfabrik</span>:
+  <span class="kw">ABSTRAKT</span> <span class="fn">erstelleFahrzeug</span>() → Fahrzeug
+
+<span class="kw">KLASSE</span> <span class="cl">AutoFabrik</span> <span class="kw">ERBT</span> Fahrzeugfabrik:
+  <span class="fn">erstelleFahrzeug</span>():
+    <span class="kw">ZURÜCK</span> <span class="kw">NEU</span> Auto()
+
+<span class="kw">KLASSE</span> <span class="cl">LkwFabrik</span> <span class="kw">ERBT</span> Fahrzeugfabrik:
+  <span class="fn">erstelleFahrzeug</span>():
+    <span class="kw">ZURÜCK</span> <span class="kw">NEU</span> Lkw()
+
+<span class="cm">// Aufrufer kennt nur "Fahrzeugfabrik"</span>
+fabrik = <span class="kw">NEU</span> AutoFabrik()
+fzg = fabrik.<span class="fn">erstelleFahrzeug</span>()</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Aufrufer vom konkreten Typ entkoppelt<br>
+          <span class="tag tag-t">✓</span> Neue Typen ohne Änderung des Aufrufers<br>
+          <span class="tag tag-r">✗</span> Viele Unterklassen nötig<br>
+          <span class="tag tag-r">✗</span> Komplexer als direktes new
+        </div>
+      </div>
+      <div class="uml">Fahrzeugfabrik (abstrakt)
+  └── AutoFabrik  → erstellt: Auto
+  └── LkwFabrik   → erstellt: Lkw</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Factory Method</div>
+        <div class="esel-text"><span class="esel-key">Fabrik</span> = jemand anderes baut — du bestellst ein „Fahrzeug", welches genau gebaut wird, entscheidet die Fabrik.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Abstract Factory <span class="cat-badge">Creational</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Familien kompatibler Objekte</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Creational #1</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Die <strong>Abstract Factory</strong> stellt eine Schnittstelle zur Erzeugung von <strong>Familien zusammengehöriger Objekte</strong> bereit, ohne deren konkrete Klassen zu benennen. Alle erzeugten Objekte passen zueinander.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· GUI-Elemente für verschiedene Betriebssysteme (Windows-Button + Windows-Textfeld passen zusammen)<br>· Datenbank-Treiber (MySQL- oder Oracle-Familie)<br>· Theme-System (Dark-Mode vs. Light-Mode)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">GUIFabrik</span>:
+  <span class="fn">erstelleButton</span>() → Button
+  <span class="fn">erstelleTextfeld</span>() → Textfeld
+
+<span class="kw">KLASSE</span> <span class="cl">WindowsFabrik</span> <span class="kw">IMPL.</span> GUIFabrik:
+  <span class="fn">erstelleButton</span>()   → WinButton
+  <span class="fn">erstelleTextfeld</span>() → WinTextfeld
+
+<span class="kw">KLASSE</span> <span class="cl">MacFabrik</span> <span class="kw">IMPL.</span> GUIFabrik:
+  <span class="fn">erstelleButton</span>()   → MacButton
+  <span class="fn">erstelleTextfeld</span>() → MacTextfeld</div>
+      <div class="def-row">
+        <div class="def-term">Unterschied Factory Method vs. Abstract Factory</div>
+        <div class="def-text">
+          <span class="tag tag-b">Factory Method</span> erzeugt <strong>ein</strong> Produkt<br>
+          <span class="tag tag-t">Abstract Factory</span> erzeugt <strong>eine Familie</strong> zusammenpassender Produkte
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Abstract Factory</div>
+        <div class="esel-text"><span class="esel-key">Abstract Factory</span> = <span class="esel-key">IKEA-Kollektion</span> — alle Möbel einer Serie passen zusammen. Wechsle die Fabrik → alles wechselt.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3: Builder + Prototype ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">Builder <span class="cat-badge">Creational</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Komplexe Objekte schrittweise bauen</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Creational #2</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Builder</strong>-Pattern trennt die <strong>Konstruktion</strong> eines komplexen Objekts von seiner <strong>Repräsentation</strong>. Es erlaubt, dasselbe Konstruktionsverfahren für verschiedene Darstellungen zu verwenden. Der Director steuert den Bauprozess, der Builder führt ihn aus.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Objekte mit vielen optionalen Parametern (Pizza-Builder)<br>· Dokumente mit verschiedenen Formaten (HTML, PDF, Markdown)<br>· SQL-Query-Builder<br>· Konfigurationsobjekte</div>
+      </div>
+      <div class="code"><span class="kw">KLASSE</span> <span class="cl">PizzaBuilder</span>:
+  <span class="fn">setzeTeig</span>(typ):
+    <span class="kw">SELBST</span>.teig = typ
+    <span class="kw">ZURÜCK</span> <span class="kw">SELBST</span>    <span class="cm">// Method Chaining</span>
+  <span class="fn">setzeBelag</span>(belag):
+    <span class="kw">SELBST</span>.belag = belag
+    <span class="kw">ZURÜCK</span> <span class="kw">SELBST</span>
+  <span class="fn">setzeGroesse</span>(gr):
+    <span class="kw">SELBST</span>.groesse = gr
+    <span class="kw">ZURÜCK</span> <span class="kw">SELBST</span>
+  <span class="fn">baue</span>():
+    <span class="kw">ZURÜCK</span> Pizza(<span class="kw">SELBST</span>)
+
+<span class="cm">// Verwendung mit Method Chaining:</span>
+pizza = PizzaBuilder()
+  .<span class="fn">setzeTeig</span>(<span class="st">"dünn"</span>)
+  .<span class="fn">setzeBelag</span>(<span class="st">"Salami"</span>)
+  .<span class="fn">setzeGroesse</span>(<span class="st">"L"</span>)
+  .<span class="fn">baue</span>()</div>
+      <div class="def-row">
+        <div class="def-term">Beteiligte Rollen</div>
+        <div class="def-text">
+          <span class="tag tag-o">Builder</span> definiert Bauschritte (Interface)<br>
+          <span class="tag tag-o">ConcreteBuilder</span> implementiert Bauschritte<br>
+          <span class="tag tag-o">Director</span> steuert die Reihenfolge<br>
+          <span class="tag tag-o">Product</span> das fertige komplexe Objekt
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Schrittweise, lesbare Objektkonstruktion<br>
+          <span class="tag tag-t">✓</span> Verschiedene Repräsentationen möglich<br>
+          <span class="tag tag-r">✗</span> Mehr Klassen als nötig für einfache Objekte
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Builder</div>
+        <div class="esel-text"><span class="esel-key">Builder</span> = <span class="esel-key">Burger-King</span>-Bestellung — Schritt für Schritt: erst Brötchen, dann Fleisch, dann Belag. Am Ende: fertiger Burger.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-green">
+    <div class="card-head">Prototype <span class="cat-badge">Creational</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Objekte effizient kopieren</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Creational #4</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Prototype</strong>-Pattern ermöglicht das Erstellen neuer Objekte durch <strong>Kopieren (Klonen)</strong> eines bestehenden Objekts (des Prototyps). Statt mit new zu erzeugen, wird ein vorhandenes Objekt dupliziert.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Objekterzeugung ist teuer (DB-Zugriff, Berechnung)<br>· Viele ähnliche Objekte werden benötigt<br>· Klassen zur Laufzeit unbekannt<br>· Spielfiguren mit gleichen Grundwerten klonen</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Klonbar</span>:
+  <span class="fn">klone</span>() → Klonbar
+
+<span class="kw">KLASSE</span> <span class="cl">Spielfigur</span> <span class="kw">IMPL.</span> Klonbar:
+  name, leben, staerke
+
+  <span class="fn">klone</span>():
+    <span class="cm">// Flache Kopie des Objekts</span>
+    <span class="kw">ZURÜCK</span> <span class="kw">NEU</span> Spielfigur(<span class="kw">SELBST</span>)
+
+<span class="cm">// Verwendung:</span>
+original = <span class="kw">NEU</span> Spielfigur(<span class="st">"Held"</span>, 100, 50)
+kopie1   = original.<span class="fn">klone</span>()
+kopie2   = original.<span class="fn">klone</span>()
+<span class="cm">// kopie1 und kopie2 unabhängig von original</span></div>
+      <div class="def-row">
+        <div class="def-term">Flache vs. tiefe Kopie</div>
+        <div class="def-text">
+          <span class="tag tag-b">Flache Kopie</span> kopiert Referenzen (Objekte geteilt)<br>
+          <span class="tag tag-t">Tiefe Kopie</span> kopiert alle Objekte rekursiv (völlig unabhängig)
+        </div>
+        <div class="def-note">IHK kann nach dem Unterschied fragen!</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Schneller als neue Erzeugung<br>
+          <span class="tag tag-t">✓</span> Klasse muss nicht bekannt sein<br>
+          <span class="tag tag-r">✗</span> Tiefe Kopie aufwendig bei Zirkelreferenzen
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Prototype</div>
+        <div class="esel-text"><span class="esel-key">Prototype</span> = <span class="esel-key">Kopiermaschine</span> — statt neu bauen: einmal einscannen, beliebig oft ausdrucken.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4: Vergleich + IHK ══ -->
+<div class="col">
+
+  <div class="card acc-amber">
+    <div class="card-head">Creational Patterns — Vergleich</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Alle Erzeugungsmuster im Überblick</div>
+        <table>
+          <thead><tr><th>Pattern</th><th>Kernfrage</th><th>Alltagsbild</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Singleton</strong></td><td>Gibt es genau eines?</td><td>Einzelkind · Staatspräsident</td></tr>
+            <tr><td><strong>Factory Method</strong></td><td>Wer baut das Objekt?</td><td>Auftrag an Fabrik</td></tr>
+            <tr><td><strong>Abstract Factory</strong></td><td>Welche Familie passt zusammen?</td><td>IKEA-Kollektion</td></tr>
+            <tr><td><strong>Builder</strong></td><td>Wie wird es Schritt für Schritt gebaut?</td><td>Burger-Bestellung</td></tr>
+            <tr><td><strong>Prototype</strong></td><td>Kann ich ein bestehendes kopieren?</td><td>Kopiermaschine</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Entscheidungshilfe: Welches Pattern wann?</div>
+        <div class="def-text">
+          → Nur eine Instanz erlaubt? → <span class="tag tag-p">Singleton</span><br>
+          → Welches Objekt erst zur Laufzeit klar? → <span class="tag tag-b">Factory Method</span><br>
+          → Ganze Familie kompatibler Objekte? → <span class="tag tag-t">Abstract Factory</span><br>
+          → Objekt hat viele optionale Teile? → <span class="tag tag-o">Builder</span><br>
+          → Neues Objekt aus bestehendem ableiten? → <span class="tag tag-gr">Prototype</span>
+        </div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Gemeinsames Ziel aller Erzeugungsmuster</div>
+        <div class="def-text">Erzeugungsmuster <strong>kapseln die Logik der Objekterzeugung</strong>. Der Aufrufer wird von den Details der Erzeugung entkoppelt — er weiß nicht, welche konkrete Klasse instanziiert wird.</div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Creational Patterns</div>
+        <div class="esel-text">„<span class="esel-key">S</span>ingle <span class="esel-key">F</span>abriken <span class="esel-key">A</span>bstrakt <span class="esel-key">B</span>auen <span class="esel-key">P</span>rototypisch" —<br>
+        <span class="esel-key">S</span>ingleton · <span class="esel-key">F</span>actory · <span class="esel-key">A</span>bstract Factory · <span class="esel-key">B</span>uilder · <span class="esel-key">P</span>rototype</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">SOLID-Prinzipien (IHK-Kontext)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Was sind SOLID-Prinzipien?</div>
+        <div class="def-text">SOLID sind fünf grundlegende Entwurfsprinzipien der OOP, die guten, wartbaren Code fördern. Design Patterns folgen SOLID-Prinzipien.</div>
+      </div>
+      <table>
+        <thead><tr><th>Buchstabe</th><th>Prinzip</th><th>Bedeutung</th></tr></thead>
+        <tbody>
+          <tr><td><strong>S</strong></td><td>Single Responsibility</td><td>Klasse hat genau eine Aufgabe</td></tr>
+          <tr><td><strong>O</strong></td><td>Open/Closed</td><td>Offen für Erweiterung, geschlossen für Änderung</td></tr>
+          <tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>Unterklasse ersetzt Oberklasse ohne Fehler</td></tr>
+          <tr><td><strong>I</strong></td><td>Interface Segregation</td><td>Viele kleine statt einem großen Interface</td></tr>
+          <tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>Abhängig von Abstraktion, nicht Implementierung</td></tr>
+        </tbody>
+      </table>
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: SOLID</div>
+        <div class="esel-text"><span class="esel-key">S</span>ingle · <span class="esel-key">O</span>ffen · <span class="esel-key">L</span>iskov · <span class="esel-key">I</span>nterface · <span class="esel-key">D</span>ependency — „<span class="esel-key">S</span>ehr <span class="esel-key">O</span>ft <span class="esel-key">L</span>ernen <span class="esel-key">I</span>st <span class="esel-key">D</span>umm" 😄</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">IHK-Prüfungsfragen Creational</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Was ist ein Design Pattern? Nennen Sie die drei Kategorien nach GoF.</div>
+        <div class="ihk-q">Erläutern Sie das Singleton-Pattern. Warum ist der Konstruktor privat?</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Factory Method und Abstract Factory?</div>
+        <div class="ihk-q">Nennen Sie zwei Anwendungsbeispiele für das Singleton-Pattern.</div>
+        <div class="ihk-q">Was versteht man unter Method Chaining im Builder-Pattern?</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen flacher und tiefer Kopie beim Prototype?</div>
+        <div class="ihk-q">Welches Erzeugungsmuster würden Sie für einen SQL-Query-Builder verwenden?</div>
+        <div class="ihk-q">Erklären Sie das Open/Closed-Prinzip aus SOLID.</div>
+        <div class="ihk-q">Warum entkoppeln Erzeugungsmuster den Aufrufer von konkreten Klassen?</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Design Patterns · Blatt 1/3 · Erzeugungsmuster · Singleton · Factory · Abstract Factory · Builder · Prototype · SOLID</span>
+  <span>→ Blatt 2: Strukturmuster · Adapter · Decorator · Facade · Composite · Proxy</span>
+  <span>GoF · Gang of Four · Softwaredesign · Entwurfsmuster · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>

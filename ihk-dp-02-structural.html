@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Design Patterns Structural – IHK FIAE Blatt 2</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #0F6E56; }
+  .cat-badge { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; background: #e6faf4; color: #0F6E56; border: 1px solid #6ee7b7; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col  { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .kw { color: #534AB7; font-weight: 700; }
+  .fn { color: #0F6E56; }
+  .cm { color: #999; }
+  .cl { color: #C04828; font-weight: 700; }
+  .st { color: #854F0B; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p  { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t  { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o  { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b  { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g  { background: #f4f4f2; color: #444;    border-color: #ccc; }
+  .tag-r  { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-gr { background: #edfade; color: #3B6D11;  border-color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text  { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key   { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #e6faf4; border: 1.5px solid #0F6E56; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #065f46; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #0F6E56; }
+
+  .pmeta { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0 4px; }
+  .pmeta-item { font-size: 7.5px; background: #f4f4f2; border: 0.75px solid #ddd; border-radius: 3px; padding: 1px 5px; color: #555; }
+  .pmeta-item strong { color: #111; }
+
+  .uml { font-family: 'Courier New', monospace; font-size: 7.5px; background: #fafafa; border: 1px solid #ddd; border-radius: 3px; padding: 3px 6px; margin: 3px 0; line-height: 1.6; color: #444; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Design Patterns — Strukturmuster (Structural Patterns) <span class="badge">Blatt 2 / 3</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · GoF-Entwurfsmuster · Adapter · Decorator · Facade · Composite · Proxy · Bridge</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Softwareentwicklung &amp; -design</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1: Adapter + Facade ══ -->
+<div class="col">
+
+  <div class="card acc-blue">
+    <div class="card-head">Adapter <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Inkompatible Schnittstellen verbinden</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Structural #1</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Adapter</strong>-Pattern wandelt die <strong>Schnittstelle einer Klasse</strong> in eine andere um, die der Aufrufer erwartet. Es ermöglicht die Zusammenarbeit von Klassen, deren Schnittstellen ansonsten inkompatibel wären.</div>
+        <div class="def-note">Auch bekannt als: Wrapper-Pattern</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Fremdbibliothek mit anderem Interface einbinden<br>· Legacy-Code mit neuem System verbinden<br>· Drittsystem-API adaptieren (z. B. EU-Stecker → US-Steckdose)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">EuroStecker</span>:
+  <span class="fn">stromEuro</span>()
+
+<span class="kw">KLASSE</span> <span class="cl">USSteckdose</span>:   <span class="cm">// inkompatibel!</span>
+  <span class="fn">stromUS</span>()
+
+<span class="kw">KLASSE</span> <span class="cl">ReiseAdapter</span> <span class="kw">IMPL.</span> EuroStecker:
+  privat usGerät: USSteckdose
+
+  <span class="fn">stromEuro</span>():
+    <span class="cm">// übersetzt Euro→US</span>
+    usGerät.<span class="fn">stromUS</span>()
+
+<span class="cm">// Aufrufer nutzt EuroStecker-Interface:</span>
+adapter = <span class="kw">NEU</span> ReiseAdapter(usGerät)
+adapter.<span class="fn">stromEuro</span>()  <span class="cm">// funktioniert!</span></div>
+      <div class="uml">Client → [EuroStecker IF] → Adapter → [USSteckdose]
+              ↑ bekannt              ↑ übersetzt    ↑ fremd</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Bestehenden Code ohne Änderung wiederverwendbar<br>
+          <span class="tag tag-t">✓</span> Trennt Adaptierungslogik vom Client<br>
+          <span class="tag tag-r">✗</span> Zusätzliche Komplexität durch Zwischenschicht
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Adapter</div>
+        <div class="esel-text"><span class="esel-key">Adapter</span> = <span class="esel-key">Reisestecker</span> — du hast einen Euro-Stecker, brauchst einen US-Anschluss: der Adapter übersetzt dazwischen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Facade <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Komplexes Subsystem vereinfachen</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Structural #5</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Facade</strong>-Pattern stellt eine <strong>vereinfachte Schnittstelle</strong> für ein komplexes Subsystem bereit. Der Client muss nur mit der Facade interagieren — die innere Komplexität bleibt verborgen.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Bibliothek mit vielen Klassen hat komplexe API<br>· Schichtenarchitektur: obere Schicht vereinfacht untere<br>· Einheitlicher Einstiegspunkt für ein Modul<br>· Heimkino-Fernbedienung: ein Knopf = viele Geräte</div>
+      </div>
+      <div class="code"><span class="cm">// Ohne Facade — komplex:</span>
+dvd.<span class="fn">einlegen</span>()
+beamer.<span class="fn">einschalten</span>()
+lautsprecher.<span class="fn">setzeVolumen</span>(50)
+licht.<span class="fn">dimmen</span>(20)
+dvd.<span class="fn">abspielen</span>()
+
+<span class="cm">// Mit Facade — einfach:</span>
+<span class="kw">KLASSE</span> <span class="cl">HeimkinoFacade</span>:
+  <span class="fn">filmSchauen</span>(film):
+    dvd.<span class="fn">einlegen</span>(film)
+    beamer.<span class="fn">einschalten</span>()
+    lautsprecher.<span class="fn">setzeVolumen</span>(50)
+    licht.<span class="fn">dimmen</span>(20)
+    dvd.<span class="fn">abspielen</span>()
+
+kino = <span class="kw">NEU</span> HeimkinoFacade()
+kino.<span class="fn">filmSchauen</span>(<span class="st">"Matrix"</span>) <span class="cm">// fertig!</span></div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Reduziert Abhängigkeiten des Clients<br>
+          <span class="tag tag-t">✓</span> Vereinfachte Nutzung komplexer Systeme<br>
+          <span class="tag tag-r">✗</span> Facade kann zur „Gottklasse" werden
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Facade</div>
+        <div class="esel-text"><span class="esel-key">Facade</span> = <span class="esel-key">Fassade eines Hauses</span> — du siehst nur die schöne Außenseite, nicht die Rohre und Kabel dahinter.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2: Decorator + Proxy ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">Decorator <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Objekte dynamisch erweitern</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Structural #4</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Decorator</strong>-Pattern fügt einem Objekt <strong>dynamisch zur Laufzeit</strong> neue Verantwortlichkeiten hinzu, ohne die ursprüngliche Klasse zu verändern. Decorator ist eine <strong>Alternative zur Vererbung</strong> für die Erweiterung von Funktionalität.</div>
+        <div class="def-note">Schlüssel: Decorator implementiert dasselbe Interface wie das dekorierte Objekt.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Erweiterung ohne Vererbung (Vererbungshierarchie wäre zu tief)<br>· Kombinierbare Zusatzfunktionen (Kaffee + Milch + Zucker + Sahne)<br>· Java I/O-Streams (FileInputStream → BufferedInputStream → DataInputStream)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Kaffee</span>:
+  <span class="fn">kosten</span>() → Zahl
+  <span class="fn">beschreibung</span>() → Text
+
+<span class="kw">KLASSE</span> <span class="cl">EinfacherKaffee</span> <span class="kw">IMPL.</span> Kaffee:
+  <span class="fn">kosten</span>(): <span class="kw">ZURÜCK</span> 1.00
+  <span class="fn">beschreibung</span>(): <span class="kw">ZURÜCK</span> <span class="st">"Kaffee"</span>
+
+<span class="kw">KLASSE</span> <span class="cl">MilchDecorator</span> <span class="kw">IMPL.</span> Kaffee:
+  privat kaffee: Kaffee  <span class="cm">// hält Referenz</span>
+  <span class="fn">kosten</span>():
+    <span class="kw">ZURÜCK</span> kaffee.<span class="fn">kosten</span>() + 0.30
+  <span class="fn">beschreibung</span>():
+    <span class="kw">ZURÜCK</span> kaffee.<span class="fn">beschreibung</span>() + <span class="st">"+Milch"</span>
+
+<span class="cm">// Schichten aufbauen:</span>
+k = <span class="kw">NEU</span> EinfacherKaffee()
+k = <span class="kw">NEU</span> MilchDecorator(k)    <span class="cm">// 1.30€</span>
+k = <span class="kw">NEU</span> ZuckerDecorator(k)   <span class="cm">// 1.50€</span></div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Flexiblere Alternative zur Vererbung<br>
+          <span class="tag tag-t">✓</span> Kombinierbar zur Laufzeit<br>
+          <span class="tag tag-r">✗</span> Viele kleine Objekte, Debugging schwieriger
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Decorator</div>
+        <div class="esel-text"><span class="esel-key">Decorator</span> = <span class="esel-key">Weihnachtsbaum</span> — Baum bleibt Baum, aber du hängst Kugeln, Lichter, Stern dran. Jede Dekoration fügt etwas hinzu.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-purple">
+    <div class="card-head">Proxy <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Zugriff auf Objekt kontrollieren</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Structural #7</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Proxy</strong>-Pattern stellt einen <strong>Stellvertreter</strong> für ein anderes Objekt bereit und kontrolliert den Zugriff auf dieses. Der Proxy implementiert dasselbe Interface und kann Zugriffe filtern, cachen, protokollieren oder verzögern.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Proxy-Varianten (IHK)</div>
+        <div class="def-text">
+          <span class="tag tag-p">Virtual Proxy</span> Lazy Loading — Objekt erst bei Bedarf laden<br>
+          <span class="tag tag-b">Protection Proxy</span> Zugriffsschutz — Berechtigungen prüfen<br>
+          <span class="tag tag-t">Remote Proxy</span> Fernzugriff auf entferntes Objekt (RPC)<br>
+          <span class="tag tag-o">Caching Proxy</span> Ergebnisse zwischenspeichern
+        </div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Bild</span>:
+  <span class="fn">anzeigen</span>()
+
+<span class="kw">KLASSE</span> <span class="cl">EchteBild</span> <span class="kw">IMPL.</span> Bild:
+  <span class="fn">EchteBild</span>(datei):
+    <span class="fn">ladenVonFestplatte</span>(datei) <span class="cm">// teuer!</span>
+  <span class="fn">anzeigen</span>(): zeige Bild
+
+<span class="kw">KLASSE</span> <span class="cl">BildProxy</span> <span class="kw">IMPL.</span> Bild:
+  privat bild = <span class="kw">NULL</span>
+  privat datei
+
+  <span class="fn">anzeigen</span>():
+    <span class="kw">WENN</span> bild == <span class="kw">NULL</span> <span class="kw">DANN</span>
+      bild = <span class="kw">NEU</span> EchteBild(datei) <span class="cm">// lazy!</span>
+    bild.<span class="fn">anzeigen</span>()</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Lazy Loading spart Ressourcen<br>
+          <span class="tag tag-t">✓</span> Zugangskontrolle ohne Client-Änderung<br>
+          <span class="tag tag-r">✗</span> Antwort kann verzögert sein
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Proxy</div>
+        <div class="esel-text"><span class="esel-key">Proxy</span> = <span class="esel-key">Assistent/Türsteher</span> — du willst zum Chef (echtes Objekt), aber der Assistent prüft erst, ob du darfst, und besorgt dir die Antwort.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3: Composite + Bridge ══ -->
+<div class="col">
+
+  <div class="card acc-green">
+    <div class="card-head">Composite <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Baumstrukturen einheitlich behandeln</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Structural #3</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Composite</strong>-Pattern erlaubt es, Objekte in <strong>Baumstrukturen</strong> zusammenzusetzen, um Hierarchien zu repräsentieren. Einzelne Objekte (Leaf) und Zusammensetzungen (Composite) werden über dasselbe Interface behandelt — der Client muss nicht unterscheiden.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Dateisystem (Datei und Ordner gleich behandeln)<br>· GUI-Widgets (Button, Panel, Window sind alle „Komponenten")<br>· Menü-Hierarchien (Menü enthält Menüpunkte oder Untermenüs)<br>· Unternehmenshierarchie (Mitarbeiter + Abteilung)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Komponente</span>:
+  <span class="fn">anzeigen</span>()
+  <span class="fn">groesse</span>() → Zahl
+
+<span class="kw">KLASSE</span> <span class="cl">Datei</span> <span class="kw">IMPL.</span> Komponente:  <span class="cm">// Leaf</span>
+  <span class="fn">anzeigen</span>(): drucke name
+  <span class="fn">groesse</span>(): <span class="kw">ZURÜCK</span> eigenGroesse
+
+<span class="kw">KLASSE</span> <span class="cl">Ordner</span> <span class="kw">IMPL.</span> Komponente: <span class="cm">// Composite</span>
+  kinder: Liste von Komponente
+
+  <span class="fn">hinzufügen</span>(k): kinder.<span class="fn">add</span>(k)
+  <span class="fn">anzeigen</span>():
+    <span class="kw">FÜR ALLE</span> k <span class="kw">IN</span> kinder: k.<span class="fn">anzeigen</span>()
+  <span class="fn">groesse</span>():
+    <span class="kw">ZURÜCK</span> SUMME(k.<span class="fn">groesse</span>() <span class="kw">FÜR ALLE</span> k)</div>
+      <div class="uml">Komponente (IF)
+  ├── Datei    (Leaf)
+  └── Ordner   (Composite)
+        ├── Datei
+        └── Ordner
+              └── Datei</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Einheitliche Behandlung von Einzel- und Gruppenobjekten<br>
+          <span class="tag tag-t">✓</span> Beliebig tiefe Hierarchien<br>
+          <span class="tag tag-r">✗</span> Interface kann zu allgemein werden
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Composite</div>
+        <div class="esel-text"><span class="esel-key">Composite</span> = <span class="esel-key">Dateisystem</span> — Datei und Ordner verhalten sich gleich: beide haben Namen, beide haben Größe. Ordner enthält beides.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">Bridge &amp; Flyweight <span class="cat-badge">Structural</span></div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Bridge — Definition</div>
+        <div class="def-text">Das <strong>Bridge</strong>-Pattern trennt eine <strong>Abstraktion von ihrer Implementierung</strong>, sodass beide unabhängig voneinander variiert werden können. Statt Vererbung wird Komposition eingesetzt.</div>
+        <div class="def-note">Wann: Abstraktion + Implementierung sollen sich unabhängig ändern · Plattformunabhängige GUIs</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Renderer</span>:
+  <span class="fn">render</span>(form)
+
+<span class="kw">KLASSE</span> <span class="cl">VektorRenderer</span> <span class="kw">IMPL.</span> Renderer:
+  <span class="fn">render</span>(f): zeichne als Vektor
+
+<span class="kw">KLASSE</span> <span class="cl">RasterRenderer</span> <span class="kw">IMPL.</span> Renderer:
+  <span class="fn">render</span>(f): zeichne als Pixel
+
+<span class="kw">KLASSE</span> <span class="cl">Kreis</span>:          <span class="cm">// Abstraktion</span>
+  privat renderer: Renderer
+  <span class="fn">zeichnen</span>():
+    renderer.<span class="fn">render</span>(<span class="st">"Kreis"</span>)
+
+<span class="cm">// Kreis mit Vektor oder Raster:</span>
+k1 = <span class="kw">NEU</span> Kreis(VektorRenderer())
+k2 = <span class="kw">NEU</span> Kreis(RasterRenderer())</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Bridge</div>
+        <div class="esel-text"><span class="esel-key">Bridge</span> = <span class="esel-key">Brücke zwischen zwei Welten</span> — Form (was) und Renderer (wie) werden getrennt und über eine Brücke verbunden.</div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Flyweight — Definition (Kurz)</div>
+        <div class="def-text">Das <strong>Flyweight</strong>-Pattern teilt gemeinsame Zustände zwischen vielen feingranularen Objekten, um <strong>Speicher zu sparen</strong>. Interner (gemeinsamer) Zustand wird geteilt, externer Zustand wird übergeben.</div>
+        <div class="def-note">Wann: sehr viele ähnliche Objekte (Buchstaben in Textverarbeitung, Partikel in Spielen)</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Flyweight</div>
+        <div class="esel-text"><span class="esel-key">Flyweight</span> = <span class="esel-key">Schriftart-Cache</span> — 10.000 Buchstaben 'A' teilen sich eine Schriftart-Definition, nur Position ist individuell.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4: Vergleich + IHK ══ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Structural Patterns — Vergleich</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Alle Strukturmuster im Überblick</div>
+        <table>
+          <thead><tr><th>Pattern</th><th>Kernfrage</th><th>Alltagsbild</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Adapter</strong></td><td>Wie übersetze ich zwischen zwei Schnittstellen?</td><td>Reisestecker</td></tr>
+            <tr><td><strong>Facade</strong></td><td>Wie vereinfache ich ein komplexes System?</td><td>Fernbedienung</td></tr>
+            <tr><td><strong>Decorator</strong></td><td>Wie erweitere ich dynamisch ohne Vererbung?</td><td>Weihnachtsbaum</td></tr>
+            <tr><td><strong>Proxy</strong></td><td>Wie kontrolliere ich den Zugriff?</td><td>Türsteher/Assistent</td></tr>
+            <tr><td><strong>Composite</strong></td><td>Wie behandle ich Einzelnes und Gruppen gleich?</td><td>Dateisystem</td></tr>
+            <tr><td><strong>Bridge</strong></td><td>Wie trenne ich Abstraktion und Implementierung?</td><td>Brücke zwischen Welten</td></tr>
+            <tr><td><strong>Flyweight</strong></td><td>Wie spare ich Speicher bei vielen Objekten?</td><td>Schriftart-Cache</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Adapter vs. Facade vs. Proxy — Abgrenzung</div>
+        <div class="def-text">
+          <span class="tag tag-b">Adapter</span> ändert das Interface eines bestehenden Objekts<br>
+          <span class="tag tag-t">Facade</span> vereinfacht mehrere Objekte hinter einem Interface<br>
+          <span class="tag tag-p">Proxy</span> gleicher Interface wie Original — kontrolliert Zugriff<br>
+          <span class="tag tag-o">Decorator</span> gleicher Interface — fügt Funktionalität hinzu
+        </div>
+        <div class="def-note">IHK-Falle: Proxy und Decorator ähneln sich — Unterschied: Proxy kontrolliert Zugriff, Decorator erweitert Verhalten!</div>
+      </div>
+
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Entscheidungshilfe</div>
+        <div class="def-text">
+          → Inkompatible Schnittstelle? → <span class="tag tag-b">Adapter</span><br>
+          → Komplexes Subsystem? → <span class="tag tag-t">Facade</span><br>
+          → Dynamisch Verhalten hinzufügen? → <span class="tag tag-o">Decorator</span><br>
+          → Zugriffsschutz / Lazy Loading? → <span class="tag tag-p">Proxy</span><br>
+          → Baum-Hierarchie? → <span class="tag tag-gr">Composite</span><br>
+          → Abstraktion ≠ Implementierung? → <span class="tag tag-g">Bridge</span>
+        </div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Structural Patterns</div>
+        <div class="esel-text">„<span class="esel-key">A</span>lle <span class="esel-key">F</span>aulen <span class="esel-key">D</span>emonstrieren <span class="esel-key">P</span>erfekte <span class="esel-key">C</span>omposit-<span class="esel-key">B</span>rücken-<span class="esel-key">F</span>lugtechnik"<br>
+        <span class="esel-key">A</span>dapter · <span class="esel-key">F</span>acade · <span class="esel-key">D</span>ecorator · <span class="esel-key">P</span>roxy · <span class="esel-key">C</span>omposite · <span class="esel-key">B</span>ridge · <span class="esel-key">F</span>lyweight</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">IHK-Prüfungsfragen Structural</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Erläutern Sie das Adapter-Pattern anhand eines konkreten Beispiels.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Adapter und Facade?</div>
+        <div class="ihk-q">Erklären Sie, wie das Decorator-Pattern Vererbung ersetzt.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Proxy und Decorator?</div>
+        <div class="ihk-q">Nennen Sie drei Varianten des Proxy-Patterns und deren Einsatzzweck.</div>
+        <div class="ihk-q">Wann ist das Composite-Pattern sinnvoll? Nennen Sie ein Beispiel.</div>
+        <div class="ihk-q">Was versteht man unter einem Virtual Proxy?</div>
+        <div class="ihk-q">Welchen Vorteil bietet das Facade-Pattern für die Wartbarkeit?</div>
+        <div class="ihk-q">Erklären Sie Method Chaining am Beispiel des Builder-Patterns (Blatt 1).</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Composite und Decorator?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-blue">
+    <div class="card-head">Zusammenhang: Patterns &amp; Prinzipien</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>Pattern</th><th>SOLID-Prinzip</th></tr></thead>
+        <tbody>
+          <tr><td>Adapter</td><td>Open/Closed (OCP) — bestehende Klasse nicht ändern</td></tr>
+          <tr><td>Facade</td><td>Dependency Inversion — gegen Abstraktion programmieren</td></tr>
+          <tr><td>Decorator</td><td>Open/Closed — Erweiterung ohne Änderung</td></tr>
+          <tr><td>Proxy</td><td>Single Responsibility — Zugangskontrolle trennen</td></tr>
+          <tr><td>Composite</td><td>Interface Segregation — einheitliches Interface</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Design Patterns · Blatt 2/3 · Strukturmuster · Adapter · Facade · Decorator · Proxy · Composite · Bridge · Flyweight</span>
+  <span>← Blatt 1: Erzeugungsmuster → Blatt 3: Verhaltensmuster · Observer · Strategy · Command · Template Method · Iterator</span>
+  <span>GoF · Softwaredesign · Entwurfsmuster · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>

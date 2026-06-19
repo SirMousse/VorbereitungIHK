@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Design Patterns Behavioral – IHK FIAE Blatt 3</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #C04828; }
+  .cat-badge { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; background: #fff0eb; color: #C04828; border: 1px solid #fcd34d; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col  { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .kw { color: #534AB7; font-weight: 700; }
+  .fn { color: #0F6E56; }
+  .cm { color: #999; }
+  .cl { color: #C04828; font-weight: 700; }
+  .st { color: #854F0B; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p  { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t  { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o  { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b  { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g  { background: #f4f4f2; color: #444;    border-color: #ccc; }
+  .tag-r  { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-gr { background: #edfade; color: #3B6D11;  border-color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text  { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key   { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #fff0eb; border: 1.5px solid #C04828; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #7c2d12; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.6; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #C04828; }
+
+  .pmeta { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0 4px; }
+  .pmeta-item { font-size: 7.5px; background: #f4f4f2; border: 0.75px solid #ddd; border-radius: 3px; padding: 1px 5px; color: #555; }
+  .pmeta-item strong { color: #111; }
+
+  /* MASTER TABLE */
+  .master-table { width: 100%; border-collapse: collapse; font-size: 7.5px; }
+  .master-table th { background: #f4f4f2; font-weight: 700; padding: 2px 3px; border: 0.75px solid #ccc; }
+  .master-table td { padding: 2px 3px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  .master-table tr:nth-child(even) td { background: #fafafa; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Design Patterns — Verhaltensmuster (Behavioral Patterns) <span class="badge">Blatt 3 / 3</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · GoF-Entwurfsmuster · Observer · Strategy · Command · Template Method · Iterator · State</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Softwareentwicklung &amp; -design</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1: Observer + Iterator ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">Observer <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Abhängige automatisch benachrichtigen</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Behavioral #5</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Observer</strong>-Pattern (Beobachter) definiert eine <strong>1-zu-n-Abhängigkeit</strong> zwischen Objekten. Ändert sich das <strong>Subject</strong> (beobachtetes Objekt), werden alle registrierten <strong>Observer</strong> (Beobachter) automatisch benachrichtigt. Auch bekannt als: <strong>Publish-Subscribe</strong>-Muster.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· MVC: Model benachrichtigt Views bei Datenänderung<br>· Event-Systeme (Button-Klick → mehrere Handler)<br>· Nachrichtensysteme (Newsletter, Push-Benachrichtigungen)<br>· Aktienkurs-Ticker (eine Quelle, viele Anzeigen)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Observer</span>:
+  <span class="fn">aktualisieren</span>(wert)
+
+<span class="kw">KLASSE</span> <span class="cl">Nachrichtenkanal</span>:   <span class="cm">// Subject</span>
+  beobachter = []
+  nachricht = <span class="st">""</span>
+
+  <span class="fn">anmelden</span>(o):
+    beobachter.<span class="fn">hinzufügen</span>(o)
+  <span class="fn">abmelden</span>(o):
+    beobachter.<span class="fn">entfernen</span>(o)
+  <span class="fn">setzeNachricht</span>(n):
+    <span class="kw">SELBST</span>.nachricht = n
+    <span class="fn">benachrichtigeAlle</span>()
+  <span class="fn">benachrichtigeAlle</span>():
+    <span class="kw">FÜR ALLE</span> o <span class="kw">IN</span> beobachter:
+      o.<span class="fn">aktualisieren</span>(nachricht)
+
+<span class="kw">KLASSE</span> <span class="cl">Abonnent</span> <span class="kw">IMPL.</span> Observer:
+  <span class="fn">aktualisieren</span>(n): drucke n</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Lose Kopplung Subject ↔ Observer<br>
+          <span class="tag tag-t">✓</span> Beliebig viele Observer dynamisch<br>
+          <span class="tag tag-r">✗</span> Unerwartete Reihenfolge der Updates<br>
+          <span class="tag tag-r">✗</span> Memory Leaks wenn Observer nicht abgemeldet
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Observer</div>
+        <div class="esel-text"><span class="esel-key">Observer</span> = <span class="esel-key">Newsletter-Abo</span> — du abonnierst, und sobald eine neue Ausgabe erscheint, bekommst du automatisch eine Mail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Iterator <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Sammlung durchlaufen ohne Inneres kennen</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Iterator</strong>-Pattern stellt einen Weg bereit, auf die Elemente einer <strong>Sammlung (Collection) sequenziell zuzugreifen</strong>, ohne die interne Darstellung (Array, Liste, Baum…) zu kennen oder offenzulegen.</div>
+        <div class="def-note">In Java und Python ist Iterator direkt eingebaut (for-each / Iterable).</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Iterator</span>:
+  <span class="fn">hatNächstes</span>() → Wahrheit
+  <span class="fn">nächstes</span>()    → Element
+
+<span class="kw">KLASSE</span> <span class="cl">ZahlenIterator</span> <span class="kw">IMPL.</span> Iterator:
+  privat daten, pos = 0
+
+  <span class="fn">hatNächstes</span>():
+    <span class="kw">ZURÜCK</span> pos &lt; länge(daten)
+  <span class="fn">nächstes</span>():
+    wert = daten[pos]
+    pos = pos + 1
+    <span class="kw">ZURÜCK</span> wert
+
+<span class="cm">// Verwendung:</span>
+iter = <span class="kw">NEU</span> ZahlenIterator([1,2,3])
+<span class="kw">SOLANGE</span> iter.<span class="fn">hatNächstes</span>():
+  drucke iter.<span class="fn">nächstes</span>()</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Client kennt keine Datenstruktur intern<br>
+          <span class="tag tag-t">✓</span> Einheitliches Durchlauf-Interface<br>
+          <span class="tag tag-r">✗</span> Eigener Iterator bei einfachen Listen unnötig
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Iterator</div>
+        <div class="esel-text"><span class="esel-key">Iterator</span> = <span class="esel-key">Fernbedienung für Kanäle</span> — du weißt nicht, wie der TV die Kanäle speichert, aber „nächster Kanal" funktioniert immer.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2: Strategy + Command ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">Strategy <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Algorithmus zur Laufzeit austauschen</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Behavioral #9</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Strategy</strong>-Pattern definiert eine Familie von Algorithmen, kapselt jeden einzeln und macht sie <strong>austauschbar</strong>. Der Algorithmus kann zur Laufzeit gewechselt werden, ohne den Client zu ändern.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Sortierverfahren austauschen (Bubble Sort ↔ Merge Sort)<br>· Zahlungsarten (PayPal, Kreditkarte, Überweisung)<br>· Kompressionsalgorithmen (ZIP, RAR, GZIP)<br>· Navigationsrouten (kürzeste, schnellste, günstigste)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">SortierStrategie</span>:
+  <span class="fn">sortiere</span>(daten)
+
+<span class="kw">KLASSE</span> <span class="cl">BubbleSortStrategie</span> <span class="kw">IMPL.</span> SortierStrategie:
+  <span class="fn">sortiere</span>(daten): <span class="cm">// Bubble Sort</span>
+
+<span class="kw">KLASSE</span> <span class="cl">MergeSortStrategie</span> <span class="kw">IMPL.</span> SortierStrategie:
+  <span class="fn">sortiere</span>(daten): <span class="cm">// Merge Sort</span>
+
+<span class="kw">KLASSE</span> <span class="cl">Sortierer</span>:   <span class="cm">// Context</span>
+  privat strategie: SortierStrategie
+
+  <span class="fn">setzeStrategie</span>(s):
+    <span class="kw">SELBST</span>.strategie = s
+  <span class="fn">ausführen</span>(daten):
+    strategie.<span class="fn">sortiere</span>(daten)
+
+<span class="cm">// Laufzeit-Wechsel:</span>
+s = <span class="kw">NEU</span> Sortierer()
+s.<span class="fn">setzeStrategie</span>(<span class="kw">NEU</span> BubbleSortStrategie())
+s.<span class="fn">ausführen</span>([3,1,2])
+s.<span class="fn">setzeStrategie</span>(<span class="kw">NEU</span> MergeSortStrategie())
+s.<span class="fn">ausführen</span>([5,4,6])</div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Algorithmen frei austauschbar<br>
+          <span class="tag tag-t">✓</span> Kein if-else-Wirrwarr im Context<br>
+          <span class="tag tag-r">✗</span> Client muss Strategien kennen
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Strategy</div>
+        <div class="esel-text"><span class="esel-key">Strategy</span> = <span class="esel-key">Navi-App</span> — du wählst: „kürzeste Route", „schnellste Route", „günstigste Route" — der Algorithmus wechselt, das Ziel bleibt gleich.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">Command <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Aktionen als Objekte kapseln</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Behavioral #2</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Command</strong>-Pattern kapselt eine <strong>Anfrage als Objekt</strong>. Dadurch können Anfragen parametrisiert, in einer Warteschlange gespeichert, rückgängig gemacht (Undo) oder protokolliert werden.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Undo/Redo-Funktion (Texteditor, Grafikprogramm)<br>· Transaktions-Log (alle Aktionen speichern)<br>· Aufgabenwarteschlangen (Job Queue)<br>· GUI-Buttons, Menüpunkte (Befehl entkoppelt von Auslöser)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Befehl</span>:
+  <span class="fn">ausführen</span>()
+  <span class="fn">rückgängig</span>()
+
+<span class="kw">KLASSE</span> <span class="cl">TextEinfügenBefehl</span> <span class="kw">IMPL.</span> Befehl:
+  privat editor, text, position
+
+  <span class="fn">ausführen</span>():
+    editor.<span class="fn">einfügen</span>(text, position)
+  <span class="fn">rückgängig</span>():
+    editor.<span class="fn">löschen</span>(position, länge(text))
+
+<span class="kw">KLASSE</span> <span class="cl">BefehlsManager</span>:   <span class="cm">// Invoker</span>
+  verlauf = []
+
+  <span class="fn">ausführen</span>(befehl):
+    befehl.<span class="fn">ausführen</span>()
+    verlauf.<span class="fn">push</span>(befehl)
+  <span class="fn">undo</span>():
+    b = verlauf.<span class="fn">pop</span>()
+    b.<span class="fn">rückgängig</span>()</div>
+      <div class="def-row">
+        <div class="def-term">Beteiligte Rollen</div>
+        <div class="def-text">
+          <span class="tag tag-o">Invoker</span> löst Befehl aus (Button, Manager)<br>
+          <span class="tag tag-o">Command</span> kapselt die Aktion (Interface)<br>
+          <span class="tag tag-o">Receiver</span> führt die eigentliche Arbeit aus (Editor)<br>
+          <span class="tag tag-o">Client</span> erstellt und konfiguriert den Befehl
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Command</div>
+        <div class="esel-text"><span class="esel-key">Command</span> = <span class="esel-key">Bestellzettel im Restaurant</span> — du schreibst deine Bestellung auf, der Zettel kann weitergegeben, gespeichert, storniert werden.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3: Template Method + State ══ -->
+<div class="col">
+
+  <div class="card acc-green">
+    <div class="card-head">Template Method <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Ablauf fest, Details variabel</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Behavioral #10</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>Template Method</strong>-Pattern definiert das <strong>Grundgerüst eines Algorithmus</strong> in einer Methode der Oberklasse. Einzelne Schritte werden als <strong>abstrakte Methoden (Hooks)</strong> definiert, die Unterklassen konkret implementieren — das Gerüst selbst bleibt unverändert.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Gleicher Ablauf, verschiedene Details (Spielablauf: Runde starten → spielen → Runde beenden)<br>· Test-Frameworks (setUp → test → tearDown)<br>· Datenexport (öffne Datei → schreibe Inhalt → schließe Datei)<br>· Getränkezubereitung (Wasser kochen → aufbrühen → einschenken)</div>
+      </div>
+      <div class="code"><span class="kw">ABSTRAKTE KLASSE</span> <span class="cl">GetränkeRezept</span>:
+  <span class="cm">// Template Method — fest!</span>
+  <span class="fn">zubereiten</span>():
+    <span class="fn">wasserKochen</span>()      <span class="cm">// fest</span>
+    <span class="fn">aufbrühen</span>()         <span class="cm">// Unterklasse!</span>
+    <span class="fn">inTasseGießen</span>()    <span class="cm">// fest</span>
+    <span class="fn">zutatenHinzufügen</span>() <span class="cm">// Hook</span>
+
+  <span class="fn">wasserKochen</span>(): drucke <span class="st">"koche Wasser"</span>
+  <span class="fn">inTasseGießen</span>(): drucke <span class="st">"gieße ein"</span>
+  <span class="kw">ABSTRAKT</span> <span class="fn">aufbrühen</span>()
+  <span class="fn">zutatenHinzufügen</span>(): <span class="cm">// opt. Hook</span>
+
+<span class="kw">KLASSE</span> <span class="cl">Tee</span> <span class="kw">ERBT</span> GetränkeRezept:
+  <span class="fn">aufbrühen</span>(): drucke <span class="st">"ziehe Teebeutel"</span>
+
+<span class="kw">KLASSE</span> <span class="cl">Kaffee</span> <span class="kw">ERBT</span> GetränkeRezept:
+  <span class="fn">aufbrühen</span>(): drucke <span class="st">"lasse Kaffee durch"</span>
+  <span class="fn">zutatenHinzufügen</span>():
+    drucke <span class="st">"gib Milch und Zucker"</span></div>
+      <div class="def-row">
+        <div class="def-term">Vor- &amp; Nachteile</div>
+        <div class="def-text">
+          <span class="tag tag-t">✓</span> Vermeidet Code-Duplikate im Ablauf<br>
+          <span class="tag tag-t">✓</span> Ablauf zentral kontrollierbar<br>
+          <span class="tag tag-r">✗</span> Unterklassen können nur bestimmte Schritte ändern<br>
+          <span class="tag tag-r">✗</span> Verletzt Liskovsches Substitutionsprinzip ggf.
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Template Method</div>
+        <div class="esel-text"><span class="esel-key">Template Method</span> = <span class="esel-key">Kochrezept-Vorlage</span> — Schritte stehen fest, aber was genau „aufgebrüht" wird, entscheidest du. Rezept = Oberklasse, Getränk = Unterklasse.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-blue">
+    <div class="card-head">State <span class="cat-badge">Behavioral</span></div>
+    <div class="card-body">
+      <div class="pmeta">
+        <div class="pmeta-item"><strong>Problem:</strong> Verhalten je Zustand ändern</div>
+        <div class="pmeta-item"><strong>GoF:</strong> Behavioral #8</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Definition (IHK)</div>
+        <div class="def-text">Das <strong>State</strong>-Pattern ermöglicht es einem Objekt, sein <strong>Verhalten abhängig von seinem inneren Zustand</strong> zu ändern — als ob das Objekt seine Klasse wechselt. Jeder Zustand wird als eigene Klasse implementiert.</div>
+        <div class="def-note">Unterschied zu Strategy: State wechselt selbstständig den Zustand, Strategy wechselt der Client.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wann einsetzen?</div>
+        <div class="def-text">· Automaten (Getränkeautomat, Ampelsteuerung)<br>· Bestellsystem (neu → bezahlt → versandt → geliefert)<br>· Verbindungsstatus (verbunden, trennend, getrennt)<br>· Spielezustände (Menü, Spiel, Pause, Game Over)</div>
+      </div>
+      <div class="code"><span class="kw">SCHNITTSTELLE</span> <span class="cl">Zustand</span>:
+  <span class="fn">einwerfen</span>()
+  <span class="fn">ausgeben</span>()
+
+<span class="kw">KLASSE</span> <span class="cl">LeererZustand</span> <span class="kw">IMPL.</span> Zustand:
+  <span class="fn">einwerfen</span>(): wechsle zu VollZustand
+  <span class="fn">ausgeben</span>():  drucke <span class="st">"leer!"</span>
+
+<span class="kw">KLASSE</span> <span class="cl">VollZustand</span> <span class="kw">IMPL.</span> Zustand:
+  <span class="fn">einwerfen</span>(): drucke <span class="st">"schon voll!"</span>
+  <span class="fn">ausgeben</span>():  wechsle zu LeererZustand
+
+<span class="kw">KLASSE</span> <span class="cl">Automat</span>:    <span class="cm">// Context</span>
+  privat zustand = <span class="kw">NEU</span> LeererZustand()
+
+  <span class="fn">einwerfen</span>(): zustand.<span class="fn">einwerfen</span>()
+  <span class="fn">ausgeben</span>():  zustand.<span class="fn">ausgeben</span>()</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: State</div>
+        <div class="esel-text"><span class="esel-key">State</span> = <span class="esel-key">Ampel</span> — dasselbe Objekt, aber je nach Zustand (Rot/Gelb/Grün) anderes Verhalten. Zustand wechselt selbst weiter.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4: Gesamtüberblick + IHK ══ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Alle 15 GoF-Patterns — Gesamtüberblick</div>
+    <div class="card-body">
+      <table class="master-table">
+        <thead><tr><th>Pattern</th><th>Kategorie</th><th>Kernidee</th><th>Bild</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Singleton</strong></td><td>Creational</td><td>Nur 1 Instanz</td><td>Einzelkind</td></tr>
+          <tr><td><strong>Factory Method</strong></td><td>Creational</td><td>Fabrik erzeugt</td><td>Auftragsfabrik</td></tr>
+          <tr><td><strong>Abstract Factory</strong></td><td>Creational</td><td>Familien erzeugen</td><td>IKEA-Kollektion</td></tr>
+          <tr><td><strong>Builder</strong></td><td>Creational</td><td>Schrittweise bauen</td><td>Burger-Bestellung</td></tr>
+          <tr><td><strong>Prototype</strong></td><td>Creational</td><td>Klonen</td><td>Kopiermaschine</td></tr>
+          <tr><td><strong>Adapter</strong></td><td>Structural</td><td>Übersetzen</td><td>Reisestecker</td></tr>
+          <tr><td><strong>Facade</strong></td><td>Structural</td><td>Vereinfachen</td><td>Fernbedienung</td></tr>
+          <tr><td><strong>Decorator</strong></td><td>Structural</td><td>Dynamisch erweitern</td><td>Weihnachtsbaum</td></tr>
+          <tr><td><strong>Proxy</strong></td><td>Structural</td><td>Zugriff kontrollieren</td><td>Türsteher</td></tr>
+          <tr><td><strong>Composite</strong></td><td>Structural</td><td>Baum einheitlich</td><td>Dateisystem</td></tr>
+          <tr><td><strong>Bridge</strong></td><td>Structural</td><td>Abstraktion trennen</td><td>Brücke</td></tr>
+          <tr><td><strong>Observer</strong></td><td>Behavioral</td><td>Benachrichtigen</td><td>Newsletter</td></tr>
+          <tr><td><strong>Strategy</strong></td><td>Behavioral</td><td>Austauschbar</td><td>Navi-App</td></tr>
+          <tr><td><strong>Command</strong></td><td>Behavioral</td><td>Aktion kapseln</td><td>Bestellzettel</td></tr>
+          <tr><td><strong>Template Method</strong></td><td>Behavioral</td><td>Skelett + Hooks</td><td>Kochrezept</td></tr>
+          <tr><td><strong>State</strong></td><td>Behavioral</td><td>Zustandsabhängig</td><td>Ampel</td></tr>
+          <tr><td><strong>Iterator</strong></td><td>Behavioral</td><td>Durchlaufen</td><td>Kanalwechsel</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">Häufige Verwechslungen (IHK-Falle!)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Strategy vs. State</div>
+        <div class="def-text">
+          <span class="tag tag-p">Strategy</span> Client wechselt Algorithmus bewusst<br>
+          <span class="tag tag-b">State</span> Objekt wechselt Zustand selbst — automatisch
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Decorator vs. Proxy</div>
+        <div class="def-text">
+          <span class="tag tag-o">Decorator</span> fügt Funktionalität hinzu (Erweiterung)<br>
+          <span class="tag tag-p">Proxy</span> kontrolliert Zugriff (Schutz/Lazy Loading)
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Observer vs. Command</div>
+        <div class="def-text">
+          <span class="tag tag-t">Observer</span> 1-zu-n, alle werden benachrichtigt<br>
+          <span class="tag tag-o">Command</span> 1-zu-1, eine Aktion wird ausgeführt/gespeichert
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Template Method vs. Strategy</div>
+        <div class="def-text">
+          <span class="tag tag-gr">Template Method</span> Ablauf in Oberklasse fest → Vererbung<br>
+          <span class="tag tag-p">Strategy</span> ganzer Algorithmus austauschbar → Komposition
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Adapter vs. Facade</div>
+        <div class="def-text">
+          <span class="tag tag-b">Adapter</span> eine Klasse anpassen (inkompatibles Interface)<br>
+          <span class="tag tag-t">Facade</span> mehrere Klassen vereinfachen (Subsystem)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-coral">
+    <div class="card-head">IHK-Prüfungsfragen alle Patterns</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Erläutern Sie das Observer-Pattern und nennen Sie ein Beispiel.</div>
+        <div class="ihk-q">Was ist Publish-Subscribe? Wie hängt es mit Observer zusammen?</div>
+        <div class="ihk-q">Erklären Sie Strategy anhand der Sortierung.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Strategy und Template Method?</div>
+        <div class="ihk-q">Wozu dient das Command-Pattern? Was ermöglicht es zusätzlich zu einer normalen Methode?</div>
+        <div class="ihk-q">Was ist Undo/Redo und welches Pattern wird dafür eingesetzt?</div>
+        <div class="ihk-q">Welches Pattern würden Sie für einen Bestellstatus (neu→bezahlt→versandt) verwenden?</div>
+        <div class="ihk-q">Was ist ein Hook im Template Method-Pattern?</div>
+        <div class="ihk-q">Nennen Sie die drei GoF-Kategorien mit je einem Beispiel-Pattern.</div>
+        <div class="ihk-q">Erklären Sie, warum Observer eine lose Kopplung erzeugt.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Decorator und Vererbung?</div>
+      </div>
+
+      <div class="esel" style="margin-top:5px">
+        <div class="esel-title">Ultimative Eselsbrücke: Alle 3 Kategorien</div>
+        <div class="esel-text">
+          <span class="esel-key">Creational</span>: „<span class="esel-key">S</span>ingle <span class="esel-key">F</span>abriken <span class="esel-key">A</span>bstrakt <span class="esel-key">B</span>auen <span class="esel-key">P</span>rototypisch"<br>
+          <span class="esel-key">Structural</span>: „<span class="esel-key">A</span>lle <span class="esel-key">F</span>aulen <span class="esel-key">D</span>eko-<span class="esel-key">P</span>roxys <span class="esel-key">C</span>omposit <span class="esel-key">B</span>rücken"<br>
+          <span class="esel-key">Behavioral</span>: „<span class="esel-key">O</span>bserver <span class="esel-key">S</span>trategisch <span class="esel-key">C</span>ommandiert <span class="esel-key">T</span>emplate <span class="esel-key">S</span>tate <span class="esel-key">I</span>teriert"
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Design Patterns · Blatt 3/3 · Verhaltensmuster · Observer · Strategy · Command · Template Method · State · Iterator</span>
+  <span>← Blatt 1: Erzeugungsmuster (Singleton, Factory, Builder…) · ← Blatt 2: Strukturmuster (Adapter, Decorator, Facade…)</span>
+  <span>GoF · Gang of Four · 17 Patterns · Softwaredesign · AP Teil 1 &amp; Teil 2 · Lernfeld: Softwareentwicklung</span>
+</div>
+</body>
+</html>
