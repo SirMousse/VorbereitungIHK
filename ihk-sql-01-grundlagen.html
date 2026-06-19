@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>SQL Grundlagen – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .sheet-badge { display: inline-block; background: #534AB7; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 8px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 3px 0; white-space: pre; line-height: 1.6; color: #333; }
+  .kw { color: #534AB7; font-weight: 700; }
+  .cm { color: #999; }
+  .str { color: #854F0B; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+  .tag-gr { background: #edfade; color: #3B6D11; border-color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ESELSBRÜCKE */
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  /* IHK BOX */
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* CONSTRAINT TABLE */
+  .constraint { display: flex; flex-direction: column; gap: 2px; margin-top: 3px; }
+  .c-row { display: flex; gap: 5px; align-items: flex-start; font-size: 8px; line-height: 1.5; }
+  .c-name { font-family: 'Courier New', monospace; font-weight: 700; min-width: 80px; color: #534AB7; }
+
+  /* NORMAL FORMS */
+  .nf-row { display: flex; gap: 4px; margin-bottom: 3px; align-items: flex-start; }
+  .nf-badge { min-width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 8px; flex-shrink: 0; }
+  .nf1 { background: #e6faf4; color: #065f46; border: 1px solid #6ee7b7; }
+  .nf2 { background: #e8f3fb; color: #185FA5; border: 1px solid #93c5fd; }
+  .nf3 { background: #f0eeff; color: #3730a3; border: 1px solid #c4b5fd; }
+  .nf-text { font-size: 8px; color: #333; line-height: 1.5; }
+  .nf-title { font-weight: 700; font-size: 8.5px; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>SQL — Grundlagen, Begriffe &amp; Datenbanktheorie <span class="sheet-badge">Blatt 1 / 3</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Themenbereich: Datenbanken &amp; SQL</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Daten systemübergreifend bereitstellen</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">Was ist SQL? — Definition &amp; Einordnung</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">SQL — Structured Query Language</div>
+        <div class="def-text"><strong>SQL</strong> ist eine standardisierte Datenbankabfragesprache zur Definition, Manipulation und Kontrolle von Daten in <strong>relationalen Datenbanksystemen (RDBMS)</strong>. SQL ist kein Programm, sondern eine <strong>deklarative Sprache</strong> — man beschreibt <em>was</em> man will, nicht <em>wie</em> es berechnet wird.</div>
+        <div class="def-note">Standard: ISO/IEC 9075 · Aktuell: SQL:2023</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Relationales Datenbanksystem (RDBMS)</div>
+        <div class="def-text">Ein <strong>RDBMS</strong> speichert Daten in Tabellen (Relationen), die über Schlüssel miteinander verknüpft sind. Beziehungen zwischen Tabellen werden durch Fremdschlüssel hergestellt.</div>
+        <div class="def-note">Beispiele: MySQL, PostgreSQL, MariaDB, Oracle, MS SQL Server, SQLite</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Relation = Tabelle</div>
+        <div class="def-text">
+          Eine <strong>Relation</strong> besteht aus:<br>
+          · <strong>Attributen</strong> = Spalten (Name, Typ, Constraint)<br>
+          · <strong>Tupeln</strong> = Zeilen (ein Datensatz)<br>
+          · <strong>Domäne</strong> = Wertebereich eines Attributs
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: SQL-Grundbegriffe</div>
+        <div class="esel-text">
+          <span class="esel-key">T</span>abelle = <span class="esel-key">R</span>elation<br>
+          <span class="esel-key">Z</span>eile &nbsp;&nbsp;= <span class="esel-key">T</span>upel (Datensatz)<br>
+          <span class="esel-key">S</span>palte &nbsp;= <span class="esel-key">A</span>ttribut<br>
+          <span class="esel-key">W</span>ert &nbsp;&nbsp;= <span class="esel-key">D</span>omäne (Wertebereich)<br>
+          → „<strong>ZTSAW → RTAD</strong>"
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">SQL-Sprachbereiche — Einteilung (IHK!)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-text">SQL ist in <strong>vier Untersprachengruppen</strong> eingeteilt. Die IHK erwartet, dass du alle kennst und Befehle korrekt zuordnen kannst.</div>
+      </div>
+      <table>
+        <thead><tr><th>Kürzel</th><th>Name</th><th>Zweck</th><th>Befehle</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DDL</strong></td><td>Data Definition</td><td>Struktur definieren</td><td>CREATE, ALTER, DROP, TRUNCATE</td></tr>
+          <tr><td><strong>DML</strong></td><td>Data Manipulation</td><td>Daten verändern</td><td>INSERT, UPDATE, DELETE</td></tr>
+          <tr><td><strong>DQL</strong></td><td>Data Query</td><td>Daten abfragen</td><td>SELECT</td></tr>
+          <tr><td><strong>DCL</strong></td><td>Data Control</td><td>Rechte vergeben</td><td>GRANT, REVOKE</td></tr>
+          <tr><td><strong>TCL</strong></td><td>Transaction Control</td><td>Transaktionen steuern</td><td>COMMIT, ROLLBACK, SAVEPOINT</td></tr>
+        </tbody>
+      </table>
+      <div class="esel" style="margin-top:5px">
+        <div class="esel-title">Eselsbrücke: SQL-Bereiche</div>
+        <div class="esel-text">
+          „<span class="esel-key">D</span>er <span class="esel-key">D</span>atenbankadmin <span class="esel-key">D</span>arf <span class="esel-key">D</span>aten <span class="esel-key">T</span>ransaktionssicher kontrollieren"<br>
+          <span class="esel-key">D</span>DL · <span class="esel-key">D</span>ML · <span class="esel-key">D</span>QL · <span class="esel-key">D</span>CL · <span class="esel-key">T</span>CL
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-blue">
+    <div class="card-head">Schlüsselkonzepte — Primär- &amp; Fremdschlüssel</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Primärschlüssel (PRIMARY KEY)</div>
+        <div class="def-text">Ein <strong>Primärschlüssel</strong> identifiziert jeden Datensatz in einer Tabelle <strong>eindeutig</strong>. Er darf nicht NULL sein und muss in der gesamten Tabelle einmalig sein.</div>
+        <div class="def-note">Kann aus einer oder mehreren Spalten bestehen (zusammengesetzter PK).</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Fremdschlüssel (FOREIGN KEY)</div>
+        <div class="def-text">Ein <strong>Fremdschlüssel</strong> ist ein Attribut, das auf den Primärschlüssel einer anderen Tabelle verweist. Er stellt die <strong>referentielle Integrität</strong> sicher — es darf nur auf existierende Werte verwiesen werden.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Kandidatenschlüssel</div>
+        <div class="def-text">Alle Attribute oder Attributkombinationen, die als Primärschlüssel geeignet wären (eindeutig + minimal). Der gewählte wird Primärschlüssel, die restlichen heißen <strong>alternative Schlüssel</strong>.</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Schlüsselarten</div>
+        <div class="esel-text">
+          „<span class="esel-key">P</span>rimär <span class="esel-key">I</span>dentifiziert <span class="esel-key">F</span>remd <span class="esel-key">V</span>erweist"<br>
+          <span class="esel-key">P</span>K = eindeutig, nicht NULL, pro Tabelle 1×<br>
+          <span class="esel-key">F</span>K = zeigt auf PK einer anderen Tabelle
+        </div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Constraints (Einschränkungen)</div>
+        <div class="constraint">
+          <div class="c-row"><span class="c-name">PRIMARY KEY</span><span>Eindeutig + NOT NULL</span></div>
+          <div class="c-row"><span class="c-name">FOREIGN KEY</span><span>Verweis auf anderen PK</span></div>
+          <div class="c-row"><span class="c-name">NOT NULL</span><span>Kein Leerwert erlaubt</span></div>
+          <div class="c-row"><span class="c-name">UNIQUE</span><span>Wert muss eindeutig sein</span></div>
+          <div class="c-row"><span class="c-name">CHECK</span><span>Bedingung muss erfüllt sein</span></div>
+          <div class="c-row"><span class="c-name">DEFAULT</span><span>Standardwert wenn leer</span></div>
+          <div class="c-row"><span class="c-name">AUTO_INCREMENT</span><span>Zähler automatisch +1</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-coral">
+    <div class="card-head">Datentypen (IHK-relevant)</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>Typ</th><th>Beschreibung</th><th>Beispiel</th></tr></thead>
+        <tbody>
+          <tr><td><strong>INT</strong></td><td>Ganzzahl</td><td>42, -7</td></tr>
+          <tr><td><strong>DECIMAL(p,s)</strong></td><td>Festkommazahl</td><td>9.99, 1234.50</td></tr>
+          <tr><td><strong>FLOAT</strong></td><td>Gleitkommazahl</td><td>3.14</td></tr>
+          <tr><td><strong>VARCHAR(n)</strong></td><td>Variabler Text</td><td>'Max Mustermann'</td></tr>
+          <tr><td><strong>CHAR(n)</strong></td><td>Fester Text</td><td>'DE', 'M'</td></tr>
+          <tr><td><strong>TEXT</strong></td><td>Langer Text</td><td>Beschreibungen</td></tr>
+          <tr><td><strong>DATE</strong></td><td>Datum</td><td>2024-01-15</td></tr>
+          <tr><td><strong>DATETIME</strong></td><td>Datum + Zeit</td><td>2024-01-15 09:30:00</td></tr>
+          <tr><td><strong>BOOLEAN</strong></td><td>Wahrheitswert</td><td>TRUE / FALSE</td></tr>
+        </tbody>
+      </table>
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: VARCHAR vs. CHAR</div>
+        <div class="esel-text">
+          <span class="esel-key">CHAR</span> = <span class="esel-key">C</span>onstant → immer gleiche Länge (z. B. Postleitzahl '12345')<br>
+          <span class="esel-key">VARCHAR</span> = <span class="esel-key">VAR</span>iable → passt sich der Länge an
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-green">
+    <div class="card-head">Normalisierung — 1NF · 2NF · 3NF</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition Normalisierung</div>
+        <div class="def-text">Die <strong>Normalisierung</strong> ist ein schrittweiser Prozess zur Strukturierung einer Datenbank, um <strong>Redundanzen</strong> (doppelte Daten) und <strong>Anomalien</strong> (Einfüge-, Änderungs-, Löschfehler) zu vermeiden.</div>
+      </div>
+
+      <div class="nf-row">
+        <div class="nf-badge nf1">1</div>
+        <div class="nf-text">
+          <div class="nf-title">1. Normalform (1NF)</div>
+          Alle Attributwerte sind <strong>atomar</strong> (unteilbar). Keine Mehrfachwerte in einer Zelle. Jede Zeile ist eindeutig identifizierbar.
+          <div class="def-note">Verletzung: Zelle enthält „Müller, Meier, Schmidt"</div>
+        </div>
+      </div>
+
+      <div class="nf-row" style="margin-top:4px">
+        <div class="nf-badge nf2">2</div>
+        <div class="nf-text">
+          <div class="nf-title">2. Normalform (2NF)</div>
+          1NF erfüllt + jedes Nicht-Schlüsselattribut ist <strong>voll funktional abhängig</strong> vom gesamten Primärschlüssel (keine Teilabhängigkeiten).
+          <div class="def-note">Nur relevant bei <strong>zusammengesetztem</strong> Primärschlüssel!</div>
+        </div>
+      </div>
+
+      <div class="nf-row" style="margin-top:4px">
+        <div class="nf-badge nf3">3</div>
+        <div class="nf-text">
+          <div class="nf-title">3. Normalform (3NF)</div>
+          2NF erfüllt + kein Nicht-Schlüsselattribut ist <strong>transitiv abhängig</strong> von einem anderen Nicht-Schlüsselattribut.
+          <div class="def-note">Verletzung: PLZ → Ort (Ort hängt von PLZ ab, nicht vom PK)</div>
+        </div>
+      </div>
+
+      <div class="esel" style="margin-top:5px">
+        <div class="esel-title">Eselsbrücke: Normalformen</div>
+        <div class="esel-text">
+          „<span class="esel-key">A</span>lles <span class="esel-key">V</span>oll <span class="esel-key">D</span>irekt"<br>
+          <span class="esel-key">1NF</span>: <span class="esel-key">A</span>tom — keine Mehrfachwerte<br>
+          <span class="esel-key">2NF</span>: <span class="esel-key">V</span>oll abhängig vom ganzen PK<br>
+          <span class="esel-key">3NF</span>: <span class="esel-key">D</span>irekt abhängig — keine Transitivität
+        </div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Anomalien (Warum normalisieren?)</div>
+        <div class="def-text">
+          <span class="tag tag-r">Einfügeanomalie</span> Daten können nicht gespeichert werden ohne andere Daten<br>
+          <span class="tag tag-r">Änderungsanomalie</span> Gleiche Info an mehreren Stellen → inkonsistent<br>
+          <span class="tag tag-r">Löschanomalie</span> Löschen eines Datensatzes verliert andere Infos
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">Beziehungstypen (Kardinalitäten)</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>Typ</th><th>Bedeutung</th><th>Beispiel</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1:1</strong></td><td>Ein Datensatz ↔ genau ein anderer</td><td>Person ↔ Ausweis</td></tr>
+          <tr><td><strong>1:n</strong></td><td>Ein Datensatz ↔ viele andere</td><td>Kunde → Bestellungen</td></tr>
+          <tr><td><strong>n:m</strong></td><td>Viele ↔ viele (Zwischentabelle!)</td><td>Student ↔ Kurse</td></tr>
+        </tbody>
+      </table>
+      <div class="def-note" style="margin-top:3px">n:m → immer Auflösung durch Zwischentabelle mit zwei Fremdschlüsseln!</div>
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: Kardinalitäten</div>
+        <div class="esel-text">
+          „<span class="esel-key">1</span> Kunde hat <span class="esel-key">n</span> Bestellungen — aber <span class="esel-key">n:m</span> braucht immer eine <span class="esel-key">M</span>itteltabelle"<br>
+          <span class="esel-key">n:m</span> = <span class="esel-key">n</span>iemals direkt → <span class="esel-key">m</span>ittels Zwischentabelle lösen
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-pink">
+    <div class="card-head">Transaktionen &amp; ACID (TCL)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Transaktion</div>
+        <div class="def-text">Eine <strong>Transaktion</strong> ist eine Folge von SQL-Befehlen, die als <strong>eine unteilbare Einheit</strong> ausgeführt wird. Entweder werden alle Befehle erfolgreich ausgeführt (<em>COMMIT</em>) oder alle werden rückgängig gemacht (<em>ROLLBACK</em>).</div>
+        <div class="def-note">Klassisches Beispiel: Banküberweisung — Abbuchung + Gutschrift müssen zusammen gelingen.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">ACID-Eigenschaften</div>
+        <div class="def-text">
+          <span class="tag tag-p">A</span>tomicity — ganz oder gar nicht<br>
+          <span class="tag tag-t">C</span>onsistency — DB bleibt konsistent<br>
+          <span class="tag tag-b">I</span>solation — Transaktionen stören sich nicht<br>
+          <span class="tag tag-gr">D</span>urability — nach COMMIT dauerhaft gespeichert
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: ACID</div>
+        <div class="esel-text">
+          „<span class="esel-key">A</span>lle <span class="esel-key">C</span>ontainer <span class="esel-key">I</span>soliert <span class="esel-key">D</span>auerhaft"<br>
+          <span class="esel-key">A</span>tomicity · <span class="esel-key">C</span>onsistency · <span class="esel-key">I</span>solation · <span class="esel-key">D</span>urability
+        </div>
+      </div>
+      <div class="code"><span class="kw">BEGIN</span>;
+  <span class="kw">UPDATE</span> Konto <span class="kw">SET</span> Guthaben = Guthaben - 100 <span class="kw">WHERE</span> ID = 1;
+  <span class="kw">UPDATE</span> Konto <span class="kw">SET</span> Guthaben = Guthaben + 100 <span class="kw">WHERE</span> ID = 2;
+<span class="kw">COMMIT</span>;  <span class="cm">-- beide oder keine</span></div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">IHK-Prüfungsfragen SQL Grundlagen</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Was ist SQL und welche Sprachbereiche unterscheidet man?</div>
+        <div class="ihk-q">Ordnen Sie die Befehle SELECT, INSERT, CREATE, GRANT den SQL-Sprachbereichen zu.</div>
+        <div class="ihk-q">Erläutern Sie den Unterschied zwischen Primärschlüssel und Fremdschlüssel.</div>
+        <div class="ihk-q">Was versteht man unter referentieller Integrität?</div>
+        <div class="ihk-q">Bringen Sie die Tabelle in die 3. Normalform. Begründen Sie jeden Schritt.</div>
+        <div class="ihk-q">Was sind Anomalien? Nennen Sie drei Arten.</div>
+        <div class="ihk-q">Erläutern Sie das ACID-Prinzip anhand eines Beispiels.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen COMMIT und ROLLBACK?</div>
+        <div class="ihk-q">Welchen Datentyp würden Sie für eine Preisinformation wählen und warum?</div>
+        <div class="ihk-q">Lösen Sie die n:m-Beziehung zwischen Studenten und Kursen auf.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-purple">
+    <div class="card-head">Merksätze &amp; Kurzreferenz</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Goldene Regeln für die IHK</div>
+        <div class="def-text">
+          · <strong>DDL</strong> = Struktur · <strong>DML</strong> = Daten · <strong>DQL</strong> = Abfragen<br>
+          · PK = eindeutig + NOT NULL · FK = Verweis auf PK<br>
+          · n:m → immer Zwischentabelle<br>
+          · 1NF: atomar · 2NF: voll abhängig · 3NF: direkt abhängig<br>
+          · ACID: Transaktion ist unteilbar<br>
+          · NULL ≠ 0 ≠ '' — NULL bedeutet „unbekannt"
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: NULL verstehen</div>
+        <div class="esel-text">
+          NULL ist kein Wert — es ist <span class="esel-key">Unwissen</span>.<br>
+          NULL = 0 → <span class="esel-key">FALSCH</span> (0 ist eine Zahl!)<br>
+          Prüfen: immer mit <span class="esel-key">IS NULL</span>, nicht mit = NULL
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · SQL Grundlagen · Blatt 1/3 · Begriffe · Sprachbereiche · Normalformen · Schlüssel · ACID</span>
+  <span>→ Blatt 2: SELECT-Abfragen · WHERE · GROUP BY · HAVING · Aggregatfunktionen</span>
+  <span>Lernfeld: Daten systemübergreifend bereitstellen · AP Teil 1 &amp; Teil 2</span>
+</div>
+
+</body>
+</html>

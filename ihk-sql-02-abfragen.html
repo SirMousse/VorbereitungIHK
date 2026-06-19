@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>SQL Abfragen – IHK FIAE Whiteboard</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 16px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .sheet-badge { display: inline-block; background: #0F6E56; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.8px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 3px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .fn  { color: #0F6E56; font-weight: 700; }
+  .str { color: #854F0B; }
+  .cm  { color: #999; }
+  .num { color: #185FA5; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; font-family: 'Courier New', monospace; }
+  td.plain { font-family: 'Segoe UI', Arial, sans-serif; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  /* ORDER CHAIN */
+  .chain { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; margin: 4px 0; }
+  .chain-box { background: #f0eeff; border: 1px solid #c4b5fd; border-radius: 3px; padding: 2px 5px; font-size: 7.5px; font-weight: 700; color: #3730a3; font-family: 'Courier New', monospace; }
+  .chain-box.opt { background: #f4f4f2; border-color: #ccc; color: #555; }
+  .chain-arrow { font-size: 9px; color: #999; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; letter-spacing: .05em; text-transform: uppercase; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* RESULT TABLE */
+  .res-table { font-size: 8px; border-collapse: collapse; width: 100%; margin-top: 3px; }
+  .res-table th { background: #534AB7; color: #fff; padding: 2px 4px; border: 1px solid #3730a3; }
+  .res-table td { padding: 2px 4px; border: 1px solid #ddd; font-family: 'Courier New', monospace; }
+  .res-table tr:nth-child(even) td { background: #f5f5f5; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>SQL — SELECT-Abfragen, Operatoren &amp; Aggregatfunktionen <span class="sheet-badge">Blatt 2 / 3</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · Fachinformatiker/-in Anwendungsentwicklung (FIAE) · Themenbereich: SQL-Abfragen (DQL)</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2 relevant<br>Lernfeld: Daten systemübergreifend bereitstellen</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-teal">
+    <div class="card-head">SELECT — Grundstruktur &amp; Ausführungsreihenfolge</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Vollständige SELECT-Syntax</div>
+        <div class="code"><span class="kw">SELECT</span>   Spalten / * / Ausdrücke
+<span class="kw">FROM</span>     Tabelle(n)
+<span class="kw">WHERE</span>    Zeilenbedingung
+<span class="kw">GROUP BY</span> Gruppierungsspalte(n)
+<span class="kw">HAVING</span>   Bedingung auf Gruppen
+<span class="kw">ORDER BY</span> Spalte ASC|DESC
+<span class="kw">LIMIT</span>    Anzahl Zeilen;</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">⚠️ Ausführungsreihenfolge (IHK!)</div>
+        <div class="def-text">SQL wird <strong>nicht</strong> in der Schreibreihenfolge ausgeführt:</div>
+        <div class="chain" style="margin-top:3px">
+          <div class="chain-box">FROM</div><div class="chain-arrow">→</div>
+          <div class="chain-box opt">WHERE</div><div class="chain-arrow">→</div>
+          <div class="chain-box opt">GROUP BY</div><div class="chain-arrow">→</div>
+          <div class="chain-box opt">HAVING</div><div class="chain-arrow">→</div>
+          <div class="chain-box">SELECT</div><div class="chain-arrow">→</div>
+          <div class="chain-box opt">ORDER BY</div><div class="chain-arrow">→</div>
+          <div class="chain-box opt">LIMIT</div>
+        </div>
+        <div class="def-note">WHERE filtert Zeilen BEVOR gruppiert wird — deshalb kein Aggregat in WHERE!</div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Ausführungsreihenfolge</div>
+        <div class="esel-text">
+          „<span class="esel-key">F</span>rische <span class="esel-key">W</span>urst <span class="esel-key">G</span>ibt <span class="esel-key">H</span>unger, <span class="esel-key">S</span>ofort <span class="esel-key">O</span>rdern <span class="esel-key">L</span>iefern"<br>
+          <span class="esel-key">F</span>ROM · <span class="esel-key">W</span>HERE · <span class="esel-key">G</span>ROUP BY · <span class="esel-key">H</span>AVING · <span class="esel-key">S</span>ELECT · <span class="esel-key">O</span>RDER BY · <span class="esel-key">L</span>IMIT
+        </div>
+      </div>
+
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Beispieldatenbank (für Blatt 2)</div>
+        <div class="def-text">Tabelle: <strong>Bestellung</strong></div>
+        <table class="res-table" style="margin-top:3px">
+          <thead><tr><th>ID</th><th>Kunde</th><th>Produkt</th><th>Menge</th><th>Preis</th><th>Stadt</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Müller</td><td>Laptop</td><td>2</td><td>999.00</td><td>Berlin</td></tr>
+            <tr><td>2</td><td>Müller</td><td>Maus</td><td>5</td><td>25.00</td><td>Berlin</td></tr>
+            <tr><td>3</td><td>Meier</td><td>Laptop</td><td>1</td><td>999.00</td><td>Hamburg</td></tr>
+            <tr><td>4</td><td>Schmidt</td><td>Tastatur</td><td>3</td><td>79.00</td><td>Berlin</td></tr>
+            <tr><td>5</td><td>Meier</td><td>Monitor</td><td>2</td><td>349.00</td><td>Hamburg</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-blue">
+    <div class="card-head">SELECT — Grundabfragen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Alle Spalten / bestimmte Spalten</div>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Bestellung;
+<span class="kw">SELECT</span> Kunde, Produkt <span class="kw">FROM</span> Bestellung;
+<span class="kw">SELECT DISTINCT</span> Stadt <span class="kw">FROM</span> Bestellung;
+<span class="cm">-- DISTINCT = keine Duplikate</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Aliase (AS)</div>
+        <div class="code"><span class="kw">SELECT</span> Kunde <span class="kw">AS</span> <span class="str">'Kundenname'</span>,
+       Preis * Menge <span class="kw">AS</span> Gesamtwert
+<span class="kw">FROM</span> Bestellung;</div>
+        <div class="def-note">Alias gilt nur in SELECT und ORDER BY — nicht in WHERE!</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Sortieren mit ORDER BY</div>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Bestellung
+<span class="kw">ORDER BY</span> Preis <span class="kw">DESC</span>;   <span class="cm">-- absteigend</span>
+
+<span class="kw">ORDER BY</span> Kunde <span class="kw">ASC</span>, Preis <span class="kw">DESC</span>;
+<span class="cm">-- mehrere Kriterien möglich</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Begrenzen mit LIMIT</div>
+        <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> Bestellung
+<span class="kw">ORDER BY</span> Preis <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">3</span>;  <span class="cm">-- nur die 3 teuersten</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">WHERE — Filtern &amp; Operatoren</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition WHERE</div>
+        <div class="def-text">WHERE filtert <strong>einzelne Zeilen</strong> vor der Gruppierung. Nur Zeilen, die die Bedingung erfüllen, werden berücksichtigt. WHERE kann <strong>keine Aggregatfunktionen</strong> enthalten (→ dafür HAVING).</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Vergleichsoperatoren</div>
+        <div class="code"><span class="kw">WHERE</span> Preis = <span class="num">999</span>       <span class="cm">-- gleich</span>
+<span class="kw">WHERE</span> Preis &lt;&gt; <span class="num">999</span>      <span class="cm">-- ungleich (auch !=)</span>
+<span class="kw">WHERE</span> Preis &gt; <span class="num">100</span>       <span class="cm">-- größer</span>
+<span class="kw">WHERE</span> Preis &lt;= <span class="num">500</span>      <span class="cm">-- kleiner gleich</span></div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Logische Operatoren</div>
+        <div class="code"><span class="kw">WHERE</span> Stadt = <span class="str">'Berlin'</span> <span class="kw">AND</span> Preis > <span class="num">100</span>
+<span class="kw">WHERE</span> Stadt = <span class="str">'Berlin'</span> <span class="kw">OR</span> Stadt = <span class="str">'Hamburg'</span>
+<span class="kw">WHERE NOT</span> Stadt = <span class="str">'München'</span></div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Spezialoperatoren</div>
+        <div class="code"><span class="cm">-- BETWEEN: Bereich (inklusiv)</span>
+<span class="kw">WHERE</span> Preis <span class="kw">BETWEEN</span> <span class="num">50</span> <span class="kw">AND</span> <span class="num">500</span>
+
+<span class="cm">-- IN: Liste von Werten</span>
+<span class="kw">WHERE</span> Stadt <span class="kw">IN</span> (<span class="str">'Berlin'</span>, <span class="str">'Hamburg'</span>)
+
+<span class="cm">-- LIKE: Mustersuche</span>
+<span class="kw">WHERE</span> Kunde <span class="kw">LIKE</span> <span class="str">'M%'</span>    <span class="cm">-- beginnt mit M</span>
+<span class="kw">WHERE</span> Kunde <span class="kw">LIKE</span> <span class="str">'%er'</span>   <span class="cm">-- endet mit er</span>
+<span class="kw">WHERE</span> Kunde <span class="kw">LIKE</span> <span class="str">'_ü%'</span>   <span class="cm">-- _ = genau 1 Zeichen</span>
+
+<span class="cm">-- NULL-Prüfung</span>
+<span class="kw">WHERE</span> Preis <span class="kw">IS NULL</span>
+<span class="kw">WHERE</span> Preis <span class="kw">IS NOT NULL</span></div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: LIKE-Platzhalter</div>
+        <div class="esel-text">
+          <span class="esel-key">%</span> = beliebig viele Zeichen (<span class="esel-key">P</span>rozent = <span class="esel-key">P</span>lural)<br>
+          <span class="esel-key">_</span> = genau <span class="esel-key">ein</span> Zeichen (Unterstrich = <span class="esel-key">ein</span> Strich)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-purple">
+    <div class="card-head">GROUP BY &amp; HAVING</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition GROUP BY</div>
+        <div class="def-text">GROUP BY fasst Zeilen mit gleichen Werten in einer Spalte zu <strong>Gruppen</strong> zusammen. Auf Gruppen können <strong>Aggregatfunktionen</strong> angewendet werden.</div>
+        <div class="def-note">Alle Spalten in SELECT, die keine Aggregatfunktion sind, müssen in GROUP BY stehen!</div>
+      </div>
+
+      <div class="def-row">
+        <div class="def-term">Definition HAVING</div>
+        <div class="def-text">HAVING filtert <strong>Gruppen</strong> (nach GROUP BY) — genau wie WHERE Zeilen filtert. HAVING darf Aggregatfunktionen enthalten, WHERE nicht.</div>
+      </div>
+
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: WHERE vs. HAVING</div>
+        <div class="esel-text">
+          <span class="esel-key">W</span>HERE = <span class="esel-key">Z</span>eilen filtern (vor Gruppierung)<br>
+          <span class="esel-key">H</span>AVING = <span class="esel-key">G</span>ruppen filtern (nach Gruppierung)<br>
+          „<span class="esel-key">W</span>as einzeln? → WHERE · <span class="esel-key">H</span>aufen? → HAVING"
+        </div>
+      </div>
+
+      <div class="code"><span class="cm">-- Umsatz je Kunde (Summe Preis × Menge)</span>
+<span class="kw">SELECT</span> Kunde,
+       <span class="fn">SUM</span>(Preis * Menge) <span class="kw">AS</span> Umsatz,
+       <span class="fn">COUNT</span>(*) <span class="kw">AS</span> Anzahl_Bestellungen
+<span class="kw">FROM</span> Bestellung
+<span class="kw">GROUP BY</span> Kunde
+<span class="kw">HAVING</span> <span class="fn">SUM</span>(Preis * Menge) > <span class="num">500</span>
+<span class="kw">ORDER BY</span> Umsatz <span class="kw">DESC</span>;</div>
+
+      <div style="margin-top:3px; font-size:7.5px; color:#555; font-style:italic">Ergebnis: Nur Kunden mit Umsatz über 500 €, absteigend sortiert</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-green">
+    <div class="card-head">Aggregatfunktionen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text"><strong>Aggregatfunktionen</strong> berechnen einen einzelnen Wert aus einer Menge von Zeilen (einer Gruppe oder der gesamten Tabelle). Sie ignorieren NULL-Werte (Ausnahme: COUNT(*)).</div>
+      </div>
+
+      <table>
+        <thead><tr><th>Funktion</th><th>Beschreibung</th><th>Beispiel</th></tr></thead>
+        <tbody>
+          <tr><td><strong>COUNT(*)</strong></td><td class="plain">Anzahl aller Zeilen</td><td>COUNT(*) → 5</td></tr>
+          <tr><td><strong>COUNT(Spalte)</strong></td><td class="plain">Anzahl Nicht-NULL-Werte</td><td>COUNT(Preis) → 5</td></tr>
+          <tr><td><strong>SUM(Spalte)</strong></td><td class="plain">Summe der Werte</td><td>SUM(Preis) → 2451</td></tr>
+          <tr><td><strong>AVG(Spalte)</strong></td><td class="plain">Durchschnitt</td><td>AVG(Preis) → 490.2</td></tr>
+          <tr><td><strong>MIN(Spalte)</strong></td><td class="plain">Kleinster Wert</td><td>MIN(Preis) → 25.00</td></tr>
+          <tr><td><strong>MAX(Spalte)</strong></td><td class="plain">Größter Wert</td><td>MAX(Preis) → 999.00</td></tr>
+        </tbody>
+      </table>
+
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: Aggregatfunktionen</div>
+        <div class="esel-text">
+          „<span class="esel-key">C</span>ount <span class="esel-key">S</span>ums <span class="esel-key">A</span>verage <span class="esel-key">M</span>inMax"<br>
+          <span class="esel-key">C</span>OUNT · <span class="esel-key">S</span>UM · <span class="esel-key">A</span>VG · <span class="esel-key">M</span>IN · MAX<br>
+          Alle ignorieren NULL — außer <span class="esel-key">COUNT(*)</span>!
+        </div>
+      </div>
+
+      <div class="code" style="margin-top:4px"><span class="cm">-- Alle Aggregatfunktionen auf Beispieldaten</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(*)              <span class="kw">AS</span> Anzahl,     <span class="cm">-- 5</span>
+  <span class="fn">SUM</span>(Preis * Menge)    <span class="kw">AS</span> Gesamtums., <span class="cm">-- 3079</span>
+  <span class="fn">AVG</span>(Preis)            <span class="kw">AS</span> Ø_Preis,   <span class="cm">-- 490.2</span>
+  <span class="fn">MIN</span>(Preis)            <span class="kw">AS</span> Min_Preis, <span class="cm">-- 25.00</span>
+  <span class="fn">MAX</span>(Preis)            <span class="kw">AS</span> Max_Preis  <span class="cm">-- 999.00</span>
+<span class="kw">FROM</span> Bestellung;</div>
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">Unterabfragen (Subqueries)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Eine <strong>Unterabfrage (Subquery)</strong> ist eine SELECT-Abfrage, die innerhalb einer anderen SQL-Abfrage steht. Das Ergebnis der inneren Abfrage wird von der äußeren verwendet.</div>
+        <div class="def-note">Unterabfragen stehen in Klammern und werden zuerst ausgeführt.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Unterabfrage in WHERE</div>
+        <div class="code"><span class="cm">-- Alle Bestellungen teurer als Durchschnitt</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Bestellung
+<span class="kw">WHERE</span> Preis > (
+  <span class="kw">SELECT</span> <span class="fn">AVG</span>(Preis) <span class="kw">FROM</span> Bestellung
+);</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Unterabfrage mit IN</div>
+        <div class="code"><span class="cm">-- Kunden, die einen Laptop bestellt haben</span>
+<span class="kw">SELECT DISTINCT</span> Kunde <span class="kw">FROM</span> Bestellung
+<span class="kw">WHERE</span> Kunde <span class="kw">IN</span> (
+  <span class="kw">SELECT</span> Kunde <span class="kw">FROM</span> Bestellung
+  <span class="kw">WHERE</span> Produkt = <span class="str">'Laptop'</span>
+);</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Subquery</div>
+        <div class="esel-text">
+          Subquery = „<span class="esel-key">Frage in der Frage</span>"<br>
+          Innen zuerst → Ergebnis nach außen<br>
+          Immer in <span class="esel-key">(</span>runden Klammern<span class="esel-key">)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-pink">
+    <div class="card-head">String- &amp; Datumsfunktionen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Wichtige Stringfunktionen</div>
+        <div class="code"><span class="fn">UPPER</span>(<span class="str">'hallo'</span>)        <span class="cm">→ 'HALLO'</span>
+<span class="fn">LOWER</span>(<span class="str">'HALLO'</span>)        <span class="cm">→ 'hallo'</span>
+<span class="fn">LENGTH</span>(<span class="str">'Hallo'</span>)       <span class="cm">→ 5</span>
+<span class="fn">CONCAT</span>(<span class="str">'Ha'</span>,<span class="str">'llo'</span>)   <span class="cm">→ 'Hallo'</span>
+<span class="fn">SUBSTRING</span>(<span class="str">'Hallo'</span>,<span class="num">1</span>,<span class="num">3</span>) <span class="cm">→ 'Hal'</span>
+<span class="fn">TRIM</span>(<span class="str">'  Hallo  '</span>)  <span class="cm">→ 'Hallo'</span>
+<span class="fn">REPLACE</span>(<span class="str">'Hallo'</span>,<span class="str">'l'</span>,<span class="str">'r'</span>) <span class="cm">→ 'Harro'</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Wichtige Datumsfunktionen</div>
+        <div class="code"><span class="fn">NOW</span>()            <span class="cm">→ 2024-06-01 10:30:00</span>
+<span class="fn">CURDATE</span>()       <span class="cm">→ 2024-06-01</span>
+<span class="fn">YEAR</span>(Datum)      <span class="cm">→ 2024</span>
+<span class="fn">MONTH</span>(Datum)     <span class="cm">→ 6</span>
+<span class="fn">DAY</span>(Datum)       <span class="cm">→ 1</span>
+<span class="fn">DATEDIFF</span>(d1,d2) <span class="cm">→ Differenz in Tagen</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">Häufige Abfragemuster (IHK-Aufgaben)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Top-N-Abfrage</div>
+        <div class="code"><span class="cm">-- Die 3 teuersten Bestellungen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Bestellung
+<span class="kw">ORDER BY</span> Preis <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">3</span>;</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Duplikate finden</div>
+        <div class="code"><span class="kw">SELECT</span> Produkt, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> Anzahl
+<span class="kw">FROM</span> Bestellung
+<span class="kw">GROUP BY</span> Produkt
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) > <span class="num">1</span>;</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Bedingte Berechnung</div>
+        <div class="code"><span class="cm">-- Gesamtwert je Zeile berechnen</span>
+<span class="kw">SELECT</span> Kunde, Produkt,
+       Preis * Menge <span class="kw">AS</span> Gesamtwert
+<span class="kw">FROM</span> Bestellung
+<span class="kw">WHERE</span> Preis * Menge > <span class="num">200</span>
+<span class="kw">ORDER BY</span> Gesamtwert <span class="kw">DESC</span>;</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">IHK-Prüfungsfragen SELECT</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Schreiben Sie eine Abfrage, die alle Kunden mit Umsatz über 500 € ausgibt.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen WHERE und HAVING?</div>
+        <div class="ihk-q">Erläutern Sie die Ausführungsreihenfolge einer SELECT-Abfrage.</div>
+        <div class="ihk-q">Warum kann man Aggregatfunktionen nicht in WHERE verwenden?</div>
+        <div class="ihk-q">Was bewirkt GROUP BY? Erstellen Sie eine Abfrage mit COUNT und GROUP BY.</div>
+        <div class="ihk-q">Was ist DISTINCT und wann wird es eingesetzt?</div>
+        <div class="ihk-q">Erklären Sie den Unterschied zwischen COUNT(*) und COUNT(Spalte).</div>
+        <div class="ihk-q">Was ist eine Unterabfrage? Geben Sie ein Beispiel.</div>
+        <div class="ihk-q">Schreiben Sie eine Abfrage mit LIKE, die alle Kunden findet, deren Name mit 'M' beginnt.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · SQL Abfragen · Blatt 2/3 · SELECT · WHERE · GROUP BY · HAVING · Aggregatfunktionen · Subqueries</span>
+  <span>→ Blatt 3: DDL · DML · DCL · JOINs · CREATE · INSERT · UPDATE · DELETE</span>
+  <span>Lernfeld: Daten systemübergreifend bereitstellen · AP Teil 1 &amp; Teil 2</span>
+</div>
+
+</body>
+</html>
