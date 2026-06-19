@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Pseudocode & Ablaufdiagramme – IHK FIAE Whiteboard Blatt 4</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 15px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #854F0B; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.8px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.7; color: #333; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .cm  { color: #999; }
+  .str { color: #854F0B; }
+  .num { color: #185FA5; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* STRUKTOGRAMM */
+  .struk { border: 1.5px solid #534AB7; border-radius: 3px; overflow: hidden; margin: 4px 0; font-size: 8px; }
+  .struk-row { padding: 3px 6px; border-bottom: 1px solid #c4b5fd; font-family: 'Courier New', monospace; }
+  .struk-row:last-child { border-bottom: none; }
+  .struk-head { background: #534AB7; color: #fff; font-weight: 700; padding: 2px 6px; }
+  .struk-if { display: grid; grid-template-columns: 1fr 1fr; }
+  .struk-if-label { background: #f0eeff; padding: 2px 5px; font-weight: 700; color: #3730a3; border-bottom: 1px solid #c4b5fd; font-size: 7.5px; }
+  .struk-branch { padding: 3px 5px; font-family: 'Courier New', monospace; font-size: 8px; }
+  .struk-branch-r { border-left: 1px solid #c4b5fd; }
+  .struk-loop { border-left: 4px solid #0F6E56; }
+  .struk-loop-head { background: #e6faf4; padding: 2px 5px; font-weight: 700; color: #065f46; font-size: 8px; border-bottom: 1px solid #9FE1CB; }
+
+  /* PAP SYMBOLS */
+  .pap { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 4px 0; }
+  .pap-sym { display: flex; align-items: center; gap: 6px; width: 100%; }
+  .pap-shape { flex-shrink: 0; }
+  .pap-label { font-size: 8px; color: #333; }
+
+  /* MEGA TABLE */
+  .mega-table { width: 100%; border-collapse: collapse; font-size: 7.5px; }
+  .mega-table th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; }
+  .mega-table td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.5; }
+  .mega-table tr:nth-child(even) td { background: #fafafa; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Pseudocode · Struktogramm · PAP · Ablaufdiagramme &amp; Darstellungsformen <span class="badge">Blatt 4 / 4</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · Algorithmen darstellen · Programmablaufplan · Nassi-Shneiderman · Pseudocode-Konventionen</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2<br>Lernfeld: Softwareentwicklung</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-amber">
+    <div class="card-head">Darstellungsformen im Überblick</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Warum Darstellungsformen?</div>
+        <div class="def-text">Algorithmen müssen vor der Implementierung <strong>sprachunabhängig</strong> geplant und kommuniziert werden. Die IHK erwartet, dass du Algorithmen in verschiedenen Darstellungen lesen, erstellen und ineinander überführen kannst.</div>
+      </div>
+      <table class="mega-table">
+        <thead><tr><th>Form</th><th>Auch bekannt als</th><th>Stärke</th><th>Wann IHK</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pseudocode</strong></td><td>Strukturierter Text</td><td>Schnell, lesbar, flexibel</td><td>Algorithmus beschreiben</td></tr>
+          <tr><td><strong>PAP</strong></td><td>Programmablaufplan, Flussdiagramm</td><td>Grafisch, normiert (DIN 66001)</td><td>Ablauf visualisieren</td></tr>
+          <tr><td><strong>Struktogramm</strong></td><td>Nassi-Shneiderman-Diagramm</td><td>Strukturierte Blöcke, kein GOTO</td><td>Strukturierten Code planen</td></tr>
+          <tr><td><strong>UML-Aktivität</strong></td><td>Activity Diagram</td><td>Objektorientiert, Swimlanes</td><td>OOP-Prozesse / AP Doku</td></tr>
+        </tbody>
+      </table>
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Eselsbrücke: Welche Form wann?</div>
+        <div class="esel-text">
+          <span class="esel-key">P</span>seudocode = <span class="esel-key">P</span>lanungsnotiz (schnell, informell)<br>
+          <span class="esel-key">P</span>AP = <span class="esel-key">P</span>feil-Diagramm (DIN-Norm, grafisch)<br>
+          <span class="esel-key">S</span>truktogramm = <span class="esel-key">S</span>truktierte Blöcke (kein Pfeil-Chaos)<br>
+          <span class="esel-key">U</span>ML = <span class="esel-key">U</span>niversell, OOP-Kontext
+        </div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Grundlegende Kontrollstrukturen (alle Formen)</div>
+        <div class="def-text">
+          <span class="tag tag-p">Sequenz</span> Anweisungen nacheinander<br>
+          <span class="tag tag-t">Selektion</span> Entscheidung (wenn-dann-sonst)<br>
+          <span class="tag tag-b">Iteration</span> Wiederholung (Schleife)<br>
+          <span class="tag tag-o">Unterprogramm</span> Funktionsaufruf
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Kontrollstrukturen</div>
+        <div class="esel-text">„<span class="esel-key">S</span>tatements <span class="esel-key">S</span>electieren <span class="esel-key">I</span>teriert" — <span class="esel-key">S</span>equenz · <span class="esel-key">S</span>elektion · <span class="esel-key">I</span>teration</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">Pseudocode — Konventionen &amp; Beispiel</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text"><strong>Pseudocode</strong> ist eine informelle, sprachunabhängige Beschreibung eines Algorithmus in strukturierter Textform. Kein konkreter Syntax einer Programmiersprache — aber klare Struktur.</div>
+        <div class="def-note">IHK akzeptiert verschiedene Pseudocode-Stile — wichtig ist Eindeutigkeit und Struktur!</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Pseudocode-Schlüsselwörter (IHK-üblich)</div>
+        <div class="code"><span class="kw">ALGORITHMUS</span> Name(Parameter)
+  <span class="kw">EINGABE</span>: Beschreibung
+  <span class="kw">AUSGABE</span>: Beschreibung
+
+  <span class="kw">WENN</span> Bedingung <span class="kw">DANN</span>
+    Anweisungen
+  <span class="kw">SONST</span>
+    Anweisungen
+  <span class="kw">ENDE WENN</span>
+
+  <span class="kw">SOLANGE</span> Bedingung <span class="kw">TUE</span>
+    Anweisungen
+  <span class="kw">ENDE SOLANGE</span>
+
+  <span class="kw">FÜR</span> i <span class="kw">VON</span> 1 <span class="kw">BIS</span> n <span class="kw">TUE</span>
+    Anweisungen
+  <span class="kw">ENDE FÜR</span>
+
+  <span class="kw">ZURÜCKGEBEN</span> Wert
+<span class="kw">ENDE ALGORITHMUS</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Beispiel: Maximum zweier Zahlen</div>
+        <div class="code"><span class="kw">ALGORITHMUS</span> Maximum(a, b)
+  <span class="kw">EINGABE</span>: Zwei Zahlen a, b
+  <span class="kw">AUSGABE</span>: Die größere Zahl
+
+  <span class="kw">WENN</span> a > b <span class="kw">DANN</span>
+    <span class="kw">ZURÜCKGEBEN</span> a
+  <span class="kw">SONST</span>
+    <span class="kw">ZURÜCKGEBEN</span> b
+  <span class="kw">ENDE WENN</span>
+<span class="kw">ENDE ALGORITHMUS</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Beispiel: Summe 1 bis n</div>
+        <div class="code"><span class="kw">ALGORITHMUS</span> Summe(n)
+  summe ← 0
+  <span class="kw">FÜR</span> i <span class="kw">VON</span> 1 <span class="kw">BIS</span> n <span class="kw">TUE</span>
+    summe ← summe + i
+  <span class="kw">ENDE FÜR</span>
+  <span class="kw">ZURÜCKGEBEN</span> summe
+<span class="kw">ENDE ALGORITHMUS</span>
+
+<span class="cm">// Trace n=3: summe=0→1→3→6</span></div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Pseudocode schreiben</div>
+        <div class="esel-text">Einrücken = Struktur zeigen · WENN…ENDE WENN immer schließen · ← für Zuweisung · Variablennamen auf Deutsch OK · kein Semikolon nötig</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-teal">
+    <div class="card-head">Struktogramm (Nassi-Shneiderman)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Das <strong>Struktogramm</strong> (Nassi-Shneiderman-Diagramm) stellt Algorithmen als ineinander geschachtelte Blöcke dar. Kein GOTO möglich — erzwingt strukturierte Programmierung.</div>
+        <div class="def-note">Entwickelt 1972 von Nassi &amp; Shneiderman · DIN 66261</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Struktogramm-Bausteine</div>
+        <div class="def-text" style="margin-bottom:3px"><strong>1. Sequenz (Anweisung)</strong></div>
+        <div class="struk">
+          <div class="struk-row">summe ← 0</div>
+          <div class="struk-row">i ← 1</div>
+          <div class="struk-row">Ausgabe summe</div>
+        </div>
+
+        <div class="def-text" style="margin-top:4px; margin-bottom:2px"><strong>2. Selektion (Wenn-Dann-Sonst)</strong></div>
+        <div class="struk">
+          <div class="struk-if">
+            <div class="struk-if-label" style="grid-column:1/3; border-bottom:1px solid #c4b5fd; padding:2px 5px; font-size:8px">Bedingung: a > b ?</div>
+            <div class="struk-if-label">WAHR</div>
+            <div class="struk-if-label struk-branch-r">FALSCH</div>
+            <div class="struk-branch">max ← a</div>
+            <div class="struk-branch struk-branch-r">max ← b</div>
+          </div>
+        </div>
+
+        <div class="def-text" style="margin-top:4px; margin-bottom:2px"><strong>3. Iteration (Schleife)</strong></div>
+        <div class="struk struk-loop">
+          <div class="struk-loop-head">SOLANGE i ≤ n</div>
+          <div class="struk-row" style="padding-left:10px">summe ← summe + i</div>
+          <div class="struk-row" style="padding-left:10px">i ← i + 1</div>
+        </div>
+
+        <div class="def-text" style="margin-top:4px; margin-bottom:2px"><strong>4. Fußgesteuerte Schleife (DO-WHILE)</strong></div>
+        <div class="struk">
+          <div class="struk-row" style="padding-left:10px">Anweisung</div>
+          <div class="struk-loop-head" style="background:#fef3e0; color:#854F0B; border-top:1px solid #fcd34d; border-left:none">WIEDERHOLE BIS Bedingung erfüllt</div>
+        </div>
+      </div>
+
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Unterschied kopf- vs. fußgesteuert</div>
+        <div class="def-text">
+          <span class="tag tag-t">Kopfgesteuert</span> Bedingung wird VOR dem ersten Durchlauf geprüft → 0 Durchläufe möglich (WHILE)<br>
+          <span class="tag tag-o">Fußgesteuert</span> Bedingung NACH dem ersten Durchlauf → mindestens 1 Durchlauf (DO-WHILE)
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Kopf vs. Fuß</div>
+        <div class="esel-text"><span class="esel-key">Kopf</span>gesteuert = <span class="esel-key">K</span>ontrolle zuerst (wie Türsteher: erst prüfen, dann rein)<br><span class="esel-key">Fuß</span>gesteuert = mindestens einmal rein (erst testen, dann entscheiden)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">PAP — Programmablaufplan (DIN 66001)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Der <strong>PAP</strong> (Programmablaufplan, auch: Flussdiagramm) ist eine grafische Darstellung nach <strong>DIN 66001</strong> mit normierten Symbolen.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Normsymbole PAP</div>
+        <svg width="100%" viewBox="0 0 200 290" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:2px 0">
+          <defs>
+            <marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+            </marker>
+          </defs>
+          <!-- START/ENDE -->
+          <rect x="10" y="5" width="55" height="18" rx="9" fill="#e6faf4" stroke="#0F6E56" stroke-width="1"/>
+          <text x="37" y="17" text-anchor="middle" font-size="7.5" font-weight="700" fill="#065f46">START/ENDE</text>
+          <text x="72" y="17" font-size="7.5" fill="#555">Abgerundetes Rechteck</text>
+
+          <!-- VERARBEITUNG -->
+          <rect x="10" y="32" width="55" height="18" rx="2" fill="#f0eeff" stroke="#534AB7" stroke-width="1"/>
+          <text x="37" y="44" text-anchor="middle" font-size="7.5" font-weight="700" fill="#3730a3">Anweisung</text>
+          <text x="72" y="44" font-size="7.5" fill="#555">Rechteck · Verarbeitung</text>
+
+          <!-- EINGABE/AUSGABE -->
+          <polygon points="10,60 65,60 60,78 5,78" fill="#fef3e0" stroke="#854F0B" stroke-width="1"/>
+          <text x="35" y="72" text-anchor="middle" font-size="7.5" font-weight="700" fill="#854F0B">E/A</text>
+          <text x="72" y="72" font-size="7.5" fill="#555">Parallelogramm · Ein-/Ausgabe</text>
+
+          <!-- ENTSCHEIDUNG -->
+          <polygon points="37,88 65,102 37,116 9,102" fill="#fffde7" stroke="#854F0B" stroke-width="1"/>
+          <text x="37" y="105" text-anchor="middle" font-size="7.5" font-weight="700" fill="#854F0B">Bed.?</text>
+          <text x="72" y="102" font-size="7.5" fill="#555">Raute · Entscheidung</text>
+          <text x="72" y="112" font-size="7" fill="#999">JA / NEIN abgehend</text>
+
+          <!-- UNTERPROGRAMM -->
+          <rect x="10" y="125" width="55" height="18" rx="2" fill="#fceaf3" stroke="#993556" stroke-width="1"/>
+          <rect x="18" y="125" width="4" height="18" fill="#993556" opacity="0.3"/>
+          <rect x="43" y="125" width="4" height="18" fill="#993556" opacity="0.3"/>
+          <text x="37" y="137" text-anchor="middle" font-size="7.5" font-weight="700" fill="#993556">Funktion()</text>
+          <text x="72" y="134" font-size="7.5" fill="#555">Doppeltes Rechteck</text>
+          <text x="72" y="143" font-size="7" fill="#999">Unterprogrammaufruf</text>
+
+          <!-- VERBINDER -->
+          <circle cx="37" cy="162" r="8" fill="#e8f3fb" stroke="#185FA5" stroke-width="1"/>
+          <text x="37" y="165" text-anchor="middle" font-size="8" font-weight="700" fill="#185FA5">A</text>
+          <text x="72" y="165" font-size="7.5" fill="#555">Kreis · Verbindungspunkt</text>
+
+          <!-- PFEILE -->
+          <line x1="37" y1="23" x2="37" y2="32" stroke="#555" stroke-width="0.8" marker-end="url(#a4)"/>
+          <line x1="37" y1="50" x2="37" y2="60" stroke="#555" stroke-width="0.8" marker-end="url(#a4)"/>
+          <line x1="37" y1="78" x2="37" y2="88" stroke="#555" stroke-width="0.8" marker-end="url(#a4)"/>
+          <line x1="37" y1="116" x2="37" y2="125" stroke="#555" stroke-width="0.8" marker-end="url(#a4)"/>
+          <line x1="37" y1="143" x2="37" y2="154" stroke="#555" stroke-width="0.8" marker-end="url(#a4)"/>
+
+          <!-- MINI PAP BEISPIEL -->
+          <text x="10" y="188" font-size="8" font-weight="700" fill="#111">Beispiel: Maximum(a,b)</text>
+          <rect x="60" y="195" width="50" height="14" rx="7" fill="#e6faf4" stroke="#0F6E56" stroke-width="0.8"/>
+          <text x="85" y="205" text-anchor="middle" font-size="7" font-weight="700" fill="#065f46">START</text>
+          <line x1="85" y1="209" x2="85" y2="218" stroke="#555" stroke-width="0.7" marker-end="url(#a4)"/>
+          <polygon points="85,218 55,228 85,238 115,228" fill="#fffde7" stroke="#854F0B" stroke-width="0.8"/>
+          <text x="85" y="231" text-anchor="middle" font-size="6.5" fill="#854F0B">a &gt; b?</text>
+          <line x1="115" y1="228" x2="140" y2="228" stroke="#555" stroke-width="0.7" marker-end="url(#a4)"/>
+          <text x="123" y="225" font-size="6.5" fill="#555">JA</text>
+          <rect x="140" y="221" width="40" height="14" rx="1" fill="#f0eeff" stroke="#534AB7" stroke-width="0.8"/>
+          <text x="160" y="231" text-anchor="middle" font-size="6.5" fill="#3730a3">max ← a</text>
+          <line x1="55" y1="228" x2="30" y2="228" stroke="#555" stroke-width="0.7" marker-end="url(#a4)"/>
+          <text x="40" y="225" font-size="6.5" fill="#555">NEIN</text>
+          <rect x="10" y="221" width="20" height="14" rx="1" fill="#f0eeff" stroke="#534AB7" stroke-width="0.8"/>
+          <text x="20" y="231" text-anchor="middle" font-size="6.5" fill="#3730a3">max←b</text>
+          <line x1="20" y1="235" x2="20" y2="256" stroke="#555" stroke-width="0.7"/>
+          <line x1="160" y1="235" x2="160" y2="256" stroke="#555" stroke-width="0.7"/>
+          <line x1="20" y1="256" x2="85" y2="256" stroke="#555" stroke-width="0.7"/>
+          <line x1="160" y1="256" x2="85" y2="256" stroke="#555" stroke-width="0.7" marker-end="url(#a4)"/>
+          <polygon points="75,256 85,250 95,256 85,268" fill="#fffde7" stroke="#854F0B" stroke-width="0.8"/>
+          <text x="85" y="262" text-anchor="middle" font-size="6" fill="#854F0B">Ausgabe max</text>
+
+          <line x1="85" y1="268" x2="85" y2="276" stroke="#555" stroke-width="0.7" marker-end="url(#a4)"/>
+          <rect x="60" y="276" width="50" height="13" rx="6" fill="#e6faf4" stroke="#0F6E56" stroke-width="0.8"/>
+          <text x="85" y="285" text-anchor="middle" font-size="7" font-weight="700" fill="#065f46">ENDE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">IHK — Alle 4 Blätter Zusammenfassung</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">IHK-Prüfungsfragen Pseudocode &amp; PAP</div>
+        <div class="ihk-q">Stellen Sie Bubble Sort als Pseudocode dar.</div>
+        <div class="ihk-q">Überführen Sie den Pseudocode in ein Struktogramm.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen kopf- und fußgesteuerter Schleife?</div>
+        <div class="ihk-q">Zeichnen Sie einen PAP für die Berechnung der Fakultät.</div>
+        <div class="ihk-q">Welche DIN-Norm gilt für den PAP?</div>
+        <div class="ihk-q">Was bedeutet das Rautensymbol im PAP?</div>
+      </div>
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Alle Blätter — Schnellübersicht</div>
+        <table>
+          <thead><tr><th>Blatt</th><th>Thema</th><th>Kerninhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>Algorithmen</td><td>Suchen, Sortieren, O-Notation, Trace</td></tr>
+            <tr><td><strong>2</strong></td><td>OOP</td><td>Klassen, Vererbung, Kapselung, Interface</td></tr>
+            <tr><td><strong>3</strong></td><td>Datenstrukturen</td><td>Array, Liste, Stack, Queue, Dict, Rekursion</td></tr>
+            <tr><td><strong>4</strong></td><td>Darstellung</td><td>Pseudocode, Struktogramm, PAP, DIN 66001</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="esel" style="margin-top:4px">
+        <div class="esel-title">Ultimative Eselsbrücke: IHK Programmierung</div>
+        <div class="esel-text">
+          <span class="esel-key">A</span>lgorithmus = endlich, eindeutig, korrekt<br>
+          <span class="esel-key">O</span>(n²) schlecht · <span class="esel-key">O</span>(log n) gut · <span class="esel-key">O</span>(1) perfekt<br>
+          <span class="esel-key">OOP</span>: K-V-P-A (Kein Verwirrter Programmiert Abstrakt)<br>
+          <span class="esel-key">Stack</span>=LIFO=Teller · <span class="esel-key">Queue</span>=FIFO=Kasse<br>
+          <span class="esel-key">Binär</span>: nur sortiert · <span class="esel-key">Linear</span>: immer<br>
+          <span class="esel-key">PAP</span>: Raute=Entscheidung · Oval=Start/Ende<br>
+          <span class="esel-key">Pseudocode</span>: WENN…ENDE WENN · FÜR…ENDE FÜR
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Pseudocode · Struktogramm (Nassi-Shneiderman, DIN 66261) · PAP (DIN 66001) · Blatt 4/4</span>
+  <span>← Blatt 1: Algorithmen · ← Blatt 2: OOP · ← Blatt 3: Datenstrukturen</span>
+  <span>Python + Java · Lernfeld: Softwareentwicklung · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>

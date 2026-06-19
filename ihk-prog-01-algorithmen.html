@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Algorithmen – IHK FIAE Whiteboard Blatt 1</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 15px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #534AB7; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .lang { font-size: 7px; font-weight: 700; color: #fff; padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; display: inline-block; }
+  .py { background: #3B6D11; }
+  .ja { background: #185FA5; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .fn  { color: #0F6E56; }
+  .cm  { color: #999; }
+  .str { color: #854F0B; }
+  .num { color: #185FA5; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+  .tag-gr { background: #edfade; color: #3B6D11; border-color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* TRACE TABLE */
+  .trace { font-size: 7.5px; border-collapse: collapse; width: 100%; margin-top: 3px; }
+  .trace th { background: #534AB7; color: #fff; padding: 2px 3px; border: 1px solid #3730a3; text-align: center; }
+  .trace td { padding: 2px 3px; border: 1px solid #ddd; text-align: center; font-family: 'Courier New', monospace; }
+  .trace tr:nth-child(even) td { background: #fafafa; }
+  .trace .hi { background: #fef3e0; font-weight: 700; }
+
+  /* COMPLEXITY */
+  .cplx { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+  .cplx-box { border-radius: 3px; padding: 3px 6px; font-size: 8px; text-align: center; flex: 1; min-width: 40px; }
+  .c-best { background: #e6faf4; border: 1px solid #6ee7b7; color: #065f46; }
+  .c-avg  { background: #fef3e0; border: 1px solid #fcd34d; color: #854F0B; }
+  .c-worst{ background: #fff0f0; border: 1px solid #fca5a5; color: #991b1b; }
+  .cplx-label { font-size: 7px; color: #888; display: block; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Algorithmen — Suchen &amp; Sortieren <span class="badge">Blatt 1 / 4</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · Programmierung · Python &amp; Java · Komplexität · Trace-Tabellen</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2<br>Lernfeld: Softwareentwicklung</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Was ist ein Algorithmus? — Definition</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Algorithmus (IHK-Definition)</div>
+        <div class="def-text">Ein <strong>Algorithmus</strong> ist eine eindeutige, endliche Folge von Anweisungen zur Lösung eines Problems oder einer Aufgabenklasse. Er muss folgende Eigenschaften erfüllen:</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Eigenschaften (Pflichtmerkmale)</div>
+        <div class="def-text">
+          <span class="tag tag-p">Finitheit</span> endliche Anzahl von Schritten<br>
+          <span class="tag tag-t">Definitheit</span> jeder Schritt eindeutig beschrieben<br>
+          <span class="tag tag-b">Terminiertheit</span> endet nach endlicher Zeit<br>
+          <span class="tag tag-o">Effektivität</span> jeder Schritt ausführbar<br>
+          <span class="tag tag-g">Determiniertheit</span> gleiche Eingabe → gleiche Ausgabe<br>
+          <span class="tag tag-gr">Korrektheit</span> liefert das richtige Ergebnis
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Algorithmus-Eigenschaften</div>
+        <div class="esel-text">„<span class="esel-key">F</span>inde <span class="esel-key">D</span>en <span class="esel-key">T</span>ollsten <span class="esel-key">E</span>ffektiven <span class="esel-key">D</span>eterministischen <span class="esel-key">K</span>orrekten"<br>
+        <span class="esel-key">F</span>initheit · <span class="esel-key">D</span>efinitheit · <span class="esel-key">T</span>erminiertheit · <span class="esel-key">E</span>ffektivität · <span class="esel-key">D</span>eterminiertheit · <span class="esel-key">K</span>orrektheit</div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Komplexität — O-Notation (Big O)</div>
+        <div class="def-text">Die <strong>O-Notation</strong> beschreibt, wie der Aufwand eines Algorithmus mit wachsender Eingabegröße n steigt.</div>
+        <table style="margin-top:3px">
+          <thead><tr><th>Notation</th><th>Name</th><th>Beispiel</th></tr></thead>
+          <tbody>
+            <tr><td><strong>O(1)</strong></td><td>Konstant</td><td>Array-Zugriff per Index</td></tr>
+            <tr><td><strong>O(log n)</strong></td><td>Logarithmisch</td><td>Binäre Suche</td></tr>
+            <tr><td><strong>O(n)</strong></td><td>Linear</td><td>Lineare Suche</td></tr>
+            <tr><td><strong>O(n log n)</strong></td><td>Linearithmisch</td><td>Merge Sort</td></tr>
+            <tr><td><strong>O(n²)</strong></td><td>Quadratisch</td><td>Bubble Sort</td></tr>
+            <tr><td><strong>O(2ⁿ)</strong></td><td>Exponentiell</td><td>Brute-Force</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-teal">
+    <div class="card-head">Lineare Suche (Linear Search)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition &amp; Wann einsetzen</div>
+        <div class="def-text">Die <strong>lineare Suche</strong> durchsucht eine Liste Element für Element von vorne nach hinten, bis das gesuchte Element gefunden oder die Liste erschöpft ist.</div>
+        <div class="def-note">Wann: unsortierte Listen · kleine Datenmengen · einfachste Suche</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Komplexität</div>
+        <div class="cplx">
+          <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(1)</div>
+          <div class="cplx-box c-avg"><span class="cplx-label">Average</span>O(n/2)</div>
+          <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(n)</div>
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Trace-Tabelle: Suche nach 7 in [3,7,1,9,4]</div>
+        <table class="trace">
+          <thead><tr><th>Schritt</th><th>Index</th><th>Wert</th><th>Gefunden?</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>0</td><td>3</td><td>Nein</td></tr>
+            <tr class="hi"><td>2</td><td class="hi">1</td><td class="hi">7</td><td class="hi">✓ JA</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Code</div>
+        <div class="lang py">Python</div>
+        <div class="code"><span class="kw">def</span> <span class="fn">lineare_suche</span>(liste, ziel):
+    <span class="kw">for</span> i, wert <span class="kw">in</span> <span class="fn">enumerate</span>(liste):
+        <span class="kw">if</span> wert == ziel:
+            <span class="kw">return</span> i    <span class="cm"># Index zurückgeben</span>
+    <span class="kw">return</span> -<span class="num">1</span>          <span class="cm"># nicht gefunden</span></div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">int</span> <span class="fn">lineareSuche</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> ziel) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        <span class="kw">if</span> (arr[i] == ziel) <span class="kw">return</span> i;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke</div>
+        <div class="esel-text">Linear = <span class="esel-key">L</span>angsam aber <span class="esel-key">L</span>ässig — jede Liste, egal ob sortiert.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-blue">
+    <div class="card-head">Binäre Suche (Binary Search)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition &amp; Wann einsetzen</div>
+        <div class="def-text">Die <strong>binäre Suche</strong> halbiert bei jedem Schritt den Suchbereich. Sie vergleicht den gesuchten Wert mit dem mittleren Element und verwirft die irrelevante Hälfte.</div>
+        <div class="def-note">Wann: NUR auf <strong>sortierten</strong> Listen! · große Datenmengen · sehr effizient</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Komplexität</div>
+        <div class="cplx">
+          <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(1)</div>
+          <div class="cplx-box c-avg"><span class="cplx-label">Average</span>O(log n)</div>
+          <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(log n)</div>
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Trace: Suche 7 in [1,3,4,7,9,12,15]</div>
+        <table class="trace">
+          <thead><tr><th>Schritt</th><th>Links</th><th>Rechts</th><th>Mitte</th><th>Wert</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>0</td><td>6</td><td>3</td><td>7 ✓</td></tr>
+          </tbody>
+        </table>
+        <div class="def-note" style="margin-top:2px">1 Schritt statt 4 bei linearer Suche!</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Code</div>
+        <div class="lang py">Python</div>
+        <div class="code"><span class="kw">def</span> <span class="fn">binaere_suche</span>(liste, ziel):
+    li, re = <span class="num">0</span>, <span class="fn">len</span>(liste) - <span class="num">1</span>
+    <span class="kw">while</span> li <= re:
+        mitte = (li + re) // <span class="num">2</span>
+        <span class="kw">if</span>   liste[mitte] == ziel: <span class="kw">return</span> mitte
+        <span class="kw">elif</span> liste[mitte] < ziel:  li = mitte + <span class="num">1</span>
+        <span class="kw">else</span>:                      re = mitte - <span class="num">1</span>
+    <span class="kw">return</span> -<span class="num">1</span></div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">int</span> <span class="fn">binaereSuche</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> ziel) {
+    <span class="kw">int</span> li=<span class="num">0</span>, re=arr.length-<span class="num">1</span>;
+    <span class="kw">while</span> (li<=re) {
+        <span class="kw">int</span> m=(li+re)/<span class="num">2</span>;
+        <span class="kw">if</span>      (arr[m]==ziel) <span class="kw">return</span> m;
+        <span class="kw">else if</span> (arr[m]<ziel)  li=m+<span class="num">1</span>;
+        <span class="kw">else</span>                   re=m-<span class="num">1</span>;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke</div>
+        <div class="esel-text">Binär = <span class="esel-key">B</span>uch aufschlagen in der <span class="esel-key">M</span>itte — links oder rechts weitersuchen. <span class="esel-key">Voraussetzung: sortiert!</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">Bubble Sort</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition &amp; Wann einsetzen</div>
+        <div class="def-text"><strong>Bubble Sort</strong> vergleicht benachbarte Elemente und tauscht sie, wenn sie in falscher Reihenfolge sind. Große Elemente „blubbern" nach oben.</div>
+        <div class="def-note">Wann: Lernzwecke · sehr kleine Listen · einfachster Sortieralgorithmus</div>
+      </div>
+      <div class="cplx">
+        <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(n)</div>
+        <div class="cplx-box c-avg"><span class="cplx-label">Average</span>O(n²)</div>
+        <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(n²)</div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Trace: [5, 3, 8, 1] sortieren</div>
+        <table class="trace">
+          <thead><tr><th>Pass</th><th>Liste</th><th>Tausch</th></tr></thead>
+          <tbody>
+            <tr><td>Start</td><td>[5, 3, 8, 1]</td><td>—</td></tr>
+            <tr><td>1</td><td>[3, 5, 1, 8]</td><td>5↔3, 8↔1</td></tr>
+            <tr><td>2</td><td>[3, 1, 5, 8]</td><td>5↔1</td></tr>
+            <tr><td>3</td><td>[1, 3, 5, 8]</td><td>3↔1</td></tr>
+            <tr class="hi"><td>4</td><td>[1, 3, 5, 8]</td><td>✓ Fertig</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">def</span> <span class="fn">bubble_sort</span>(lst):
+    n = <span class="fn">len</span>(lst)
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="num">0</span>, n-i-<span class="num">1</span>):
+            <span class="kw">if</span> lst[j] > lst[j+<span class="num">1</span>]:
+                lst[j],lst[j+<span class="num">1</span>] = lst[j+<span class="num">1</span>],lst[j]
+    <span class="kw">return</span> lst</div>
+      <div class="lang ja">Java</div>
+      <div class="code"><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span>[] a) {
+    <span class="kw">int</span> n=a.length;
+    <span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">0</span>;i&lt;n;i++)
+      <span class="kw">for</span>(<span class="kw">int</span> j=<span class="num">0</span>;j&lt;n-i-<span class="num">1</span>;j++)
+        <span class="kw">if</span>(a[j]>a[j+<span class="num">1</span>]) {
+          <span class="kw">int</span> t=a[j]; a[j]=a[j+<span class="num">1</span>]; a[j+<span class="num">1</span>]=t;
+        }
+}</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke</div>
+        <div class="esel-text">Blasen steigen auf — große Zahlen <span class="esel-key">blubbern</span> nach rechts. <span class="esel-key">n² = n·n</span> Vergleiche → langsam bei großen Listen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-green">
+    <div class="card-head">Selection Sort</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition &amp; Wann einsetzen</div>
+        <div class="def-text"><strong>Selection Sort</strong> sucht in jedem Durchlauf das kleinste Element im unsortierten Teil und stellt es an die richtige Position.</div>
+        <div class="def-note">Wann: kleine Listen · wenig Speicher nötig · Lernzwecke</div>
+      </div>
+      <div class="cplx">
+        <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(n²)</div>
+        <div class="cplx-box c-avg"><span class="cplx-label">Average</span>O(n²)</div>
+        <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(n²)</div>
+      </div>
+      <div class="def-row" style="margin-top:3px">
+        <div class="def-term">Trace: [5, 3, 8, 1]</div>
+        <table class="trace">
+          <thead><tr><th>Pass</th><th>Min-Pos</th><th>Liste</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>idx=3 (Wert 1)</td><td>[<b>1</b>, 3, 8, 5]</td></tr>
+            <tr><td>2</td><td>idx=1 (Wert 3)</td><td>[1, <b>3</b>, 8, 5]</td></tr>
+            <tr><td>3</td><td>idx=3 (Wert 5)</td><td>[1, 3, <b>5</b>, 8]</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">def</span> <span class="fn">selection_sort</span>(lst):
+    n = <span class="fn">len</span>(lst)
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        min_idx = i
+        <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i+<span class="num">1</span>, n):
+            <span class="kw">if</span> lst[j] < lst[min_idx]:
+                min_idx = j
+        lst[i],lst[min_idx] = lst[min_idx],lst[i]
+    <span class="kw">return</span> lst</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke</div>
+        <div class="esel-text"><span class="esel-key">S</span>election = <span class="esel-key">S</span>uche immer das <span class="esel-key">S</span>kleinste und stelle es vorne hin.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">Insertion Sort &amp; Merge Sort</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Insertion Sort — Definition</div>
+        <div class="def-text">Nimmt ein Element und fügt es an der richtigen Stelle in den bereits sortierten Teil ein — wie Karten sortieren in der Hand.</div>
+        <div class="def-note">Wann: fast sortierte Listen · kleine Datenmengen · stabil</div>
+      </div>
+      <div class="cplx">
+        <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(n)</div>
+        <div class="cplx-box c-avg"><span class="cplx-label">Avg</span>O(n²)</div>
+        <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(n²)</div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">def</span> <span class="fn">insertion_sort</span>(lst):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(lst)):
+        key = lst[i]
+        j = i - <span class="num">1</span>
+        <span class="kw">while</span> j >= <span class="num">0</span> <span class="kw">and</span> lst[j] > key:
+            lst[j+<span class="num">1</span>] = lst[j]
+            j -= <span class="num">1</span>
+        lst[j+<span class="num">1</span>] = key
+    <span class="kw">return</span> lst</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Insertion Sort</div>
+        <div class="esel-text"><span class="esel-key">I</span>nsertion = <span class="esel-key">I</span>n die richtige Lücke einfügen — wie Spielkarten in der Hand sortieren.</div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Merge Sort — Definition</div>
+        <div class="def-text"><strong>Merge Sort</strong> teilt die Liste rekursiv in Hälften, sortiert jede Hälfte und <strong>verschmilzt</strong> (merged) die sortierten Teile. Prinzip: <strong>Divide &amp; Conquer</strong>.</div>
+        <div class="def-note">Wann: große Datenmengen · stabile Sortierung nötig · effizient</div>
+      </div>
+      <div class="cplx">
+        <div class="cplx-box c-best"><span class="cplx-label">Best</span>O(n log n)</div>
+        <div class="cplx-box c-avg"><span class="cplx-label">Avg</span>O(n log n)</div>
+        <div class="cplx-box c-worst"><span class="cplx-label">Worst</span>O(n log n)</div>
+      </div>
+      <div class="def-row" style="margin-top:3px">
+        <div class="def-term">Ablauf: [5,3,8,1] → Merge Sort</div>
+        <div class="def-text" style="font-family:'Courier New',monospace; font-size:8px; line-height:1.7">
+          [5,3,8,1]<br>
+          [5,3] &nbsp;&nbsp;[8,1]<br>
+          [5][3] [8][1]<br>
+          [3,5] &nbsp;&nbsp;[1,8]<br>
+          [1,3,5,8] ✓
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Merge Sort</div>
+        <div class="esel-text"><span class="esel-key">M</span>erge = <span class="esel-key">M</span>ischen nach dem <span class="esel-key">T</span>eilen — „<span class="esel-key">T</span>eile und herrsche" (<span class="esel-key">D</span>ivide &amp; <span class="esel-key">C</span>onquer)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-amber">
+    <div class="card-head">Algorithmen-Vergleich &amp; IHK-Fragen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Sortieralgorithmen im Überblick</div>
+        <table>
+          <thead><tr><th>Algorithmus</th><th>Best</th><th>Avg</th><th>Worst</th><th>Stabil</th></tr></thead>
+          <tbody>
+            <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>✓</td></tr>
+            <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>✗</td></tr>
+            <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>✓</td></tr>
+            <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>✓</td></tr>
+            <tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>✗</td></tr>
+          </tbody>
+        </table>
+        <div class="def-note" style="margin-top:2px">Stabil = gleiche Elemente behalten ihre ursprüngliche Reihenfolge</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Suchalgorithmen im Überblick</div>
+        <table>
+          <thead><tr><th>Algorithmus</th><th>Worst</th><th>Voraussetzung</th></tr></thead>
+          <tbody>
+            <tr><td>Lineare Suche</td><td>O(n)</td><td>Keine</td></tr>
+            <tr><td>Binäre Suche</td><td>O(log n)</td><td>Sortiert!</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ihk-box">
+        <div class="ihk-title">IHK-Prüfungsfragen</div>
+        <div class="ihk-q">Nennen Sie drei Eigenschaften, die ein Algorithmus erfüllen muss.</div>
+        <div class="ihk-q">Was ist die Voraussetzung für die binäre Suche?</div>
+        <div class="ihk-q">Verfolgen Sie Bubble Sort auf [4,2,7,1] — zeigen Sie alle Durchläufe.</div>
+        <div class="ihk-q">Was bedeutet O(n²) und warum ist es schlechter als O(n log n)?</div>
+        <div class="ihk-q">Welchen Sortieralgorithmus würden Sie für sehr große Datenmengen wählen?</div>
+        <div class="ihk-q">Erklären Sie das Prinzip „Divide &amp; Conquer" am Beispiel Merge Sort.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Algorithmen · Blatt 1/4 · Lineare &amp; Binäre Suche · Bubble/Selection/Insertion/Merge Sort · O-Notation</span>
+  <span>→ Blatt 2: OOP · Klassen · Vererbung · Interfaces · Kapselung → Blatt 3: Datenstrukturen · Blatt 4: Pseudocode</span>
+  <span>Python + Java · Lernfeld: Softwareentwicklung · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>

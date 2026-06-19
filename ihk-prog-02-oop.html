@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>OOP & Programmierkonzepte – IHK FIAE Whiteboard Blatt 2</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 15px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #0F6E56; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .lang { font-size: 7px; font-weight: 700; color: #fff; padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; display: inline-block; }
+  .py { background: #3B6D11; }
+  .ja { background: #185FA5; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .fn  { color: #0F6E56; }
+  .cm  { color: #999; }
+  .str { color: #854F0B; }
+  .num { color: #185FA5; }
+  .cl  { color: #C04828; font-weight: 700; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-r { background: #fff0f0; color: #991b1b; border-color: #fca5a5; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* ACCESS MODIFIER TABLE */
+  .access-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2px; margin: 3px 0; }
+  .access-cell { border-radius: 3px; padding: 2px 4px; text-align: center; font-size: 7.5px; font-weight: 700; }
+  .a-yes { background: #e6faf4; color: #065f46; }
+  .a-no  { background: #fff0f0; color: #991b1b; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>OOP — Klassen, Vererbung, Kapselung, Interfaces &amp; Schlüsselkonzepte <span class="badge">Blatt 2 / 4</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · Objektorientierte Programmierung · Python &amp; Java</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2<br>Lernfeld: Softwareentwicklung</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">OOP — Grundbegriffe &amp; Die 4 Säulen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Objektorientierte Programmierung (OOP)</div>
+        <div class="def-text">OOP ist ein <strong>Programmierparadigma</strong>, bei dem ein Programm aus interagierenden <strong>Objekten</strong> besteht, die Daten (Attribute) und Verhalten (Methoden) kapseln.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Klasse vs. Objekt</div>
+        <div class="def-text">
+          <span class="tag tag-p">Klasse</span> = Bauplan / Vorlage (abstrakt)<br>
+          <span class="tag tag-t">Objekt</span> = Instanz einer Klasse (konkret)<br>
+          <span class="tag tag-o">Instanziierung</span> = Erstellen eines Objekts aus Klasse
+        </div>
+        <div class="def-note">Klasse Auto → Objekte: meinAuto, deinAuto (beide sind Autos)</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Die 4 Säulen der OOP (IHK!)</div>
+        <div class="def-text">
+          <span class="tag tag-p">1. Kapselung</span> Daten verstecken + Zugriff kontrollieren<br>
+          <span class="tag tag-t">2. Vererbung</span> Eigenschaften von Klasse übernehmen<br>
+          <span class="tag tag-b">3. Polymorphismus</span> Gleicher Name, verschiedenes Verhalten<br>
+          <span class="tag tag-o">4. Abstraktion</span> Komplexität verstecken, Wesentliches zeigen
+        </div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: 4 Säulen OOP</div>
+        <div class="esel-text">„<span class="esel-key">K</span>eine <span class="esel-key">V</span>erwirrung <span class="esel-key">P</span>assiert <span class="esel-key">A</span>bstrahiert"<br>
+        <span class="esel-key">K</span>apselung · <span class="esel-key">V</span>ererbung · <span class="esel-key">P</span>olymorphismus · <span class="esel-key">A</span>bstraktion</div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Attribut, Methode, Konstruktor</div>
+        <div class="def-text">
+          <span class="tag tag-p">Attribut</span> Variable einer Klasse (Zustand)<br>
+          <span class="tag tag-t">Methode</span> Funktion einer Klasse (Verhalten)<br>
+          <span class="tag tag-b">Konstruktor</span> Spezielle Methode zum Erstellen eines Objekts<br>
+          <span class="tag tag-o">this / self</span> Verweis auf das aktuelle Objekt
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Klassen &amp; Objekte — Code</div>
+    <div class="card-body">
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">class</span> <span class="cl">Auto</span>:
+    <span class="cm"># Konstruktor</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, marke, ps):
+        <span class="kw">self</span>.marke = marke  <span class="cm"># Attribut</span>
+        <span class="kw">self</span>.ps    = ps
+        <span class="kw">self</span>.__km  = <span class="num">0</span>      <span class="cm"># privat (__)</span>
+
+    <span class="kw">def</span> <span class="fn">fahren</span>(<span class="kw">self</span>, km): <span class="cm"># Methode</span>
+        <span class="kw">self</span>.__km += km
+        <span class="fn">print</span>(<span class="str">f"Gefahren: {km} km"</span>)
+
+    <span class="kw">def</span> <span class="fn">get_km</span>(<span class="kw">self</span>):   <span class="cm"># Getter</span>
+        <span class="kw">return</span> <span class="kw">self</span>.__km
+
+<span class="cm"># Instanziierung</span>
+mein_auto = <span class="cl">Auto</span>(<span class="str">"BMW"</span>, <span class="num">200</span>)
+mein_auto.<span class="fn">fahren</span>(<span class="num">100</span>)</div>
+      <div class="lang ja">Java</div>
+      <div class="code"><span class="kw">public class</span> <span class="cl">Auto</span> {
+    <span class="kw">private</span> String marke;
+    <span class="kw">private int</span> ps;
+    <span class="kw">private int</span> km = <span class="num">0</span>;
+
+    <span class="kw">public</span> <span class="cl">Auto</span>(String marke, <span class="kw">int</span> ps) {
+        <span class="kw">this</span>.marke = marke;
+        <span class="kw">this</span>.ps    = ps;
+    }
+    <span class="kw">public void</span> <span class="fn">fahren</span>(<span class="kw">int</span> km) {
+        <span class="kw">this</span>.km += km;
+    }
+    <span class="kw">public int</span> <span class="fn">getKm</span>() { <span class="kw">return</span> km; }
+}</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-coral">
+    <div class="card-head">Kapselung &amp; Zugriffsmodifikatoren</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Kapselung (Encapsulation)</div>
+        <div class="def-text"><strong>Kapselung</strong> bedeutet, interne Daten einer Klasse zu <strong>verbergen</strong> und nur über definierte Methoden (Getter/Setter) zugänglich zu machen. Schützt vor unkontrolliertem Zugriff.</div>
+        <div class="def-note">Prinzip: Attribute privat, Methoden öffentlich</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Zugriffsmodifikatoren (Java)</div>
+        <table>
+          <thead><tr><th>Modifier</th><th>Klasse</th><th>Package</th><th>Unterklasse</th><th>Alle</th></tr></thead>
+          <tbody>
+            <tr><td><strong>private</strong></td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#991b1b">✗</td><td style="color:#991b1b">✗</td><td style="color:#991b1b">✗</td></tr>
+            <tr><td><strong>protected</strong></td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#991b1b">✗</td></tr>
+            <tr><td><strong>public</strong></td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#065f46;font-weight:700">✓</td><td style="color:#065f46;font-weight:700">✓</td></tr>
+          </tbody>
+        </table>
+        <div class="def-note" style="margin-top:2px">Python: _ = protected-Konvention · __ = private-Konvention (Name Mangling)</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Getter &amp; Setter</div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">private int</span> alter;
+
+<span class="kw">public int</span> <span class="fn">getAlter</span>() {
+    <span class="kw">return</span> alter;
+}
+<span class="kw">public void</span> <span class="fn">setAlter</span>(<span class="kw">int</span> alter) {
+    <span class="kw">if</span> (alter >= <span class="num">0</span>) <span class="kw">this</span>.alter = alter;
+    <span class="cm">// Validierung im Setter!</span>
+}</div>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Kapselung</div>
+        <div class="esel-text"><span class="esel-key">K</span>apselung = <span class="esel-key">K</span>offer mit Schloss — du weißt was drin ist, kommst aber nur über den <span class="esel-key">K</span>ofer-Handler (Getter/Setter) ran.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-blue">
+    <div class="card-head">Vererbung (Inheritance)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text"><strong>Vererbung</strong> ermöglicht einer Klasse (Unterklasse/Kindklasse), Attribute und Methoden einer anderen Klasse (Oberklasse/Elternklasse) zu übernehmen und zu erweitern.</div>
+        <div class="def-note">Prinzip: „is-a"-Beziehung · Elektroauto IS-A Auto</div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">class</span> <span class="cl">Fahrzeug</span>:           <span class="cm"># Oberklasse</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, marke):
+        <span class="kw">self</span>.marke = marke
+    <span class="kw">def</span> <span class="fn">starten</span>(<span class="kw">self</span>):
+        <span class="fn">print</span>(<span class="str">"Fahrzeug startet"</span>)
+
+<span class="kw">class</span> <span class="cl">Elektroauto</span>(<span class="cl">Fahrzeug</span>): <span class="cm"># erbt</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, marke, akku):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(marke) <span class="cm"># Eltern</span>
+        <span class="kw">self</span>.akku = akku
+    <span class="kw">def</span> <span class="fn">starten</span>(<span class="kw">self</span>): <span class="cm"># überschreiben</span>
+        <span class="fn">print</span>(<span class="str">"Lautlos starten"</span>)</div>
+      <div class="lang ja">Java</div>
+      <div class="code"><span class="kw">class</span> <span class="cl">Elektroauto</span> <span class="kw">extends</span> <span class="cl">Fahrzeug</span> {
+    <span class="kw">private int</span> akku;
+    <span class="kw">public</span> <span class="cl">Elektroauto</span>(String m, <span class="kw">int</span> a){
+        <span class="kw">super</span>(m);     <span class="cm">// Elternkonstruktor</span>
+        <span class="kw">this</span>.akku = a;
+    }
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> <span class="fn">starten</span>() {
+        <span class="fn">System.out.println</span>(<span class="str">"Lautlos"</span>);
+    }
+}</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Vererbung</div>
+        <div class="esel-text">„<span class="esel-key">E</span>lektroauto <span class="esel-key">IS-A</span> Fahrzeug" — erbt alles vom Elternteil und kann eigenes hinzufügen. <span class="esel-key">super()</span> = Elternteil anrufen.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-green">
+    <div class="card-head">Polymorphismus &amp; Abstraktion</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Polymorphismus</div>
+        <div class="def-text"><strong>Polymorphismus</strong> („Vielgestaltigkeit") bedeutet, dass eine Methode mit gleichem Namen in verschiedenen Klassen unterschiedlich implementiert werden kann.</div>
+        <div class="def-text" style="margin-top:3px">
+          <span class="tag tag-t">Überschreiben (Override)</span> Methode in Unterklasse neu implementieren (Laufzeit)<br>
+          <span class="tag tag-b">Überladen (Overload)</span> Gleicher Methodenname, verschiedene Parameter (Kompilierzeit, Java)
+        </div>
+      </div>
+      <div class="lang py">Python — Polymorphismus</div>
+      <div class="code"><span class="kw">class</span> <span class="cl">Tier</span>:
+    <span class="kw">def</span> <span class="fn">laut</span>(<span class="kw">self</span>): <span class="fn">print</span>(<span class="str">"..."</span>)
+
+<span class="kw">class</span> <span class="cl">Hund</span>(<span class="cl">Tier</span>):
+    <span class="kw">def</span> <span class="fn">laut</span>(<span class="kw">self</span>): <span class="fn">print</span>(<span class="str">"Wuff"</span>)
+
+<span class="kw">class</span> <span class="cl">Katze</span>(<span class="cl">Tier</span>):
+    <span class="kw">def</span> <span class="fn">laut</span>(<span class="kw">self</span>): <span class="fn">print</span>(<span class="str">"Miau"</span>)
+
+<span class="kw">for</span> tier <span class="kw">in</span> [<span class="cl">Hund</span>(), <span class="cl">Katze</span>()]:
+    tier.<span class="fn">laut</span>()  <span class="cm"># Wuff / Miau</span></div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Polymorphismus</div>
+        <div class="esel-text"><span class="esel-key">P</span>oly = viele · <span class="esel-key">M</span>orphismus = Formen. Gleicher Befehl (laut()), verschiedene Reaktion — wie „Hallo" in verschiedenen Sprachen.</div>
+      </div>
+
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Abstraktion</div>
+        <div class="def-text"><strong>Abstraktion</strong> versteckt unnötige Details und zeigt nur das Wesentliche. Abstrakte Klassen/Interfaces definieren einen <strong>Vertrag</strong> ohne Implementierung.</div>
+      </div>
+      <div class="lang ja">Java — abstrakte Klasse</div>
+      <div class="code"><span class="kw">abstract class</span> <span class="cl">Form</span> {
+    <span class="kw">abstract double</span> <span class="fn">flaeche</span>(); <span class="cm">// kein Body</span>
+    <span class="kw">void</span> <span class="fn">drucken</span>() {
+        <span class="fn">System.out.println</span>(<span class="fn">flaeche</span>());
+    }
+}
+<span class="kw">class</span> <span class="cl">Kreis</span> <span class="kw">extends</span> <span class="cl">Form</span> {
+    <span class="kw">double</span> r;
+    <span class="kw">double</span> <span class="fn">flaeche</span>() { <span class="kw">return</span> Math.PI*r*r; }
+}</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Abstraktion</div>
+        <div class="esel-text">Abstrakte Klasse = <span class="esel-key">Bauplan mit Lücken</span>. Die Unterklasse füllt die Lücken aus. Kann nicht direkt instanziiert werden!</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-amber">
+    <div class="card-head">Interface &amp; Abstrakte Klasse</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Interface (Java) / ABC (Python)</div>
+        <div class="def-text">Ein <strong>Interface</strong> definiert einen <strong>Vertrag</strong> — eine Menge von Methoden, die eine Klasse implementieren muss. Enthält keine Implementierung (nur Signaturen).</div>
+        <div class="def-note">Interface = „kann-machen"-Beziehung · Klasse implements Interface</div>
+      </div>
+      <div class="lang ja">Java — Interface</div>
+      <div class="code"><span class="kw">interface</span> <span class="cl">Fahrbar</span> {
+    <span class="kw">void</span> <span class="fn">fahren</span>(<span class="kw">int</span> km); <span class="cm">// kein Body</span>
+    <span class="kw">int</span>  <span class="fn">getTempo</span>();
+}
+
+<span class="kw">class</span> <span class="cl">Auto</span> <span class="kw">implements</span> <span class="cl">Fahrbar</span> {
+    <span class="kw">public void</span> <span class="fn">fahren</span>(<span class="kw">int</span> km) { <span class="cm">/*...*/</span> }
+    <span class="kw">public int</span> <span class="fn">getTempo</span>()    { <span class="kw">return</span> <span class="num">120</span>; }
+}
+<span class="cm">// Eine Klasse kann mehrere Interfaces</span>
+<span class="cm">// implementieren — keine Mehrfachvererbung!</span></div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Vergleich: Interface vs. Abstrakte Klasse</div>
+        <table>
+          <thead><tr><th>Kriterium</th><th>Interface</th><th>Abstrakte Klasse</th></tr></thead>
+          <tbody>
+            <tr><td>Implementierung</td><td>Keine (nur Sig.)</td><td>Teilweise möglich</td></tr>
+            <tr><td>Mehrfach</td><td>Mehrere möglich</td><td>Nur eine</td></tr>
+            <tr><td>Konstruktor</td><td>Nein</td><td>Ja</td></tr>
+            <tr><td>Attribute</td><td>Nur Konstanten</td><td>Alle Typen</td></tr>
+            <tr><td>Keyword Java</td><td>implements</td><td>extends</td></tr>
+            <tr><td>Beziehung</td><td>kann-machen</td><td>ist-ein</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Interface vs. Abstrakte Klasse</div>
+        <div class="esel-text"><span class="esel-key">Interface</span> = Steckdosenstandard — jedes Gerät das den Standard erfüllt, passt.<br><span class="esel-key">Abstrakte Klasse</span> = Halbfertiges Produkt — Unterklasse ergänzt den Rest.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">Wichtige OOP-Konzepte</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Statische Methoden &amp; Attribute</div>
+        <div class="def-text"><strong>static</strong> gehört zur Klasse, nicht zum Objekt — kein self/this nötig, existiert einmal für alle Instanzen.</div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">static int</span> anzahl = <span class="num">0</span>;    <span class="cm">// Klassenvar.</span>
+<span class="kw">static int</span> <span class="fn">getAnzahl</span>() { <span class="kw">return</span> anzahl; }</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Konstruktor-Überladen (Java)</div>
+        <div class="code"><span class="kw">class</span> <span class="cl">Punkt</span> {
+    <span class="kw">int</span> x, y;
+    <span class="kw">public</span> <span class="cl">Punkt</span>()           { x=<span class="num">0</span>; y=<span class="num">0</span>; }
+    <span class="kw">public</span> <span class="cl">Punkt</span>(<span class="kw">int</span> x,<span class="kw">int</span> y){ <span class="kw">this</span>.x=x; <span class="kw">this</span>.y=y; }
+}</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Aggregation vs. Komposition</div>
+        <div class="def-text">
+          <span class="tag tag-t">Aggregation</span> „hat-ein" · unabhängig · Motor kann ohne Auto existieren<br>
+          <span class="tag tag-o">Komposition</span> „besteht aus" · abhängig · Raum existiert nicht ohne Haus
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-gray">
+    <div class="card-head">IHK-Prüfungsfragen OOP</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Nennen Sie die vier Grundprinzipien der OOP und erläutern Sie eines.</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Klasse und Objekt?</div>
+        <div class="ihk-q">Erklären Sie Kapselung anhand eines Beispiels mit Getter und Setter.</div>
+        <div class="ihk-q">Was versteht man unter Vererbung? Geben Sie ein Beispiel (is-a).</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Überschreiben und Überladen?</div>
+        <div class="ihk-q">Wann verwendet man ein Interface, wann eine abstrakte Klasse?</div>
+        <div class="ihk-q">Was bedeutet private in Java? Was ist der Unterschied zu protected?</div>
+        <div class="ihk-q">Wozu dient super() / super().__init__() in der Vererbung?</div>
+        <div class="ihk-q">Was ist Polymorphismus? Nennen Sie ein Alltagsbeispiel.</div>
+        <div class="ihk-q">Erklären Sie den Unterschied zwischen Aggregation und Komposition.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · OOP · Blatt 2/4 · Klassen · Vererbung · Kapselung · Polymorphismus · Abstraktion · Interface</span>
+  <span>→ Blatt 3: Datenstrukturen · Stack · Queue · Listen → Blatt 4: Pseudocode &amp; Ablaufdiagramme</span>
+  <span>Python + Java · Lernfeld: Softwareentwicklung · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>

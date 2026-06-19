@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Datenstrukturen – IHK FIAE Whiteboard Blatt 3</title>
+<style>
+  @page { size: A4 landscape; margin: 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; color: #111; background: #fff; }
+
+  .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #111; padding-bottom: 5px; margin-bottom: 7px; }
+  .header-left h1 { font-size: 15px; font-weight: 700; }
+  .header-left .meta { font-size: 8px; color: #555; margin-top: 2px; }
+  .header-right { font-size: 8px; color: #777; text-align: right; }
+  .badge { display: inline-block; color: #fff; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; background: #C04828; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .card { border: 1.5px solid #222; border-radius: 5px; overflow: hidden; }
+  .card-head { padding: 4px 7px; font-weight: 700; font-size: 9px; border-bottom: 1.5px solid #222; }
+  .card-body { padding: 5px 7px; }
+
+  .acc-purple .card-head { background: #f0eeff; border-left: 4px solid #534AB7; }
+  .acc-teal   .card-head { background: #e6faf4; border-left: 4px solid #0F6E56; }
+  .acc-coral  .card-head { background: #fff0eb; border-left: 4px solid #C04828; }
+  .acc-green  .card-head { background: #edfade; border-left: 4px solid #3B6D11; }
+  .acc-blue   .card-head { background: #e8f3fb; border-left: 4px solid #185FA5; }
+  .acc-amber  .card-head { background: #fef3e0; border-left: 4px solid #854F0B; }
+  .acc-gray   .card-head { background: #f4f4f2; border-left: 4px solid #444; }
+  .acc-pink   .card-head { background: #fceaf3; border-left: 4px solid #993556; }
+
+  .def-row { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 0.75px solid #e5e5e5; }
+  .def-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .def-term { font-weight: 700; font-size: 9px; color: #111; margin-bottom: 1px; }
+  .def-text { font-size: 8.5px; color: #333; line-height: 1.55; }
+  .def-note { font-size: 8px; color: #777; font-style: italic; margin-top: 2px; }
+
+  .code { font-family: 'Courier New', monospace; font-size: 7.5px; background: #f5f5f5; border-left: 2px solid #ccc; border-radius: 3px; padding: 3px 6px; margin: 2px 0; white-space: pre; line-height: 1.65; color: #333; }
+  .lang { font-size: 7px; font-weight: 700; color: #fff; padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; display: inline-block; }
+  .py { background: #3B6D11; }
+  .ja { background: #185FA5; }
+  .kw  { color: #534AB7; font-weight: 700; }
+  .fn  { color: #0F6E56; }
+  .cm  { color: #999; }
+  .str { color: #854F0B; }
+  .num { color: #185FA5; }
+
+  .tag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid; margin-right: 2px; margin-bottom: 1px; }
+  .tag-p { background: #f0eeff; color: #3730a3; border-color: #c4b5fd; }
+  .tag-t { background: #e6faf4; color: #065f46; border-color: #6ee7b7; }
+  .tag-o { background: #fff0eb; color: #b45309; border-color: #fcd34d; }
+  .tag-b { background: #e8f3fb; color: #185FA5; border-color: #93c5fd; }
+  .tag-g { background: #f4f4f2; color: #444; border-color: #ccc; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 3px; }
+  th { background: #f4f4f2; font-weight: 700; padding: 2px 4px; border: 0.75px solid #ccc; text-align: left; }
+  td { padding: 2px 4px; border: 0.75px solid #ddd; vertical-align: top; line-height: 1.4; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .esel { background: #fffde7; border: 1.5px solid #f9a825; border-radius: 4px; padding: 4px 6px; margin: 3px 0; }
+  .esel-title { font-size: 7.5px; font-weight: 700; color: #b45309; margin-bottom: 2px; }
+  .esel-text { font-size: 8.5px; color: #333; line-height: 1.6; }
+  .esel-key { font-weight: 700; color: #b45309; }
+
+  .ihk-box { background: #f0eeff; border: 1.5px solid #534AB7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; }
+  .ihk-title { font-size: 7.5px; font-weight: 700; color: #3730a3; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+  .ihk-q { font-size: 8px; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .ihk-q::before { content: 'F: '; font-weight: 700; color: #534AB7; }
+
+  /* STACK / QUEUE VISUAL */
+  .stack-vis { display: flex; flex-direction: column-reverse; gap: 2px; align-items: center; margin: 4px 0; }
+  .stack-item { background: #f0eeff; border: 1px solid #c4b5fd; border-radius: 3px; padding: 2px 16px; font-size: 8px; font-family: 'Courier New', monospace; font-weight: 700; color: #3730a3; width: 80px; text-align: center; }
+  .stack-item.top { background: #534AB7; color: #fff; border-color: #3730a3; }
+  .queue-vis { display: flex; gap: 2px; align-items: center; margin: 4px 0; }
+  .queue-item { background: #e6faf4; border: 1px solid #6ee7b7; border-radius: 3px; padding: 2px 6px; font-size: 8px; font-family: 'Courier New', monospace; font-weight: 700; color: #065f46; text-align: center; }
+  .queue-item.front { background: #0F6E56; color: #fff; }
+
+  .footer { border-top: 1px solid #ccc; margin-top: 6px; padding-top: 3px; display: flex; justify-content: space-between; font-size: 7.5px; color: #888; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Datenstrukturen — Array · Liste · Stack · Queue · Dictionary · Baum <span class="badge">Blatt 3 / 4</span></h1>
+    <div class="meta">IHK-Prüfungsvorbereitung · FIAE · Python &amp; Java · Wann welche Struktur — Vor- &amp; Nachteile</div>
+  </div>
+  <div class="header-right">AP Teil 1 &amp; Teil 2<br>Lernfeld: Softwareentwicklung</div>
+</div>
+
+<div class="grid">
+
+<!-- ══ SPALTE 1 ══ -->
+<div class="col">
+
+  <div class="card acc-gray">
+    <div class="card-head">Array &amp; Liste — Grundlagen</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Array (Feld)</div>
+        <div class="def-text">Eine <strong>feste</strong> Sammlung von Elementen <strong>gleichen Typs</strong> mit direktem Indexzugriff. Größe wird bei der Erstellung festgelegt.</div>
+        <div class="def-note">Index beginnt bei 0 · Zugriff per arr[i] in O(1)</div>
+      </div>
+      <div class="lang ja">Java</div>
+      <div class="code"><span class="kw">int</span>[] zahlen = <span class="kw">new int</span>[<span class="num">5</span>];
+zahlen[<span class="num">0</span>] = <span class="num">10</span>;
+<span class="kw">int</span>[] vorbel = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>};
+<span class="fn">System.out.println</span>(vorbel.length); <span class="cm">// 5</span></div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Liste (dynamisches Array)</div>
+        <div class="def-text">Eine <strong>dynamische</strong> Sammlung, die wächst und schrumpft. In Python: list, in Java: ArrayList.</div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code">lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+lst.<span class="fn">append</span>(<span class="num">4</span>)      <span class="cm"># hinzufügen</span>
+lst.<span class="fn">insert</span>(<span class="num">1</span>, <span class="num">99</span>)  <span class="cm"># an Position 1</span>
+lst.<span class="fn">remove</span>(<span class="num">2</span>)      <span class="cm"># Wert 2 entfernen</span>
+lst.<span class="fn">pop</span>()          <span class="cm"># letztes entfernen</span>
+<span class="fn">len</span>(lst)           <span class="cm"># Länge</span>
+lst[<span class="num">0</span>:<span class="num">2</span>]           <span class="cm"># Slicing</span></div>
+      <div class="lang ja">Java</div>
+      <div class="code">ArrayList&lt;Integer&gt; lst = <span class="kw">new</span> ArrayList&lt;&gt;();
+lst.<span class="fn">add</span>(<span class="num">1</span>);
+lst.<span class="fn">add</span>(<span class="num">0</span>, <span class="num">99</span>);   <span class="cm">// an Index 0</span>
+lst.<span class="fn">remove</span>(<span class="num">0</span>);    <span class="cm">// Index entfernen</span>
+lst.<span class="fn">size</span>();       <span class="cm">// Länge</span>
+lst.<span class="fn">get</span>(<span class="num">1</span>);       <span class="cm">// Zugriff</span></div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Array vs. Liste</div>
+        <div class="esel-text"><span class="esel-key">Array</span> = Schubladenschrank — feste Anzahl Schubladen, direkter Griff.<br><span class="esel-key">Liste</span> = Einkaufskorb — beliebig viele Elemente rein und raus.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-teal">
+    <div class="card-head">Zugriff &amp; Komplexität Vergleich</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>Operation</th><th>Array</th><th>LinkedList</th><th>ArrayList</th></tr></thead>
+        <tbody>
+          <tr><td>Zugriff [i]</td><td>O(1)</td><td>O(n)</td><td>O(1)</td></tr>
+          <tr><td>Einfügen Ende</td><td>O(1)*</td><td>O(1)</td><td>O(1)*</td></tr>
+          <tr><td>Einfügen Mitte</td><td>O(n)</td><td>O(1)</td><td>O(n)</td></tr>
+          <tr><td>Suchen</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+          <tr><td>Löschen Mitte</td><td>O(n)</td><td>O(1)</td><td>O(n)</td></tr>
+        </tbody>
+      </table>
+      <div class="def-note" style="margin-top:3px">* amortisiert · LinkedList gut bei häufigem Einfügen/Löschen in der Mitte</div>
+      <div class="def-row" style="margin-top:5px">
+        <div class="def-term">Wann was verwenden?</div>
+        <div class="def-text">
+          <span class="tag tag-g">Array</span> Feste Größe, viele Index-Zugriffe<br>
+          <span class="tag tag-t">ArrayList</span> Variable Größe, viele Zugriffe per Index<br>
+          <span class="tag tag-b">LinkedList</span> Häufiges Einfügen/Löschen in der Mitte<br>
+          <span class="tag tag-p">Stack</span> LIFO — Rückgängig-Funktion, Rekursion<br>
+          <span class="tag tag-o">Queue</span> FIFO — Warteschlangen, Druckjobs
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 2 ══ -->
+<div class="col">
+
+  <div class="card acc-purple">
+    <div class="card-head">Stack (Stapel) — LIFO</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Ein <strong>Stack</strong> (Stapel) ist eine Datenstruktur nach dem <strong>LIFO-Prinzip</strong> (Last In, First Out) — das zuletzt hinzugefügte Element wird zuerst entnommen.</div>
+        <div class="def-note">Wann: Rückgängig-Funktion (Undo) · Rekursions-Stack · Browser-Verlauf · Klammerprüfung</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Visualisierung</div>
+        <div class="stack-vis">
+          <div class="stack-item">10</div>
+          <div class="stack-item">20</div>
+          <div class="stack-item top">30 ← TOP (push/pop hier)</div>
+        </div>
+        <div style="font-size:7.5px; color:#555; margin-top:2px; text-align:center">push(30) → auf Stapel · pop() → 30 entnehmen</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Operationen</div>
+        <div class="def-text">
+          <span class="tag tag-p">push(x)</span> Element oben drauflegen · O(1)<br>
+          <span class="tag tag-p">pop()</span> Oberstes Element entnehmen · O(1)<br>
+          <span class="tag tag-p">peek()</span> Oberstes Element ansehen (nicht entnehmen)<br>
+          <span class="tag tag-p">isEmpty()</span> Prüfen ob leer
+        </div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code">stack = []
+stack.<span class="fn">append</span>(<span class="num">10</span>)   <span class="cm"># push</span>
+stack.<span class="fn">append</span>(<span class="num">20</span>)
+top = stack.<span class="fn">pop</span>()  <span class="cm"># pop → 20</span>
+peek = stack[-<span class="num">1</span>]   <span class="cm"># peek → 10</span>
+leer = <span class="fn">len</span>(stack) == <span class="num">0</span></div>
+      <div class="lang ja">Java</div>
+      <div class="code">Stack&lt;Integer&gt; s = <span class="kw">new</span> Stack&lt;&gt;();
+s.<span class="fn">push</span>(<span class="num">10</span>);
+s.<span class="fn">push</span>(<span class="num">20</span>);
+<span class="kw">int</span> top = s.<span class="fn">pop</span>();   <span class="cm">// 20</span>
+<span class="kw">int</span> peek = s.<span class="fn">peek</span>(); <span class="cm">// 10</span>
+<span class="kw">boolean</span> leer = s.<span class="fn">isEmpty</span>();</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Stack LIFO</div>
+        <div class="esel-text"><span class="esel-key">LIFO</span> = <span class="esel-key">L</span>etzter <span class="esel-key">I</span>n, <span class="esel-key">F</span>irst <span class="esel-key">O</span>ut — wie ein <span class="esel-key">Tellerstapel</span>: letzter drauf = erster runter.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-coral">
+    <div class="card-head">Queue (Warteschlange) — FIFO</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Eine <strong>Queue</strong> (Warteschlange) folgt dem <strong>FIFO-Prinzip</strong> (First In, First Out) — das zuerst hinzugefügte Element wird zuerst entnommen.</div>
+        <div class="def-note">Wann: Druckerwarteschlange · Aufgabenplanung · Breitensuche (BFS) · Netzwerkpakete</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Visualisierung</div>
+        <div class="queue-vis">
+          <div style="font-size:7.5px;color:#555">dequeue→</div>
+          <div class="queue-item front">10</div>
+          <div class="queue-item">20</div>
+          <div class="queue-item">30</div>
+          <div style="font-size:7.5px;color:#555">←enqueue</div>
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Operationen</div>
+        <div class="def-text">
+          <span class="tag tag-t">enqueue(x)</span> Element hinten anhängen · O(1)<br>
+          <span class="tag tag-t">dequeue()</span> Vorderstes Element entnehmen · O(1)<br>
+          <span class="tag tag-t">peek()</span> Vorderstes ansehen<br>
+          <span class="tag tag-t">isEmpty()</span> Prüfen ob leer
+        </div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code"><span class="kw">from</span> collections <span class="kw">import</span> deque
+q = <span class="fn">deque</span>()
+q.<span class="fn">append</span>(<span class="num">10</span>)     <span class="cm"># enqueue</span>
+q.<span class="fn">append</span>(<span class="num">20</span>)
+first = q.<span class="fn">popleft</span>() <span class="cm"># dequeue → 10</span></div>
+      <div class="lang ja">Java</div>
+      <div class="code">Queue&lt;Integer&gt; q = <span class="kw">new</span> LinkedList&lt;&gt;();
+q.<span class="fn">offer</span>(<span class="num">10</span>);          <span class="cm">// enqueue</span>
+q.<span class="fn">offer</span>(<span class="num">20</span>);
+<span class="kw">int</span> f = q.<span class="fn">poll</span>();    <span class="cm">// dequeue → 10</span>
+<span class="kw">int</span> p = q.<span class="fn">peek</span>();    <span class="cm">// ansehen → 20</span></div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Queue FIFO</div>
+        <div class="esel-text"><span class="esel-key">FIFO</span> = <span class="esel-key">F</span>irst <span class="esel-key">I</span>n, <span class="esel-key">F</span>irst <span class="esel-key">O</span>ut — wie eine <span class="esel-key">Supermarktkasse</span>: wer zuerst ansteht, zahlt zuerst.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 3 ══ -->
+<div class="col">
+
+  <div class="card acc-blue">
+    <div class="card-head">Dictionary / HashMap (Schlüssel-Wert)</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Definition</div>
+        <div class="def-text">Ein <strong>Dictionary</strong> (Python) / <strong>HashMap</strong> (Java) speichert Daten als <strong>Schlüssel-Wert-Paare</strong>. Der Zugriff erfolgt über den Schlüssel in O(1) — nicht über einen Index.</div>
+        <div class="def-note">Wann: schnelle Suche nach Schlüssel · Lookup-Tabellen · Zählen von Häufigkeiten</div>
+      </div>
+      <div class="lang py">Python</div>
+      <div class="code">person = {
+    <span class="str">"name"</span>: <span class="str">"Max"</span>,
+    <span class="str">"alter"</span>: <span class="num">25</span>,
+    <span class="str">"stadt"</span>: <span class="str">"Berlin"</span>
+}
+person[<span class="str">"email"</span>] = <span class="str">"max@mail.de"</span>  <span class="cm"># add</span>
+<span class="kw">del</span> person[<span class="str">"stadt"</span>]              <span class="cm"># delete</span>
+<span class="str">"name"</span> <span class="kw">in</span> person                 <span class="cm"># exists?</span>
+<span class="kw">for</span> k, v <span class="kw">in</span> person.<span class="fn">items</span>():      <span class="cm"># iterate</span>
+    <span class="fn">print</span>(k, v)</div>
+      <div class="lang ja">Java</div>
+      <div class="code">HashMap&lt;String,Integer&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
+map.<span class="fn">put</span>(<span class="str">"Max"</span>, <span class="num">25</span>);
+map.<span class="fn">get</span>(<span class="str">"Max"</span>);          <span class="cm">// → 25</span>
+map.<span class="fn">remove</span>(<span class="str">"Max"</span>);
+map.<span class="fn">containsKey</span>(<span class="str">"Max"</span>); <span class="cm">// exists?</span>
+<span class="kw">for</span> (String k : map.<span class="fn">keySet</span>())
+    <span class="fn">System.out.println</span>(k + map.<span class="fn">get</span>(k));</div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Dictionary</div>
+        <div class="esel-text"><span class="esel-key">Dict</span> = Wörterbuch — du kennst das Wort (<span class="esel-key">Key</span>), schlägst nach und findest die Bedeutung (<span class="esel-key">Value</span>). Kein Blättern nötig — direkt!</div>
+      </div>
+      <div class="def-row" style="margin-top:4px">
+        <div class="def-term">Set (Menge)</div>
+        <div class="def-text">Speichert <strong>eindeutige</strong> Elemente ohne Reihenfolge. Perfekt zum Entfernen von Duplikaten und Mengenoperationen.</div>
+        <div class="lang py">Python</div>
+        <div class="code">s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.<span class="fn">add</span>(<span class="num">4</span>)
+s.<span class="fn">discard</span>(<span class="num">2</span>)
+a & b   <span class="cm"># Schnittmenge</span>
+a | b   <span class="cm"># Vereinigung</span>
+a - b   <span class="cm"># Differenz</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-green">
+    <div class="card-head">Baum &amp; Rekursion</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Binärbaum</div>
+        <div class="def-text">Ein <strong>Baum</strong> besteht aus <strong>Knoten</strong>, die über <strong>Kanten</strong> verbunden sind. Jeder Knoten hat max. einen Elternknoten. Ein <strong>Binärbaum</strong> hat max. 2 Kindknoten pro Knoten.</div>
+        <div class="def-text" style="font-family:'Courier New',monospace; font-size:8px; line-height:1.7; margin-top:3px; background:#f5f5f5; padding:3px 5px; border-radius:3px">
+             5 ← Wurzel<br>
+            / \<br>
+           3   8<br>
+          / \   \<br>
+         1   4   9
+        </div>
+        <div class="def-note">Wann: Suchbäume (BST) · Heap · Dateisystem · Ausdrucksbaum</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Rekursion</div>
+        <div class="def-text"><strong>Rekursion</strong> = eine Funktion ruft sich selbst auf. Benötigt immer einen <strong>Basisfall</strong> (Abbruchbedingung) und einen <strong>Rekursionsfall</strong>.</div>
+      </div>
+      <div class="lang py">Python — Fakultät rekursiv</div>
+      <div class="code"><span class="kw">def</span> <span class="fn">fakultaet</span>(n):
+    <span class="kw">if</span> n <= <span class="num">1</span>:            <span class="cm"># Basisfall</span>
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">return</span> n * <span class="fn">fakultaet</span>(n-<span class="num">1</span>)  <span class="cm"># Rekursion</span>
+
+<span class="cm"># Trace: fakultaet(4)</span>
+<span class="cm"># 4 * fak(3) → 4 * 3 * fak(2)</span>
+<span class="cm"># → 4 * 3 * 2 * fak(1) → 24</span></div>
+      <div class="esel">
+        <div class="esel-title">Eselsbrücke: Rekursion</div>
+        <div class="esel-text"><span class="esel-key">Rekursion</span> = Matrjoschka-Puppe — öffne Puppe, drin ist wieder eine Puppe... bis zur kleinsten (<span class="esel-key">Basisfall</span>).</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SPALTE 4 ══ -->
+<div class="col">
+
+  <div class="card acc-amber">
+    <div class="card-head">Wichtige Programmierkonzepte</div>
+    <div class="card-body">
+      <div class="def-row">
+        <div class="def-term">Variablen &amp; Datentypen</div>
+        <div class="def-text">
+          <span class="tag tag-p">int</span> Ganzzahl · <span class="tag tag-t">float</span> Kommazahl<br>
+          <span class="tag tag-b">str</span> Text · <span class="tag tag-o">bool</span> True/False<br>
+          <span class="tag tag-g">None / null</span> kein Wert
+        </div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Kontrollstrukturen</div>
+        <div class="lang py">Python</div>
+        <div class="code"><span class="cm"># Bedingung</span>
+<span class="kw">if</span> x > <span class="num">0</span>:    <span class="fn">print</span>(<span class="str">"positiv"</span>)
+<span class="kw">elif</span> x == <span class="num">0</span>: <span class="fn">print</span>(<span class="str">"null"</span>)
+<span class="kw">else</span>:         <span class="fn">print</span>(<span class="str">"negativ"</span>)
+
+<span class="cm"># Schleifen</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>): <span class="fn">print</span>(i)
+<span class="kw">while</span> x > <span class="num">0</span>: x -= <span class="num">1</span>
+
+<span class="cm"># break = Schleife abbrechen</span>
+<span class="cm"># continue = nächste Iteration</span></div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Funktionen / Methoden</div>
+        <div class="lang py">Python</div>
+        <div class="code"><span class="kw">def</span> <span class="fn">addiere</span>(a, b=<span class="num">0</span>):  <span class="cm"># Default-Param</span>
+    <span class="str">"""Docstring: gibt a+b zurück"""</span>
+    <span class="kw">return</span> a + b
+
+ergebnis = <span class="fn">addiere</span>(<span class="num">3</span>, <span class="num">4</span>)  <span class="cm"># → 7</span></div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">public static int</span> <span class="fn">addiere</span>(<span class="kw">int</span> a, <span class="kw">int</span> b){
+    <span class="kw">return</span> a + b;
+}</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Fehlerbehandlung (Exception Handling)</div>
+        <div class="lang py">Python</div>
+        <div class="code"><span class="kw">try</span>:
+    x = <span class="kw">int</span>(<span class="fn">input</span>(<span class="str">"Zahl: "</span>))
+    ergebnis = <span class="num">10</span> / x
+<span class="kw">except</span> ZeroDivisionError:
+    <span class="fn">print</span>(<span class="str">"Nicht durch 0 teilen!"</span>)
+<span class="kw">except</span> ValueError:
+    <span class="fn">print</span>(<span class="str">"Keine gültige Zahl!"</span>)
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="str">"Immer ausgeführt"</span>)</div>
+        <div class="lang ja">Java</div>
+        <div class="code"><span class="kw">try</span> {
+    <span class="kw">int</span> x = Integer.<span class="fn">parseInt</span>(<span class="str">"abc"</span>);
+} <span class="kw">catch</span> (NumberFormatException e) {
+    <span class="fn">System.out.println</span>(e.<span class="fn">getMessage</span>());
+} <span class="kw">finally</span> {
+    <span class="fn">System.out.println</span>(<span class="str">"Fertig"</span>);
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card acc-pink">
+    <div class="card-head">IHK-Prüfungsfragen Datenstrukturen</div>
+    <div class="card-body">
+      <div class="ihk-box">
+        <div class="ihk-title">Typische AP-Aufgaben</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen Stack und Queue? Nennen Sie je ein Anwendungsbeispiel.</div>
+        <div class="ihk-q">Erklären Sie das LIFO- und das FIFO-Prinzip.</div>
+        <div class="ihk-q">Welche Operationen hat ein Stack? Was macht push() und pop()?</div>
+        <div class="ihk-q">Wann würden Sie eine LinkedList statt einer ArrayList verwenden?</div>
+        <div class="ihk-q">Was ist Rekursion? Welche zwei Bestandteile muss eine rekursive Funktion haben?</div>
+        <div class="ihk-q">Schreiben Sie eine Funktion, die die Summe einer Liste rekursiv berechnet.</div>
+        <div class="ihk-q">Was ist ein Dictionary/HashMap? Wie greift man auf Elemente zu?</div>
+        <div class="ihk-q">Erklären Sie den Unterschied zwischen Array und ArrayList in Java.</div>
+        <div class="ihk-q">Was ist eine Exception? Wozu dient try-catch-finally?</div>
+        <div class="ihk-q">Was ist der Unterschied zwischen break und continue in einer Schleife?</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  <span>IHK FIAE · Datenstrukturen · Blatt 3/4 · Array · Liste · Stack (LIFO) · Queue (FIFO) · Dictionary · Rekursion</span>
+  <span>→ Blatt 4: Pseudocode · Struktogramm · PAP · Ablaufdiagramme</span>
+  <span>Python + Java · Lernfeld: Softwareentwicklung · AP Teil 1 &amp; Teil 2</span>
+</div>
+</body>
+</html>
